@@ -1,4 +1,4 @@
-INCLUDES = -I../../../../../tufsbox/cdkroot/usr/include -I../../../../../cvs/driver/bpamem
+AM_CFLAGS = -I../../../../../tufsbox/cdkroot/usr/include -I../../../../../cvs/driver/bpamem
 
 grab_SOURCES = main.c
 
