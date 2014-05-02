@@ -1,6 +1,6 @@
 #!/bin/sh
 
-package="tuxbox-apps-misc-tools"
+package="tuxbox-apps-tools"
 
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.

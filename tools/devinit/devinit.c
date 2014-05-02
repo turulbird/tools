@@ -1,4 +1,4 @@
-/*  $Id: devinit.c,v 1.1 2005/12/13 22:23:56 carjay Exp $
+/*  $Id: devinit.c,v 1.2 2012/04/13 12:15:01 rhabarber1848 Exp $
 
 	Helper app to populate the initial /dev directory with the required
 	devices when they don't exist yet
@@ -77,8 +77,8 @@ int main(int argc, char **argv, char **envp)
 			if (fh){ /* descriptor 0 is already open?!? */
 				close(fh);
 			} else { /* create stdout/stderr for init */
-				dup(0); /* 1 */
-				dup(0); /* 2 */
+				(void)dup(0); /* 1 */
+				(void)dup(0); /* 2 */
 			}
 		}
 		
