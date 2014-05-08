@@ -34,14 +34,33 @@ Feel free to use the code for your own projects. See LICENSE file for details.
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
+#include <sys/time.h>
 #include <sys/mman.h>
 #include <linux/types.h>
 #include <linux/fb.h>
-
 #include <bpamem.h>
 
 #include "png.h"
 #include "jpeglib.h"
+
+#define CLAMP(x)    ((x < 0) ? 0 : ((x > 255) ? 255 : x))
+#define SWAP(x,y)	{ x ^= y; y ^= x; x ^= y; }
+
+#define RED565(x)    ((((x) >> (11 )) & 0x1f) << 3)
+#define GREEN565(x)  ((((x) >> (5 )) & 0x3f) << 2)
+#define BLUE565(x)   ((((x) >> (0)) & 0x1f) << 3)
+
+#define YFB(x)    ((((x) >> (10)) & 0x3f) << 2)
+#define CBFB(x)  ((((x) >> (6)) & 0xf) << 4)
+#define CRFB(x)   ((((x) >> (2)) & 0xf) << 4)
+#define BFFB(x)   ((((x) >> (0)) & 0x3) << 6)
+
+#define VIDEO_DEV "/dev/video"
+
+// dont change SPARE_RAM and DMA_BLOCKSIZE until you really know what you are doing !!!
+#define SPARE_RAM 252*1024*1024 // the last 4 MB is enough...
+#define DMA_BLOCKSIZE 0x3FF000 // should be big enough to hold a complete YUV 1920x1080 HD picture, otherwise it will not work properly on DM8000
+
 
 #define OUT(x) \
 	out[OUTITER]=(unsigned char)*(decode_surface + x)&0xFF; \
@@ -78,23 +97,28 @@ Feel free to use the code for your own projects. See LICENSE file for details.
 #define OUT_CH_8(x,l,b) \
 	OUT_CH_8A(x + (l/4) * 0x10 + (l%2) * 0x40 + ((l/2)%2?0x00:0x08) + (b?0x04:0x00));
 
-#define CLAMP(x)    ((x < 0) ? 0 : ((x > 255) ? 255 : x))
-#define SWAP(x,y)	{ x ^= y; y ^= x; x ^= y; }
+int timeval_subtract (struct timeval *result, struct timeval *x, struct timeval *y)
+{
+	/* Perform the carry for the later subtraction by updating y. */
+	if (x->tv_usec < y->tv_usec) {
+		int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;
+		y->tv_usec -= 1000000 * nsec;
+		y->tv_sec += nsec;
+	}
+	if (x->tv_usec - y->tv_usec > 1000000) {
+		int nsec = (x->tv_usec - y->tv_usec) / 1000000;
+		y->tv_usec += 1000000 * nsec;
+		y->tv_sec -= nsec;
+	}
 
-#define RED565(x)    ((((x) >> (11 )) & 0x1f) << 3)
-#define GREEN565(x)  ((((x) >> (5 )) & 0x3f) << 2)
-#define BLUE565(x)   ((((x) >> (0)) & 0x1f) << 3)
+	/* Compute the time remaining to wait.
+	  tv_usec is certainly positive. */
+	result->tv_sec = x->tv_sec - y->tv_sec;
+	result->tv_usec = x->tv_usec - y->tv_usec;
 
-#define YFB(x)    ((((x) >> (10)) & 0x3f) << 2)
-#define CBFB(x)  ((((x) >> (6)) & 0xf) << 4)
-#define CRFB(x)   ((((x) >> (2)) & 0xf) << 4)
-#define BFFB(x)   ((((x) >> (0)) & 0x3) << 6)
-
-#define VIDEO_DEV "/dev/video"
-
-// dont change SPARE_RAM and DMA_BLOCKSIZE until you really know what you are doing !!!
-#define SPARE_RAM 252*1024*1024 // the last 4 MB is enough...
-#define DMA_BLOCKSIZE 0x3FF000 // should be big enough to hold a complete YUV 1920x1080 HD picture, otherwise it will not work properly on DM8000
+	/* Return 1 if result is negative. */
+	return x->tv_sec < y->tv_sec;
+}
 
 // static lookup tables for faster yuv2rgb conversion
 static const int yuv2rgbtable_y[256] = {
@@ -648,11 +672,11 @@ int main(int argc, char **argv)
 	{
 		// write png
 		png_bytep *row_pointers;
-//		png_structp png_ptr;
-//		png_infop info_ptr;
+		png_structp png_ptr;
+		png_infop info_ptr;
 
-		png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp) NULL, (png_error_ptr) NULL, (png_error_ptr) NULL);
-		png_infop info_ptr = png_create_info_struct(png_ptr);
+		png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL, (png_error_ptr)NULL, (png_error_ptr)NULL);
+		info_ptr = png_create_info_struct(png_ptr);
 		png_init_io(png_ptr, fd2);
 
 		row_pointers=(png_bytep*)malloc(sizeof(png_bytep)*yres);
@@ -662,7 +686,6 @@ int main(int argc, char **argv)
 			row_pointers[y] = output + (y * xres * output_bytes);
 
 		png_set_bgr(png_ptr);
-		png_set_filter(png_ptr, 0, PNG_FILTER_NONE);
 		png_set_IHDR(png_ptr, info_ptr, xres, yres, 8, ((output_bytes<4)?PNG_COLOR_TYPE_RGB:PNG_COLOR_TYPE_RGBA) , PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 		png_write_info(png_ptr, info_ptr);
 		png_write_image(png_ptr, row_pointers);
@@ -1082,8 +1105,15 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 
 		luma   = (unsigned char *)malloc(stride * res);
 		chroma = (unsigned char *)malloc(stride * res / 2);
+		char *temp = (unsigned char *)malloc(4 * 1024 * 1024);
+		if( NULL == temp )  {
+			printf("can not allocate memory\n");
+			return;
+		}
 
 		memset(chroma, 0x80, stride * res / 2);
+		memset(luma, 0x00, stride * res); /* just to invalidate the page */
+		memset(temp, 0x00, 4 * 1024 * 1024); /* just to invalidate the page */
 
 		fd_bpa = open("/dev/bpamem0", O_RDWR);
 
@@ -1146,9 +1176,9 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 			return;
 		}
 
-		decode_surface = (char *)mmap(0, bpa_data.mem_size, PROT_WRITE|PROT_READ, MAP_SHARED, fd_bpa, 0);
+		char *decode_map = (char *)mmap(0, bpa_data.mem_size, PROT_WRITE|PROT_READ, MAP_SHARED, fd_bpa, 0);
 
-		if (decode_surface == MAP_FAILED) 
+		if(decode_map == MAP_FAILED)
 		{
 			fprintf(stderr, "could not map bpa mem");
 			close(fd_bpa);
@@ -1172,14 +1202,28 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 		OUTINC        = 1; /*no spaces between pixel*/
 		out           = luma;
 
-		unsigned char old_frame[0x800]; /*first 2 luma blocks, 0:0 - 32:64*/
-		memcpy(old_frame, decode_surface, 0x800);
-		for (delay = 0; delay < 500 /*ms*/; ++delay)
+		struct timeval start_tv;
+		struct timeval stop_tv;
+		struct timeval result_tv;
+
+		//wait_for_frame_sync
 		{
-			if (memcmp(decode_surface, old_frame, 0x800) != 0)
-				break;
-			usleep(100);
+			unsigned char old_frame[0x800]; /*first 2 luma blocks, 0:0 - 32:64*/
+			memcpy(old_frame, decode_map, 0x800);
+			gettimeofday(&start_tv, NULL);
+			memcmp(decode_map, old_frame, 0x800);
+			gettimeofday(&stop_tv, NULL);
+			for(delay = 0; delay < 500/*ms*/; delay++)
+			{
+				if (memcmp(decode_map, old_frame, 0x800) != 0)
+					break;
+				usleep(100);
+			}
 		}
+		//gettimeofday(&start_tv, NULL);
+		memcpy(temp,decode_map,4*1024*1024);
+		//gettimeofday(&stop_tv, NULL);
+		decode_surface = temp;
 
 		//now we have 16,6ms(60hz) to 50ms(20hz) to get the whole picture
 		for (even = 0; even < 2; ++even)
@@ -1191,8 +1235,8 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 			{
 				for (ixblock = 0; ixblock < xblock; ++ixblock)
 				{
-					int line; 
-					
+					int line;
+
 					OUTITER = OUTITERoffset;
 					for (line = 0; line < 16; ++line)
 					{
@@ -1211,13 +1255,13 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 		layer_offset = ((stride*res + (yblockoffset >> 1 /* /2*/ /*round up*/)) / yblockoffset) * yblockoffset;
 
 		//cb
-		//we do not have to round that every chroma y res will be a multiple of 16 
+		//we do not have to round that every chroma y res will be a multiple of 16
 		//and every chroma x res /2 will be a multiple of 8
 		yblock = res >> 4 /* /16*/; //45
 		xblock = stride_half >> 3 /* /8*/; //no roundin
 
-		//if xblock is not even than we will have to move to the next even value an 
-		yblockoffset = (((xblock + 1) >> 1 /* / 2*/) << 1 /* * 2*/ ) << 8 /* * 64=8x8px * 2=2 block rows * 2=cr cb*/; 
+		//if xblock is not even than we will have to move to the next even value an
+		yblockoffset = (((xblock + 1) >> 1 /* / 2*/) << 1 /* * 2*/ ) << 8 /* * 64=8x8px * 2=2 block rows * 2=cr cb*/;
 
 		//printf("yblock: %u xblock:%u yblockoffset:0x%x\n", yblock, xblock, yblockoffset);
 
@@ -1237,9 +1281,9 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 				{
 					for (ixblock = 0; ixblock < xblock; ++ixblock)
 					{
-						int line; 
+						int line;
 						OUTITER = OUTITERoffset;
-						
+
 						for (line = 0; line < 8; ++line)
 						{
 							OUT_CH_8(offset, line, !cr);
@@ -1254,11 +1298,12 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 				}
 			}
 		}
+		timeval_subtract(&result_tv,&stop_tv,&start_tv);
 
 		if (!quiet)
 			fprintf(stderr, "framesync after %dms\n", delay);
 
-		munmap(decode_surface, bpa_data.mem_size);
+		munmap(decode_map, bpa_data.mem_size);
 
 		ioctlres = ioctl(fd_bpa, BPAMEMIO_UNMAPMEM); // request memory from bpamem
 		if (ioctlres)
