@@ -220,8 +220,8 @@ static int setTimer(Context_t* context, time_t* theGMTTime)
        /* nothing to do for e2 */  
 //       fprintf(stderr, "no e2 timer found clearing fp wakeup time ... good bye ...\n");
 //       vData.u.standby.time[0] = '\0';
-	fprintf(stderr, "no timer found ... good bye ...\n");
-	setNuvotonTime(wakeupTime, vData.u.standby.time);
+       fprintf(stderr, "no timer found ... good bye ...\n");
+       setNuvotonTime(wakeupTime, vData.u.standby.time);
        if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
        {
 	  perror("standby: ");

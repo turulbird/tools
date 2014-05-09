@@ -248,7 +248,7 @@ static char* Codec2Encoding(AVCodecContext *codec, int* version)
     case AV_CODEC_ID_MP3:
         return "A_MP3";
     case AV_CODEC_ID_AAC:
-        return "A_AAC";
+        return "A_IPCM";
     case AV_CODEC_ID_AC3:
         return "A_AC3";
     case AV_CODEC_ID_DTS:
@@ -269,7 +269,7 @@ static char* Codec2Encoding(AVCodecContext *codec, int* version)
     case AV_CODEC_ID_FLAC:
         return "A_IPCM";
     case AV_CODEC_ID_PCM_S16LE:
-	return "A_PCM";
+	return "A_IPCM";
 /* subtitle */
     case AV_CODEC_ID_SSA:
         return "S_TEXT/ASS"; /* Hellmaster1024: seems to be ASS instead of SSA */

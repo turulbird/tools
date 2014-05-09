@@ -385,7 +385,7 @@ int getModel()
             vBoxType = CNBox;
         else if(!strncasecmp(vName,"hs5101", 6))
             vBoxType = Hs5101;
-        else if(!strncasecmp(vName,"adb_box", 7))
+        else if((!strncasecmp(vName,"adb_box", 7)) || (!strncasecmp(vName,"sagemcom88", 10)) || (!strncasecmp(vName,"esi_88", 6)) || (!strncasecmp(vName,"esi88", 5)))
             vBoxType = Adb_Box;
         else if((!strncasecmp(vName,"ipbox9900", 9)) || (!strncasecmp(vName,"ipbox99", 7)) || (!strncasecmp(vName,"ipbox55", 7)))
             vBoxType = Ipbox;

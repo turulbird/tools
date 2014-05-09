@@ -117,8 +117,8 @@ static unsigned char isContainerRunning = 0;
 static ASS_Library *ass_library;
 static ASS_Renderer *ass_renderer;
 
-static float ass_font_scale = 1.0;
-static float ass_line_spacing = 1.0;
+static float ass_font_scale = 0.9;
+static float ass_line_spacing = 0.9;
 
 static unsigned int screen_width     = 0;
 static unsigned int screen_height    = 0;
