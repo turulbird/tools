@@ -25,6 +25,7 @@ config.status
 config.guess
 config.sub
 ltmain.sh
+config.h.in
 compile
 configure
 install-sh
@@ -36,6 +37,7 @@ depcomp
 libstb-hal*
 neutrino-*
 enigma2*
+libs/libstgles/libltdl/
 tools/acinclude.m4
 tools/aio-grab/grab
 tools/devinit/devinit
