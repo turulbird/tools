@@ -53,7 +53,7 @@ int showiframe(char * path, bool progress) {
         struct stat s;
         fstat(f, &s);
 
-        m_video_clip_fd = open("/dev/dvb/adapter0/video0", O_WRONLY|O_NONBLOCK);
+        m_video_clip_fd = open("/dev/dvb/adapter0/video0", O_WRONLY);
         if (ioctl(m_video_clip_fd, VIDEO_SET_FORMAT, VIDEO_FORMAT_16_9) < 0)
             printf("VIDEO_SET_FORMAT failed (%m)\n");
             
@@ -108,7 +108,7 @@ int showiframe(char * path, bool progress) {
  * Under some circumstance this is enough time for e2 to try to open the video device itself.
  */
                     progress_ch[3] = '\0';
-                    if (atoi(progress_ch) >= 95) 
+                    if (atoi(progress_ch) >= 98) 
                         end = true;
 
                 }
