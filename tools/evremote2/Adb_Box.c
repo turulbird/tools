@@ -39,77 +39,87 @@
 #include "remotes.h"
 #include "Adb_Box.h"
 
+#define REPEATDELAY 300 // ms
+
 #define ADB_BOX_LONGKEY
 
 #ifdef ADB_BOX_LONGKEY
 static tLongKeyPressSupport cLongKeyPressSupport = {
 //  140, 100,
-    250, 45,
+//    250, 45 - b4t
+    REPEATDELAY, 45
 };
 #endif
 
+static long diffMilli(struct timeval from, struct timeval to)
+{
+  struct timeval diff;
+  timeval_subtract(&diff, &to, &from);
+  return (long)(diff.tv_sec*1000 + diff.tv_usec/1000);
+}
+
 //extern int KeyPressDown;
 
-/* B4Team ADB_BOX RCU */
-static tButton cButtonsADB_BOX[] = {
+/* ADB_BOX RAW mode RCU '000000000000003b' */
+static tButton cButtonsADB_BOX_RAW[] = {
 
-    {"POWER"          	, "01", KEY_POWER},
-    {"VOD"            	, "02", KEY_AUX},
-    {"N.Button"       	, "03", KEY_V},
+    {"KEY_POWER"        , "01", KEY_POWER},
+    {"KEY_MEDIA"        , "02", KEY_AUX}, //VOD
+    {"KEY_GOTO"       	, "03", KEY_V}, //N.Button
 
-    {"EPG"            	, "04", KEY_EPG},
-    {"HOME"           	, "05", KEY_BACK}, //HOME
-    {"BACK"           	, "06", KEY_HOME}, //BACK
-    {"INFO"           	, "07", KEY_INFO}, //THIS IS WRONG SHOULD BE KEY_INFO
+    {"KEY_EPG"		, "04", KEY_EPG},
+    {"KEY_PVR"		, "05", KEY_BACK}, //HOME
+    {"KEY_HOME"		, "06", KEY_HOME}, //BACK
+    {"KEY_HELP"           	, "07", KEY_INFO}, 
 
-    {"OPT"            	, "08", KEY_MENU},
+    {"KEY_OPTION"	, "08", KEY_MENU},  //OPT
 
-    {"VOLUMEUP"		, "09", KEY_VOLUMEUP},
-    {"VOLUMEDOWN"	, "0a", KEY_VOLUMEDOWN},
-    {"CHANNELUP"	, "0b", KEY_PAGEUP},
-    {"CHANNELDOWN"	, "0c", KEY_PAGEDOWN},
+    {"KEY_VOLUMEUP"	, "09", KEY_VOLUMEUP},
+    {"KEY_VOLUMEDOWN"	, "0a", KEY_VOLUMEDOWN},
+    {"KEY_PAGEUP"	, "0b", KEY_PAGEUP},
+    {"KEY_PAGEDOWN"	, "0c", KEY_PAGEDOWN},
 
-    {"OK"             	, "0d", KEY_OK},
+    {"KEY_OK"		, "0d", KEY_OK},
 
-    {"UP"          	, "0e", KEY_UP},
-    {"DOWN"        	, "0f", KEY_DOWN},
-    {"LEFT"       	, "10", KEY_LEFT},
-    {"RIGHT"       	, "11", KEY_RIGHT},
+    {"KEY_UP"		, "0e", KEY_UP},
+    {"KEY_DOWN"        	, "0f", KEY_DOWN},
+    {"KEY_LEFT"       	, "10", KEY_LEFT},
+    {"KEY_RIGHT"       	, "11", KEY_RIGHT},
  
-    {"STOP"           	, "12", KEY_STOP},
-    {"REWIND"         	, "13", KEY_REWIND},
-    {"FASTFORWARD"    	, "14", KEY_FASTFORWARD},
-    {"PLAY"           	, "15", KEY_PLAY},
-    {"PAUSE"          	, "16", KEY_PAUSE},
-    {"RECORD"         	, "17", KEY_RECORD},
+    {"KEY_STOP"		, "12", KEY_STOP},
+    {"KEY_REWIND"	, "13", KEY_REWIND},
+    {"KEY_FASTFORWARD"	, "14", KEY_FASTFORWARD},
+    {"KEY_PLAY"		, "15", KEY_PLAY},
+    {"KEY_PAUSE"	, "16", KEY_PAUSE},
+    {"KEY_RECORD"	, "17", KEY_RECORD},
 
-    {"MUTE"           	, "18", KEY_MUTE},
+    {"KEY_MUTE"		, "18", KEY_MUTE},
 
-    {"TV/RADIO/@"     	, "19", KEY_TV2}, //WE USE TV2 AS TV/RADIO SWITCH BUTTON
-    {"TEXT"           	, "1a", KEY_TEXT},
-    {"LIST"           	, "1b", KEY_FAVORITES},
+    {"KEY_MODE"		, "19", KEY_TV2}, //TV/RADIO
+    {"KEY_TEXT"		, "1a", KEY_TEXT},
+    {"KEY_LIST"		, "1b", KEY_FAVORITES},
 
-    {"RED"            	, "1c", KEY_RED},
-    {"GREEN"          	, "1d", KEY_GREEN},
-    {"YELLOW"         	, "1e", KEY_YELLOW},
-    {"BLUE"           	, "1f", KEY_BLUE},
+    {"KEY_RED"		, "1c", KEY_RED},
+    {"KEY_GREEN"	, "1d", KEY_GREEN},
+    {"KEY_YELLOW"	, "1e", KEY_YELLOW},
+    {"KEY_BLUE"		, "1f", KEY_BLUE},
 
-    {"1BUTTON"        	, "20", KEY_1},
-    {"2BUTTON"        	, "21", KEY_2},
-    {"3BUTTON"        	, "22", KEY_3},
-    {"4BUTTON"        	, "23", KEY_4},
-    {"5BUTTON"        	, "24", KEY_5},
-    {"6BUTTON"        	, "25", KEY_6},
-    {"7BUTTON"        	, "26", KEY_7},
-    {"8BUTTON"        	, "27", KEY_8},
-    {"9BUTTON"        	, "28", KEY_9},
-    {"0BUTTON"        	, "29", KEY_0},
+    {"KEY_1"        	, "20", KEY_1},
+    {"KEY_2"        	, "21", KEY_2},
+    {"KEY_3"        	, "22", KEY_3},
+    {"KEY_4"        	, "23", KEY_4},
+    {"KEY_5"        	, "24", KEY_5},
+    {"KEY_6"        	, "25", KEY_6},
+    {"KEY_7"        	, "26", KEY_7},
+    {"KEY_8"        	, "27", KEY_8},
+    {"KEY_9"        	, "28", KEY_9},
+    {"KEY_0"        	, "29", KEY_0},
 
-    {"AUDIO/SETUP"    	, "2a", KEY_AUDIO},
+    {"KEY_MENU"    	, "2a", KEY_AUDIO}, //AUDIO/SETUP
 
-    {"TIMER/APP"      	, "2b", KEY_TIME},
+    {"KEY_PROGRAM"	, "2b", KEY_TIME}, //TIMER/APP
 
-    {"STAR"         	, "2c", KEY_HELP},
+    {"KEY_SUBTITLE"	, "2c", KEY_HELP}, //STAR
 
 //------long
 
@@ -124,17 +134,17 @@ static tButton cButtonsADB_BOX[] = {
 
     {"OPT"            	, "48", KEY_MENU},
 
-    {"VOLUMEUP"		, "49", KEY_VOLUMEUP},
-    {"VOLUMEDOWN"	, "4a", KEY_VOLUMEDOWN},
+    {"KEY_VOLUMEUP_LONG", "49", KEY_VOLUMEUP},
+    {"KEY_VOLUMEDOWN_LONG", "4a", KEY_VOLUMEDOWN},
     {"CHANNELUP"	, "4b", KEY_PAGEUP},
     {"CHANNELDOWN"	, "4c", KEY_PAGEDOWN},
 
-    {"OK"             	, "4d", KEY_OK},
+    {"KEY_OK"		, "4d", KEY_OK},
 
-    {"UP"          	, "4e", KEY_UP},
-    {"DOWN"        	, "4f", KEY_DOWN},
-    {"LEFT"       	, "50", KEY_LEFT},
-    {"RIGHT"       	, "51", KEY_RIGHT},
+    {"KEY_UP_LONG"	, "4e", KEY_UP},
+    {"KEY_DOWN_LONG"	, "4f", KEY_DOWN},
+    {"KEY_LEFT_LONG"	, "50", KEY_LEFT},
+    {"KEY_RIGHT_LONG"	, "51", KEY_RIGHT},
  
     {"STOP"           	, "52", KEY_STOP},
     {"REWIND"         	, "53", KEY_REWIND},
@@ -149,21 +159,21 @@ static tButton cButtonsADB_BOX[] = {
     {"TEXT"           	, "5a", KEY_TEXT},
     {"LIST"           	, "5b", KEY_FAVORITES},
 
-    {"RED"            	, "5c", KEY_RED},
-    {"GREEN"          	, "5d", KEY_GREEN},
-    {"YELLOW"         	, "5e", KEY_YELLOW},
-    {"BLUE"           	, "5f", KEY_BLUE},
+    {"KEY_RED"		, "5c", KEY_RED},
+    {"KEY_GREEN"	, "5d", KEY_GREEN},
+    {"KEY_YELLOW"	, "5e", KEY_YELLOW},
+    {"KEY_BLUE"		, "5f", KEY_BLUE},
 
-    {"1BUTTON"        	, "60", KEY_1},
-    {"2BUTTON"        	, "61", KEY_2},
-    {"3BUTTON"        	, "62", KEY_3},
-    {"4BUTTON"        	, "63", KEY_4},
-    {"5BUTTON"        	, "64", KEY_5},
-    {"6BUTTON"        	, "65", KEY_6},
-    {"7BUTTON"        	, "66", KEY_7},
-    {"8BUTTON"        	, "67", KEY_8},
-    {"9BUTTON"        	, "68", KEY_9},
-    {"0BUTTON"        	, "69", KEY_0},
+    {"KEY_1"        	, "60", KEY_1},
+    {"KEY_2"        	, "61", KEY_2},
+    {"KEY_3"        	, "62", KEY_3},
+    {"KEY_4"        	, "63", KEY_4},
+    {"KEY_5"        	, "64", KEY_5},
+    {"KEY_6"        	, "65", KEY_6},
+    {"KEY_7"        	, "66", KEY_7},
+    {"KEY_8"        	, "67", KEY_8},
+    {"KEY_9"        	, "68", KEY_9},
+    {"KEY_9"        	, "69", KEY_9},
 
     {"AUDIO/SETUP"    	, "6a", KEY_AUDIO},
 
@@ -173,19 +183,142 @@ static tButton cButtonsADB_BOX[] = {
 
     {""               	, ""  , KEY_NULL},
 };
+
+/* ADB_BOX XMP mode RCU '193f442a1d8307XY' */
+static tButton cButtonsADB_BOX_XMP[] = {
+
+    {"KEY_OK"		, "00", KEY_OK},
+    {"KEY_POWER"        , "01", KEY_POWER},
+    {"KEY_PROGRAM"	, "02", KEY_TIME}, //TIMER/APP
+    {"KEY_EPG"		, "03", KEY_EPG},
+    {"KEY_PVR"		, "04", KEY_BACK}, //HOME
+    {"KEY_HELP"       	, "05", KEY_INFO}, 
+
+    {"KEY_OPTION"	, "06", KEY_MENU},  //OPT
+    {"KEY_UP"		, "07", KEY_UP},
+    {"KEY_VOLUMEUP"	, "08", KEY_VOLUMEUP},
+    {"KEY_PAGEUP"	, "09", KEY_PAGEUP},
+    {"KEY_1"        	, "0c", KEY_1},
+    {"KEY_GOTO"       	, "0f", KEY_V}, //N.Button
+
+    {"KEY_PAGEDOWN"	, "20", KEY_PAGEDOWN},
+    {"KEY_DOWN"        	, "21", KEY_DOWN},
+    {"KEY_MUTE"		, "22", KEY_MUTE},
+    {"KEY_HOME"		, "23", KEY_HOME}, //BACK
+    {"KEY_TEXT"		, "24", KEY_TEXT},
+
+    {"KEY_MENU"    	, "25", KEY_AUDIO}, //AUDIO/SETUP
+    {"KEY_RED"		, "26", KEY_RED},
+    {"KEY_VOLUMEDOWN"	, "28", KEY_VOLUMEDOWN},
+    
+    {"KEY_7"        	, "30", KEY_7},
+    {"KEY_8"        	, "31", KEY_8},
+    {"KEY_9"        	, "32", KEY_9},
+    {"KEY_0"        	, "33", KEY_0},
+    {"KEY_MEDIA"        , "34", KEY_AUX}, //VOD
+
+    {"KEY_STOP"		, "35", KEY_STOP},
+    {"KEY_REWIND"	, "36", KEY_REWIND},
+    {"KEY_PAUSE"	, "37", KEY_PAUSE},
+    {"KEY_PLAY"		, "38", KEY_PLAY},
+
+    {"KEY_3"        	, "40", KEY_3},
+    {"KEY_4"        	, "41", KEY_4},
+    {"KEY_5"        	, "42", KEY_5},
+    {"KEY_6"        	, "43", KEY_6},
+    {"KEY_MODE"		, "44", KEY_TV2}, //TV/RADIO/@
+    {"KEY_YELLOW"	, "45", KEY_YELLOW},
+
+    {"KEY_RIGHT"       	, "50", KEY_RIGHT},
+    {"KEY_LEFT"       	, "51", KEY_LEFT},
+    {"KEY_GREEN"	, "52", KEY_GREEN},
+    {"KEY_2"        	, "53", KEY_2},
+    {"KEY_BLUE"		, "54", KEY_BLUE},
+
+    {"KEY_FASTFORWARD"	, "60", KEY_FASTFORWARD},
+    {"KEY_RECORD"	, "61", KEY_RECORD},
+    {"KEY_LIST"		, "62", KEY_FAVORITES},
+    {"KEY_SUBTITLE"	, "65", KEY_HELP}, //STAR
+
+//------long
+
+    {"KEY_OK"		, "40", KEY_OK},
+    {"KEY_POWER"        , "41", KEY_POWER},
+    {"KEY_PROGRAM"	, "42", KEY_TIME}, //TIMER/APP
+    {"KEY_EPG"		, "43", KEY_EPG},
+    {"KEY_PVR"		, "44", KEY_BACK}, //HOME
+    {"KEY_HELP"       	, "45", KEY_INFO}, 
+    {"KEY_OPTION"	, "46", KEY_MENU},  //OPT
+    {"KEY_UP"		, "47", KEY_UP},
+    {"KEY_VOLUMEUP"	, "48", KEY_VOLUMEUP},
+    {"KEY_PAGEUP"	, "49", KEY_PAGEUP},
+    {"KEY_1"        	, "4c", KEY_1},
+    {"KEY_GOTO"       	, "4f", KEY_V}, //N.Button
+
+    {"KEY_PAGEDOWN"	, "60", KEY_PAGEDOWN},
+    {"KEY_DOWN"        	, "61", KEY_DOWN},
+    {"KEY_MUTE"		, "62", KEY_MUTE},
+    {"KEY_HOME"		, "63", KEY_HOME}, //BACK
+    {"KEY_TEXT"		, "64", KEY_TEXT},
+
+    {"KEY_MENU"    	, "65", KEY_AUDIO}, //AUDIO/SETUP
+    {"KEY_RED"		, "66", KEY_RED},
+    {"KEY_VOLUMEDOWN"	, "68", KEY_VOLUMEDOWN},
+    
+    {"KEY_7"        	, "70", KEY_7},
+    {"KEY_8"        	, "71", KEY_8},
+    {"KEY_9"        	, "72", KEY_9},
+    {"KEY_0"        	, "73", KEY_0},
+    {"KEY_MEDIA"        , "74", KEY_AUX}, //VOD
+
+    {"KEY_STOP"		, "75", KEY_STOP},
+    {"KEY_REWIND"	, "76", KEY_REWIND},
+    {"KEY_PAUSE"	, "77", KEY_PAUSE},
+    {"KEY_PLAY"		, "78", KEY_PLAY},
+
+    {"KEY_3"        	, "80", KEY_3},
+    {"KEY_4"        	, "81", KEY_4},
+    {"KEY_5"        	, "82", KEY_5},
+    {"KEY_6"        	, "83", KEY_6},
+    {"KEY_MODE"		, "84", KEY_TV2}, //TV/RADIO/@
+    {"KEY_YELLOW"	, "85", KEY_YELLOW},
+
+    {"KEY_RIGHT"       	, "90", KEY_RIGHT},
+    {"KEY_LEFT"       	, "91", KEY_LEFT},
+    {"KEY_GREEN"	, "92", KEY_GREEN},
+    {"KEY_2"        	, "93", KEY_2},
+    {"KEY_BLUE"		, "94", KEY_BLUE},
+    
+    {"KEY_FASTFORWARD"	, "a0", KEY_FASTFORWARD},
+    {"KEY_RECORD"	, "a1", KEY_RECORD},
+    {"KEY_LIST"		, "a2", KEY_FAVORITES},
+    {"KEY_SUBTITLE"	, "a5", KEY_HELP}, //STAR
+
+    {""               	, ""  , KEY_NULL},
+};
 /* fixme: move this to a structure and
  * use the private structure of RemoteControl_t
  */
 static struct sockaddr_un  vAddr;
 
-static int pInit(Context_t* context, int argc, char* argv[]) {
+static int LastKey = 0;
+char LastKeyName[30];
+static struct timeval LastKeyPressedTime;
 
+
+static int pInit(Context_t* context, int argc, char* argv[]) {
     int vHandle;
+    gettimeofday(&LastKeyPressedTime, NULL);
 
     vAddr.sun_family = AF_UNIX;
     // in new lircd its moved to /var/run/lirc/lircd by default and need use key to run as old version
+    if (access("/var/run/lirc/lircd", F_OK) == 0)
+	strcpy(vAddr.sun_path, "/var/run/lirc/lircd");
+    else {
+	strcpy(vAddr.sun_path, "/dev/lircd");
+    }
     
-    strcpy(vAddr.sun_path, "/var/run/lirc/lircd");
+    //strcpy(vAddr.sun_path, "/var/run/lirc/lircd");
 
     vHandle = socket(AF_UNIX,SOCK_STREAM, 0);
 
@@ -210,85 +343,77 @@ int pShutdown(Context_t* context ) {
     return 0;
 }
 
-#ifndef ADB_BOX_LONGKEY
-static int pRead(Context_t* context ) {
-    char                vBuffer[128];
-    char                vData[10];
-    const int           cSize         = 128;
-    int                 vCurrentCode  = -1;
-
-    read (context->fd, vBuffer, cSize);
-
-
-    vData[0] = vBuffer[14];
-    vData[1] = vBuffer[15];
-    vData[2] = '\0';
-
-/*
-    printf("[ ADB_BOX RCU ] key: %s\n", &vBuffer);   			//move to DEBUG
-    printf("[ ADB_BOX RCU ] key: %s -> %s\n", vData, &vBuffer[20]);   	//move to DEBUG
-*/
-    vCurrentCode = getInternalCode(cButtonsADB_BOX, vData);
-
-    printf("[ ADB_BOX RCU ] key: vCC -> %i\n", vCurrentCode);
-
-    return vCurrentCode;
-}
-
-#else
-
-static int gNextKey = 0;
-
 static int pRead(Context_t* context) {
-    char                vBuffer[128];
-    char         	vData[3];
-    const int    	cSize		= 128;
-    int          	vCurrentCode	= -1;
-    char 		*buffer;
+    char	vBuffer[128];
+    char       	vData[3];
+    const int   cSize		= 128;
+    int         vCurrentCode	= -1;
+    char 	*buffer;
+    //When LIRC in XMP, we need to find key by name -> codes are a bit strange
+    char 	KeyName[30];
+    int 	count;
+    tButton     *cButtons = cButtonsADB_BOX_RAW;
+
+    struct timeval time;
+    gettimeofday(&time, NULL);
 
     memset(vBuffer, 0, 128);
     
     //wait for new command
     read (context->fd, vBuffer, cSize);
+    
+    if (sscanf(vBuffer, "%*x %x %29s", &count, KeyName) != 2) { // '29' in '%29s' is LIRC_KEY_BUF-1!
+	printf("[ADB_BOX RCU] Warning: unparseable lirc command: %s\n", vBuffer);
+    }
 
+    //checking what RCU definition mode
+    if (('1' == vBuffer[0]) && ('9' == vBuffer[1]) && ('3' == vBuffer[2])) {
+	//printf("XMP\n");
+	cButtons = cButtonsADB_BOX_XMP;
+	vData[0] = vBuffer[12];
+	vData[1] = vBuffer[13];
+	vData[2] = '\0';
+    } else {
+	cButtons = cButtonsADB_BOX_RAW;
+	vData[0] = vBuffer[14];
+	vData[1] = vBuffer[15];
+	vData[2] = '\0';
+    }
 
-
-
-  vData[0] = vBuffer[17];
-  vData[1] = vBuffer[18];
-  vData[2] = '\0';
-  //printf("[RCU ADB_BOX] key: %s -> %s\n", vData, &vBuffer[0]);
-
-  vData[0] = vBuffer[14];
-  vData[1] = vBuffer[15];
-  vData[2] = '\0';
-  printf("[RCU ADB_BOX] key: %s -> %s\n", vData, &vBuffer[0]);
-
-
-  vCurrentCode = getInternalCode((tButton*)((RemoteControl_t*)context->r)->RemoteControl, vData);
+    //vCurrentCode = getInternalCode((cButtons*)((RemoteControl_t*)context->r)->RemoteControl, vData);
+    vCurrentCode = getInternalCode(cButtons, vData);
   
-  //printf("[ADB_BOX RCU] key: vCC -> %i\n", vCurrentCode);
-  //printf("[ADB_BOX RCU] [17|18]: %i,    {"CHANNELUP"	, "0b", KEY_PAGEUP},
- 
-	if(vCurrentCode != 0) {
-		static int nextflag = 0;
-		if (('0' == vBuffer[17]) && ('0' == vBuffer[18]))
-		{
-		    nextflag++;
-		}
-//		printf("[ADB_BOX RCU] nextflag: nf -> %i\n", nextflag);
-		vCurrentCode += (nextflag << 16);
+    //if no code found, let's try lirc KeyName
+    if ( vCurrentCode == 0 ) {
+	printf("[ADB_BOX RCU] No code found trying to match KeyName\n");
+	//vCurrentCode = getInternalCodeLircKeyName((cButtons*)((RemoteControl_t*)context->r)->RemoteControl, KeyName);
+	vCurrentCode = getInternalCodeLircKeyName(cButtons, KeyName);
+    }
+  
+    if(vCurrentCode != 0) {
+	if((vBuffer[17] == '0') && (vBuffer[18] == '0') && (diffMilli(LastKeyPressedTime, time) <= REPEATDELAY)) {
+	    printf("[ADB_BOX RCU] skiping keys coming in too fast %d\n", diffMilli(LastKeyPressedTime, time));
+	    return 0;
+	} else
+	    printf("[RCU ADB_BOX] key code: %s, KeyName: '%s', after %d ms, LastKey: '%s', count: %i -> %s\n", vData, KeyName, diffMilli(LastKeyPressedTime, time), LastKeyName, count, &vBuffer[0] );
+	    LastKeyPressedTime = time;
+
+	strcpy(LastKeyName, KeyName);
+	static int nextflag = 0;
+	if (('0' == vBuffer[17]) && ('0' == vBuffer[18]))
+	{
+	    nextflag++;
 	}
-
-
-//   printf("[ADB_BOX RCU] key: vCC -> %i\n", vCurrentCode); 
-
+	//printf("[ADB_BOX RCU] nextflag: nf -> %i\n", nextflag);
+	vCurrentCode += (nextflag << 16);
+    }
+    else
+	printf("[RCU ADB_BOX] unknown key -> %s\n", &vBuffer[0] );
+      
 return vCurrentCode;
 
 
 }
-#endif
-
 
 static int pNotification(Context_t* context, const int cOn) {
 
@@ -317,7 +442,7 @@ static int pNotification(Context_t* context, const int cOn) {
     }
     else
     {
-       usleep(100000);
+       usleep(50000);
 
        ioctl_fd = open("/dev/vfd", O_RDONLY);
 
@@ -334,13 +459,13 @@ static int pNotification(Context_t* context, const int cOn) {
 }
 
 RemoteControl_t Adb_Box_RC = {
-	"Adb_Box RemoteControl",
+	"Adb_Box Universal RemoteControl",
 	Adb_Box,
 	&pInit,
 	&pShutdown,
 	&pRead,
 	&pNotification,
-	cButtonsADB_BOX,
+	cButtonsADB_BOX_RAW,
 	NULL,
         NULL,
 #ifndef ADB_BOX_LONGKEY

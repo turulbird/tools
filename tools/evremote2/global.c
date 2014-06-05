@@ -79,7 +79,22 @@ int getInternalCode(tButton * cButtons, const char cCode[3]) {
         if ( (cButtons[vLoop].KeyWord[0] == cCode[0] || cButtons[vLoop].KeyWord[0] == (cCode[0]-32) ) && 
              (cButtons[vLoop].KeyWord[1] == cCode[1] || cButtons[vLoop].KeyWord[1] == (cCode[1]-32) )) {
              
-            printf("KEY: %02X - %s\n", cButtons[vLoop].KeyCode, cButtons[vLoop].KeyName);
+            printf("KEY by code: %02X - %s\n", cButtons[vLoop].KeyCode, cButtons[vLoop].KeyName);
+            return cButtons[vLoop].KeyCode;
+        }
+    }
+    return 0;
+}
+
+// Translates lirc key name to known linux input key value
+int getInternalCodeLircKeyName(tButton * cButtons, const char cCode[30]) {
+    int         vLoop       = 0;
+
+    for (vLoop = 0; cButtons[vLoop].KeyCode != KEY_NULL; vLoop++)
+    {
+        //printf("%20s - %2s - %3d\n", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode);
+        if (strcmp(cCode, cButtons[vLoop].KeyName) == 0 ) {
+            printf("KEY by name: %02X - %s\n", cButtons[vLoop].KeyCode, cButtons[vLoop].KeyName);
             return cButtons[vLoop].KeyCode;
         }
     }

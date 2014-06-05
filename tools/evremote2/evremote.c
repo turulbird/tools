@@ -342,7 +342,7 @@ int getModel()
     if(vLen > 0) {
         vName[vLen-1] = '\0';
 
-        printf("Model: %s\n", vName);
+        printf("Model: '%s'\n", vName);
 
         if(!strncasecmp(vName,"ufs910", 6)) {
             switch(getKathreinUfs910BoxType())
@@ -385,7 +385,11 @@ int getModel()
             vBoxType = CNBox;
         else if(!strncasecmp(vName,"hs5101", 6))
             vBoxType = Hs5101;
-        else if((!strncasecmp(vName,"adb_box", 7)) || (!strncasecmp(vName,"sagemcom88", 10)) || (!strncasecmp(vName,"esi_88", 6)) || (!strncasecmp(vName,"esi88", 5)))
+        else if ((!strncasecmp(vName,"adb_box", 7)) ||
+                 (!strncasecmp(vName,"sagemcom88", 10)) ||
+                 (!strncasecmp(vName,"esi_88", 6)) ||
+                 (!strncasecmp(vName,"esi88", 5)) ||
+                 (!strncasecmp(vName,"dsi87", 5)))
             vBoxType = Adb_Box;
         else if((!strncasecmp(vName,"ipbox9900", 9)) || (!strncasecmp(vName,"ipbox99", 7)) || (!strncasecmp(vName,"ipbox55", 7)))
             vBoxType = Ipbox;
@@ -395,11 +399,11 @@ int getModel()
             vBoxType = Ufs912;
         else if(!strncasecmp(vName,"spark", 5))
         {
-    		vBoxType = Spark;
+            vBoxType = Spark;
         }
         else if(!strncasecmp(vName,"spark7162", 9))
         {
-    		vBoxType = Spark;
+            vBoxType = Spark;
         }
         else if ((!strncasecmp(vName,"cuberevo", 8)) ||
                  (!strncasecmp(vName,"cuberevo-mini", 13)) ||
@@ -409,7 +413,7 @@ int getModel()
                  (!strncasecmp(vName,"cuberevo-2000hd", 15)) ||
                  (!strncasecmp(vName,"cuberevo-9500hd", 15)))
         {
-    		vBoxType = Cuberevo;
+            vBoxType = Cuberevo;
         }
     	else if (!strncasecmp(vName,"vitamin_hd5000", 14))
 	    vBoxType = VitaminHD5000;

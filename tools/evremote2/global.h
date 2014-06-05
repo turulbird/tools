@@ -33,6 +33,8 @@ int getInternalCode(tButton * cButtons, const char cCode[3]);
 
 int getInternalCodeHex(tButton * cButtons, const unsigned char cCode);
 
+int getInternalCodeLircKeyName(tButton * cButtons, const char cCode[30]);
+
 int printKeyMap(tButton * cButtons);
 
 int checkTuxTxt(const int cCode);
