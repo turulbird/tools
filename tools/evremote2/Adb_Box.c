@@ -40,6 +40,8 @@
 #include "Adb_Box.h"
 
 #define REPEATDELAY 300 // ms
+#define REPEATFREQ 45 // ms
+#define KEYPRESSDELAY 200 // ms
 
 #define ADB_BOX_LONGKEY
 
@@ -47,15 +49,39 @@
 static tLongKeyPressSupport cLongKeyPressSupport = {
 //  140, 100,
 //    250, 45 - b4t
-    REPEATDELAY, 45
+    REPEATDELAY, REPEATFREQ
 };
 #endif
 
-static long diffMilli(struct timeval from, struct timeval to)
+long long GetNow(void)
 {
-  struct timeval diff;
-  timeval_subtract(&diff, &to, &from);
-  return (long)(diff.tv_sec*1000 + diff.tv_usec/1000);
+#define MIN_RESOLUTION 1 // ms
+  static bool initialized = false;
+  static bool monotonic = false;
+  struct timespec tp;
+  if (!initialized) {
+     // check if monotonic timer is available and provides enough accurate resolution:
+     if (clock_getres(CLOCK_MONOTONIC, &tp) == 0) {
+        //long Resolution = tp.tv_nsec;
+        // require a minimum resolution:
+        if (tp.tv_sec == 0 && tp.tv_nsec <= MIN_RESOLUTION * 1000000) {
+           if (clock_gettime(CLOCK_MONOTONIC, &tp) == 0) {
+              monotonic = true;
+           }
+        }
+     }
+     initialized = true;
+  }
+  if (monotonic) {
+     if (clock_gettime(CLOCK_MONOTONIC, &tp) == 0)
+        return (long long)(tp.tv_sec) * 1000 + tp.tv_nsec / 1000000;
+     monotonic = false;
+     // fall back to gettimeofday()
+  }
+  struct timeval t;
+  if (gettimeofday(&t, NULL) == 0)
+     return (long long)(t.tv_sec) * 1000 + t.tv_usec / 1000;
+  return 0;
 }
 
 //extern int KeyPressDown;
@@ -95,7 +121,7 @@ static tButton cButtonsADB_BOX_RAW[] = {
 
     {"KEY_MUTE"		, "18", KEY_MUTE},
 
-    {"KEY_MODE"		, "19", KEY_TV2}, //TV/RADIO
+    {"KEY_MODE"		, "19", KEY_TV2}, //TV/RADIO/@
     {"KEY_TEXT"		, "1a", KEY_TEXT},
     {"KEY_LIST"		, "1b", KEY_FAVORITES},
 
@@ -189,17 +215,17 @@ static tButton cButtonsADB_BOX_XMP[] = {
 
     {"KEY_OK"		, "00", KEY_OK},
     {"KEY_POWER"        , "01", KEY_POWER},
-    {"KEY_PROGRAM"	, "02", KEY_TIME}, //TIMER/APP
+    {"KEY_PROGRAM"	, "02", KEY_PROGRAM}, //TIMER/APP
     {"KEY_EPG"		, "03", KEY_EPG},
-    {"KEY_PVR"		, "04", KEY_BACK}, //HOME
-    {"KEY_HELP"       	, "05", KEY_INFO}, 
+    {"KEY_PVR"		, "04", KEY_PVR}, //HOME
+    {"KEY_HELP"       	, "05", KEY_HELP}, 
 
-    {"KEY_OPTION"	, "06", KEY_MENU},  //OPT
+    {"KEY_OPTION"	, "06", KEY_OPTION},  //OPT
     {"KEY_UP"		, "07", KEY_UP},
     {"KEY_VOLUMEUP"	, "08", KEY_VOLUMEUP},
     {"KEY_PAGEUP"	, "09", KEY_PAGEUP},
     {"KEY_1"        	, "0c", KEY_1},
-    {"KEY_GOTO"       	, "0f", KEY_V}, //N.Button
+    {"KEY_GOTO"       	, "0f", KEY_GOTO}, //N.Button
 
     {"KEY_PAGEDOWN"	, "20", KEY_PAGEDOWN},
     {"KEY_DOWN"        	, "21", KEY_DOWN},
@@ -207,7 +233,7 @@ static tButton cButtonsADB_BOX_XMP[] = {
     {"KEY_HOME"		, "23", KEY_HOME}, //BACK
     {"KEY_TEXT"		, "24", KEY_TEXT},
 
-    {"KEY_MENU"    	, "25", KEY_AUDIO}, //AUDIO/SETUP
+    {"KEY_MENU"    	, "25", KEY_MENU}, //AUDIO/SETUP
     {"KEY_RED"		, "26", KEY_RED},
     {"KEY_VOLUMEDOWN"	, "28", KEY_VOLUMEDOWN},
     
@@ -215,7 +241,7 @@ static tButton cButtonsADB_BOX_XMP[] = {
     {"KEY_8"        	, "31", KEY_8},
     {"KEY_9"        	, "32", KEY_9},
     {"KEY_0"        	, "33", KEY_0},
-    {"KEY_MEDIA"        , "34", KEY_AUX}, //VOD
+    {"KEY_MEDIA"        , "34", KEY_MEDIA}, //VOD
 
     {"KEY_STOP"		, "35", KEY_STOP},
     {"KEY_REWIND"	, "36", KEY_REWIND},
@@ -226,7 +252,7 @@ static tButton cButtonsADB_BOX_XMP[] = {
     {"KEY_4"        	, "41", KEY_4},
     {"KEY_5"        	, "42", KEY_5},
     {"KEY_6"        	, "43", KEY_6},
-    {"KEY_MODE"		, "44", KEY_TV2}, //TV/RADIO/@
+    {"KEY_MODE"		, "44", KEY_MODE}, //TV/RADIO/@
     {"KEY_YELLOW"	, "45", KEY_YELLOW},
 
     {"KEY_RIGHT"       	, "50", KEY_RIGHT},
@@ -237,23 +263,23 @@ static tButton cButtonsADB_BOX_XMP[] = {
 
     {"KEY_FASTFORWARD"	, "60", KEY_FASTFORWARD},
     {"KEY_RECORD"	, "61", KEY_RECORD},
-    {"KEY_LIST"		, "62", KEY_FAVORITES},
-    {"KEY_SUBTITLE"	, "65", KEY_HELP}, //STAR
+    {"KEY_LIST"		, "62", KEY_LIST},
+    {"KEY_SUBTITLE"	, "63", KEY_SUBTITLE}, //STAR
 
 //------long
 
     {"KEY_OK"		, "40", KEY_OK},
     {"KEY_POWER"        , "41", KEY_POWER},
-    {"KEY_PROGRAM"	, "42", KEY_TIME}, //TIMER/APP
+    {"KEY_PROGRAM"	, "42", KEY_PROGRAM}, //TIMER/APP
     {"KEY_EPG"		, "43", KEY_EPG},
-    {"KEY_PVR"		, "44", KEY_BACK}, //HOME
-    {"KEY_HELP"       	, "45", KEY_INFO}, 
-    {"KEY_OPTION"	, "46", KEY_MENU},  //OPT
+    {"KEY_PVR"		, "44", KEY_PVR}, //HOME
+    {"KEY_HELP"       	, "45", KEY_HELP}, 
+    {"KEY_OPTION"	, "46", KEY_OPTION},  //OPT
     {"KEY_UP"		, "47", KEY_UP},
     {"KEY_VOLUMEUP"	, "48", KEY_VOLUMEUP},
     {"KEY_PAGEUP"	, "49", KEY_PAGEUP},
     {"KEY_1"        	, "4c", KEY_1},
-    {"KEY_GOTO"       	, "4f", KEY_V}, //N.Button
+    {"KEY_GOTO"       	, "4f", KEY_GOTO}, //N.Button
 
     {"KEY_PAGEDOWN"	, "60", KEY_PAGEDOWN},
     {"KEY_DOWN"        	, "61", KEY_DOWN},
@@ -261,7 +287,7 @@ static tButton cButtonsADB_BOX_XMP[] = {
     {"KEY_HOME"		, "63", KEY_HOME}, //BACK
     {"KEY_TEXT"		, "64", KEY_TEXT},
 
-    {"KEY_MENU"    	, "65", KEY_AUDIO}, //AUDIO/SETUP
+    {"KEY_MENU"    	, "65", KEY_MENU}, //AUDIO/SETUP
     {"KEY_RED"		, "66", KEY_RED},
     {"KEY_VOLUMEDOWN"	, "68", KEY_VOLUMEDOWN},
     
@@ -269,7 +295,7 @@ static tButton cButtonsADB_BOX_XMP[] = {
     {"KEY_8"        	, "71", KEY_8},
     {"KEY_9"        	, "72", KEY_9},
     {"KEY_0"        	, "73", KEY_0},
-    {"KEY_MEDIA"        , "74", KEY_AUX}, //VOD
+    {"KEY_MEDIA"        , "74", KEY_MEDIA}, //VOD
 
     {"KEY_STOP"		, "75", KEY_STOP},
     {"KEY_REWIND"	, "76", KEY_REWIND},
@@ -280,7 +306,7 @@ static tButton cButtonsADB_BOX_XMP[] = {
     {"KEY_4"        	, "81", KEY_4},
     {"KEY_5"        	, "82", KEY_5},
     {"KEY_6"        	, "83", KEY_6},
-    {"KEY_MODE"		, "84", KEY_TV2}, //TV/RADIO/@
+    {"KEY_MODE"		, "84", KEY_MODE}, //TV/RADIO/@
     {"KEY_YELLOW"	, "85", KEY_YELLOW},
 
     {"KEY_RIGHT"       	, "90", KEY_RIGHT},
@@ -291,8 +317,8 @@ static tButton cButtonsADB_BOX_XMP[] = {
     
     {"KEY_FASTFORWARD"	, "a0", KEY_FASTFORWARD},
     {"KEY_RECORD"	, "a1", KEY_RECORD},
-    {"KEY_LIST"		, "a2", KEY_FAVORITES},
-    {"KEY_SUBTITLE"	, "a5", KEY_HELP}, //STAR
+    {"KEY_LIST"		, "a2", KEY_LIST},
+    {"KEY_SUBTITLE"	, "a3", KEY_SUBTITLE}, //STAR
 
     {""               	, ""  , KEY_NULL},
 };
@@ -301,14 +327,13 @@ static tButton cButtonsADB_BOX_XMP[] = {
  */
 static struct sockaddr_un  vAddr;
 
-static int LastKey = 0;
-char LastKeyName[30];
-static struct timeval LastKeyPressedTime;
+static int LastKeyCode = -1;
+static char LastKeyName[30];
+static long long LastKeyPressedTime;
 
 
 static int pInit(Context_t* context, int argc, char* argv[]) {
     int vHandle;
-    gettimeofday(&LastKeyPressedTime, NULL);
 
     vAddr.sun_family = AF_UNIX;
     // in new lircd its moved to /var/run/lirc/lircd by default and need use key to run as old version
@@ -354,26 +379,28 @@ static int pRead(Context_t* context) {
     int 	count;
     tButton     *cButtons = cButtonsADB_BOX_RAW;
 
-    struct timeval time;
-    gettimeofday(&time, NULL);
+    long long LastTime;
 
     memset(vBuffer, 0, 128);
     
     //wait for new command
     read (context->fd, vBuffer, cSize);
     
-    if (sscanf(vBuffer, "%*x %x %29s", &count, KeyName) != 2) { // '29' in '%29s' is LIRC_KEY_BUF-1!
+    if (sscanf(vBuffer, "%*x %x %29s", &count, KeyName) != 2)  // '29' in '%29s' is LIRC_KEY_BUF-1!
+    {
 	printf("[ADB_BOX RCU] Warning: unparseable lirc command: %s\n", vBuffer);
+	return 0;
     }
 
     //checking what RCU definition mode
-    if (('1' == vBuffer[0]) && ('9' == vBuffer[1]) && ('3' == vBuffer[2])) {
-	//printf("XMP\n");
+    if (('1' == vBuffer[0]) && ('9' == vBuffer[1]) && ('3' == vBuffer[2]))
+    {
 	cButtons = cButtonsADB_BOX_XMP;
 	vData[0] = vBuffer[12];
 	vData[1] = vBuffer[13];
 	vData[2] = '\0';
-    } else {
+    } else if (('0' == vBuffer[0]) && ('0' == vBuffer[1]) && ('0' == vBuffer[2]))
+    {
 	cButtons = cButtonsADB_BOX_RAW;
 	vData[0] = vBuffer[14];
 	vData[1] = vBuffer[15];
@@ -384,20 +411,42 @@ static int pRead(Context_t* context) {
     vCurrentCode = getInternalCode(cButtons, vData);
   
     //if no code found, let's try lirc KeyName
-    if ( vCurrentCode == 0 ) {
+    if ( vCurrentCode == 0 )
+    {
 	printf("[ADB_BOX RCU] No code found trying to match KeyName\n");
 	//vCurrentCode = getInternalCodeLircKeyName((cButtons*)((RemoteControl_t*)context->r)->RemoteControl, KeyName);
 	vCurrentCode = getInternalCodeLircKeyName(cButtons, KeyName);
     }
-  
-    if(vCurrentCode != 0) {
-	if((vBuffer[17] == '0') && (vBuffer[18] == '0') && (diffMilli(LastKeyPressedTime, time) <= REPEATDELAY)) {
-	    printf("[ADB_BOX RCU] skiping keys coming in too fast %d\n", diffMilli(LastKeyPressedTime, time));
-	    return 0;
-	} else
-	    printf("[RCU ADB_BOX] key code: %s, KeyName: '%s', after %d ms, LastKey: '%s', count: %i -> %s\n", vData, KeyName, diffMilli(LastKeyPressedTime, time), LastKeyName, count, &vBuffer[0] );
-	    LastKeyPressedTime = time;
 
+    printf("LastKeyPressedTime: %lld\n", LastKeyPressedTime);
+    printf("CurrKeyPressedTime: %lld\n", GetNow());
+    printf("         diffMilli: %lld\n", GetNow() - LastKeyPressedTime);
+
+    if(vCurrentCode != 0)
+    {
+	//time checking
+	if((vBuffer[17] == '0') && (vBuffer[18] == '0'))
+	{
+	    if( ( LastKeyCode == vCurrentCode ) && (GetNow() - LastKeyPressedTime < REPEATDELAY)) // (diffMilli(LastKeyPressedTime, CurrKeyPressedTime) <= REPEATDELAY) )
+	    {
+		printf("[ADB_BOX RCU] skiping same key coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime );
+		return 0;
+	    }
+	    else if( GetNow() - LastKeyPressedTime < KEYPRESSDELAY )
+	    {
+		printf("[ADB_BOX RCU] skiping different keys coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime );
+		return 0;
+	    } else
+		printf("[RCU ADB_BOX] key code: %s, KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", vData, KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0] );
+	}
+	else if( GetNow() - LastKeyPressedTime < REPEATFREQ )
+	{
+		printf("[ADB_BOX RCU] skiping repeated key coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
+		return 0;
+	}
+
+	LastKeyCode = vCurrentCode;
+	LastKeyPressedTime = GetNow();
 	strcpy(LastKeyName, KeyName);
 	static int nextflag = 0;
 	if (('0' == vBuffer[17]) && ('0' == vBuffer[18]))
