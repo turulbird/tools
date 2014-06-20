@@ -1,15 +1,18 @@
 #ifndef __CNBOX_H
 #define __CNBOX_H
 
-struct set_standby_s {
+struct set_standby_s
+{
 	time_t localTime;
 };
 
-struct set_time_s {
+struct set_time_s
+{
 	time_t localTime;
 };
 
-struct cnbox_ioctl_data {
+struct cnbox_ioctl_data
+{
 	union
 	{
 		struct set_standby_s standby;
