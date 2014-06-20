@@ -52,13 +52,12 @@ typedef struct
 
 tArgs vArgs[] =
 {
-	{
-		"-e",   "--setTimer             ", "Args: No arguments or [time date] Format: HH:MM:SS dd-mm-YYYY \
+	{ "-e",   "--setTimer             ", "Args: No arguments or [time date] Format: HH:MM:SS dd-mm-YYYY \
 \n\tSet the most recent timer from e2 or neutrino to the frontcontroller and standby \
 \n\tSet the current frontcontroller wake-up time"
 	},
-	{ "-d",   "  --shutdown           ", "Args: [time date] Format: HH:MM:SS dd-mm-YYYY\n\tMimics shutdown command. Shutdown receiver via fc at given time." },
-	{ "-g",   "  --getTime            ", "Args: No arguments\n\tReturn current set frontcontroller time" },
+	{ "-d",   "--shutdown             ", "Args: [time date] Format: HH:MM:SS dd-mm-YYYY\n\tMimics shutdown command. Shutdown receiver via fc at given time." },
+	{ "-g",   "--getTime              ", "Args: No arguments\n\tReturn current set frontcontroller time" },
 	{ "-gs",  "--getTimeAndSet        ", "Args: No arguments\n\tSet system time to current frontcontroller time" },
 	{ "-gw",  "--getWakeupTime        ", "Args: No arguments\n\tReturn current wakeup time" },
 	{ "-s",   "--setTime              ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the current frontcontroller time" },

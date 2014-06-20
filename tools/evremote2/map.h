@@ -3,11 +3,12 @@
 
 #include "input_extended.h"
 
-typedef struct {
-    char KeyName[20];
-    char KeyWord[2];
-    int  KeyCode;
-}tButton;
+typedef struct
+{
+	char KeyName[20];
+	char KeyWord[2];
+	int  KeyCode;
+} tButton;
 
 
 

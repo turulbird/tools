@@ -13,29 +13,32 @@
 #define INPUT_PRESS 1
 #define INPUT_RELEASE 0
 
-typedef enum {Unknown, Ufs910_1W, Ufs910_14W, Ufs922, Ufc960, Tf7700, Hl101, Vip2, HdBox,
-				Hs5101, Ufs912, Spark, Cuberevo, Adb_Box, Ipbox, CNBox, VitaminHD5000} eBoxType;
+typedef enum {Unknown, Ufs910_1W, Ufs910_14W, Ufs922, Ufc960, Tf7700, Hl101, Vip2, Fortis,
+			  Hs5101, Ufs912, Spark, Cuberevo, Adb_Box, Ipbox, CNBox, VitaminHD5000
+			 } eBoxType;
 typedef enum {RemoteControl, FrontPanel} eKeyType;
 
-typedef struct Context_s {
-  void* /* RemoteControl_t */  *r; /* instance data */
-  int                          fd; /* filedescriptor of fd */
+typedef struct Context_s
+{
+	void * /* RemoteControl_t */  *r; /* instance data */
+	int                          fd; /* filedescriptor of fd */
 
 } Context_t;
 
-typedef struct {
-  unsigned int delay;
-  unsigned int period;
+typedef struct
+{
+	unsigned int delay;
+	unsigned int period;
 
 } tLongKeyPressSupport;
 
-int getInternalCode(tButton * cButtons, const char cCode[3]);
+int getInternalCode(tButton *cButtons, const char cCode[3]);
 
-int getInternalCodeHex(tButton * cButtons, const unsigned char cCode);
+int getInternalCodeHex(tButton *cButtons, const unsigned char cCode);
 
-int getInternalCodeLircKeyName(tButton * cButtons, const char cCode[30]);
+int getInternalCodeLircKeyName(tButton *cButtons, const char cCode[30]);
 
-int printKeyMap(tButton * cButtons);
+int printKeyMap(tButton *cButtons);
 
 int checkTuxTxt(const int cCode);
 

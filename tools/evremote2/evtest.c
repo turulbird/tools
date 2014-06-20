@@ -9,18 +9,18 @@
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
+ *
  * Should you need to contact me, the author, you can do so either by
  * e-mail - mail your message to <vojtech@ucw.cz>, or by paper mail:
  * Vojtech Pavlik, Simunkova 1594, Prague 8, 182 00 Czech Republic
@@ -39,7 +39,8 @@
 #define EV_SYN 0
 #endif
 
-char *events[EV_MAX + 1] = {
+char *events[EV_MAX + 1] =
+{
 	[0 ... EV_MAX] = NULL,
 	[EV_SYN] = "Sync",			[EV_KEY] = "Key",
 	[EV_REL] = "Relative",			[EV_ABS] = "Absolute",
@@ -49,7 +50,8 @@ char *events[EV_MAX + 1] = {
 	[EV_FF_STATUS] = "ForceFeedbackStatus",
 };
 
-char *keys[KEY_MAX + 1] = {
+char *keys[KEY_MAX + 1] =
+{
 	[0 ... KEY_MAX] = NULL,
 	[KEY_RESERVED] = "Reserved",		[KEY_ESC] = "Esc",
 	[KEY_1] = "1",				[KEY_2] = "2",
@@ -229,15 +231,17 @@ char *keys[KEY_MAX + 1] = {
 
 char *absval[5] = { "Value", "Min  ", "Max  ", "Fuzz ", "Flat " };
 
-char *relatives[REL_MAX + 1] = {
+char *relatives[REL_MAX + 1] =
+{
 	[0 ... REL_MAX] = NULL,
 	[REL_X] = "X",			[REL_Y] = "Y",
 	[REL_Z] = "Z",			[REL_HWHEEL] = "HWheel",
-	[REL_DIAL] = "Dial",		[REL_WHEEL] = "Wheel", 
-	[REL_MISC] = "Misc",	
+	[REL_DIAL] = "Dial",		[REL_WHEEL] = "Wheel",
+	[REL_MISC] = "Misc",
 };
 
-char *absolutes[ABS_MAX + 1] = {
+char *absolutes[ABS_MAX + 1] =
+{
 	[0 ... ABS_MAX] = NULL,
 	[ABS_X] = "X",			[ABS_Y] = "Y",
 	[ABS_Z] = "Z",			[ABS_RX] = "Rx",
@@ -254,34 +258,39 @@ char *absolutes[ABS_MAX + 1] = {
 	[ABS_VOLUME] = "Volume",	[ABS_MISC] = "Misc",
 };
 
-char *misc[MSC_MAX + 1] = {
+char *misc[MSC_MAX + 1] =
+{
 	[ 0 ... MSC_MAX] = NULL,
 	[MSC_SERIAL] = "Serial",	[MSC_PULSELED] = "Pulseled",
 	[MSC_GESTURE] = "Gesture",	[MSC_RAW] = "RawData",
 	[MSC_SCAN] = "ScanCode",
 };
 
-char *leds[LED_MAX + 1] = {
+char *leds[LED_MAX + 1] =
+{
 	[0 ... LED_MAX] = NULL,
-	[LED_NUML] = "NumLock",		[LED_CAPSL] = "CapsLock", 
+	[LED_NUML] = "NumLock",		[LED_CAPSL] = "CapsLock",
 	[LED_SCROLLL] = "ScrollLock",	[LED_COMPOSE] = "Compose",
-	[LED_KANA] = "Kana",		[LED_SLEEP] = "Sleep", 
+	[LED_KANA] = "Kana",		[LED_SLEEP] = "Sleep",
 	[LED_SUSPEND] = "Suspend",	[LED_MUTE] = "Mute",
 	[LED_MISC] = "Misc",
 };
 
-char *repeats[REP_MAX + 1] = {
+char *repeats[REP_MAX + 1] =
+{
 	[0 ... REP_MAX] = NULL,
 	[REP_DELAY] = "Delay",		[REP_PERIOD] = "Period"
 };
 
-char *sounds[SND_MAX + 1] = {
+char *sounds[SND_MAX + 1] =
+{
 	[0 ... SND_MAX] = NULL,
 	[SND_CLICK] = "Click",		[SND_BELL] = "Bell",
 	[SND_TONE] = "Tone"
 };
 
-char **names[EV_MAX + 1] = {
+char **names[EV_MAX + 1] =
+{
 	[0 ... EV_MAX] = NULL,
 	[EV_SYN] = events,			[EV_KEY] = keys,
 	[EV_REL] = relatives,			[EV_ABS] = absolutes,
@@ -296,7 +305,7 @@ char **names[EV_MAX + 1] = {
 #define LONG(x) ((x)/BITS_PER_LONG)
 #define test_bit(bit, array)	((array[LONG(bit)] >> OFF(bit)) & 1)
 
-int main (int argc, char **argv)
+int main(int argc, char **argv)
 {
 	int fd, rd, i, j, k;
 	struct input_event ev[64];
@@ -306,28 +315,31 @@ int main (int argc, char **argv)
 	char name[256] = "Unknown";
 	int abs[5];
 
-	if (argc < 2) {
+	if (argc < 2)
+	{
 		printf("Usage: evtest /dev/input/eventX\n");
 		printf("Where X = input device number\n");
 		return 1;
 	}
 
-	if ((fd = open(argv[argc - 1], O_RDONLY)) < 0) {
+	if ((fd = open(argv[argc - 1], O_RDONLY)) < 0)
+	{
 		perror("evtest");
 		return 1;
 	}
 
-	if (ioctl(fd, EVIOCGVERSION, &version)) {
+	if (ioctl(fd, EVIOCGVERSION, &version))
+	{
 		perror("evtest: can't get version");
 		return 1;
 	}
 
 	printf("Input driver version is %d.%d.%d\n",
-		version >> 16, (version >> 8) & 0xff, version & 0xff);
+		   version >> 16, (version >> 8) & 0xff, version & 0xff);
 
 	ioctl(fd, EVIOCGID, id);
 	printf("Input device ID: bus 0x%x vendor 0x%x product 0x%x version 0x%x\n",
-		id[ID_BUS], id[ID_VENDOR], id[ID_PRODUCT], id[ID_VERSION]);
+		   id[ID_BUS], id[ID_VENDOR], id[ID_PRODUCT], id[ID_VERSION]);
 
 	ioctl(fd, EVIOCGNAME(sizeof(name)), name);
 	printf("Input device name: \"%s\"\n", name);
@@ -337,29 +349,39 @@ int main (int argc, char **argv)
 	printf("Supported events:\n");
 
 	for (i = 0; i < EV_MAX; i++)
-		if (test_bit(i, bit[0])) {
+		if (test_bit(i, bit[0]))
+		{
 			printf("  Event type %d (%s)\n", i, events[i] ? events[i] : "?");
+
 			if (!i) continue;
+
 			ioctl(fd, EVIOCGBIT(i, KEY_MAX), bit[i]);
-			for (j = 0; j < KEY_MAX; j++) 
-				if (test_bit(j, bit[i])) {
+
+			for (j = 0; j < KEY_MAX; j++)
+				if (test_bit(j, bit[i]))
+				{
 					printf("    Event code %d (%s)\n", j, names[i] ? (names[i][j] ? names[i][j] : "?") : "?");
-					if (i == EV_ABS) {
+
+					if (i == EV_ABS)
+					{
 						ioctl(fd, EVIOCGABS(j), abs);
+
 						for (k = 0; k < 5; k++)
 							if ((k < 3) || abs[k])
 								printf("      %s %6d\n", absval[k], abs[k]);
 					}
 				}
 		}
-		
+
 
 	printf("Testing ... (interrupt to exit)\n");
 
-	while (1) {
+	while (1)
+	{
 		rd = read(fd, ev, sizeof(struct input_event) * 64);
 
-		if (rd < (int) sizeof(struct input_event)) {
+		if (rd < (int) sizeof(struct input_event))
+		{
 			printf("yyy\n");
 			perror("\nevtest: error reading");
 			return 1;
@@ -367,24 +389,29 @@ int main (int argc, char **argv)
 
 		for (i = 0; i < rd / sizeof(struct input_event); i++)
 
-			if (ev[i].type == EV_SYN) {
+			if (ev[i].type == EV_SYN)
+			{
 				printf("Event: time %ld.%06ld, -------------- %s ------------\n",
-					ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].code ? "Config Sync" : "Report Sync" );
-			} else if (ev[i].type == EV_MSC && (ev[i].code == MSC_RAW || ev[i].code == MSC_SCAN)) {
+					   ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].code ? "Config Sync" : "Report Sync");
+			}
+			else if (ev[i].type == EV_MSC && (ev[i].code == MSC_RAW || ev[i].code == MSC_SCAN))
+			{
 				printf("Event: time %ld.%06ld, type %d (%s), code %d (%s), value %02x\n",
-					ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].type,
-					events[ev[i].type] ? events[ev[i].type] : "?",
-					ev[i].code,
-					names[ev[i].type] ? (names[ev[i].type][ev[i].code] ? names[ev[i].type][ev[i].code] : "?") : "?",
-					ev[i].value);
-			} else {
+					   ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].type,
+					   events[ev[i].type] ? events[ev[i].type] : "?",
+					   ev[i].code,
+					   names[ev[i].type] ? (names[ev[i].type][ev[i].code] ? names[ev[i].type][ev[i].code] : "?") : "?",
+					   ev[i].value);
+			}
+			else
+			{
 				printf("Event: time %ld.%06ld, type %d (%s), code %d (%s), value %d\n",
-					ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].type,
-					events[ev[i].type] ? events[ev[i].type] : "?",
-					ev[i].code,
-					names[ev[i].type] ? (names[ev[i].type][ev[i].code] ? names[ev[i].type][ev[i].code] : "?") : "?",
-					ev[i].value);
-			}	
+					   ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].type,
+					   events[ev[i].type] ? events[ev[i].type] : "?",
+					   ev[i].code,
+					   names[ev[i].type] ? (names[ev[i].type][ev[i].code] ? names[ev[i].type][ev[i].code] : "?") : "?",
+					   ev[i].value);
+			}
 
 	}
 }

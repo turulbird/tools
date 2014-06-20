@@ -1,26 +1,30 @@
 #ifndef __adb_box__
 #define __adb_box__
 
-#define VFDICONDISPLAYONOFF		0xc0425a0a 
+#define VFDICONDISPLAYONOFF		0xc0425a0a
 
 /* this setups the mode temporarily (for one ioctl)
  * to the desired mode. currently the "normal" mode
  * is the compatible vfd mode
  */
-struct set_mode_s {
+struct set_mode_s
+{
 	int compat; /* 0 = compatibility mode to vfd driver; 1 = nuvoton mode */
 };
 
-struct set_brightness_s {
+struct set_brightness_s
+{
 	int level;
 };
 
-struct set_icon_s {
+struct set_icon_s
+{
 	int icon_nr;
 	int on;
 };
 
-struct set_led_s {
+struct set_led_s
+{
 	int led_nr;
 	int on;
 };
@@ -31,15 +35,18 @@ struct set_led_s {
  * time[3] = min
  * time[4] = sec
  */
-struct set_standby_s {
+struct set_standby_s
+{
 	char time[5];
 };
 
-struct set_time_s {
+struct set_time_s
+{
 	char time[5];
 };
 
-struct adb_box_ioctl_data {
+struct adb_box_ioctl_data
+{
 	union
 	{
 		struct set_icon_s icon;

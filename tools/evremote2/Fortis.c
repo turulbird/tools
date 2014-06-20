@@ -1,5 +1,5 @@
 /*
- * Cnbox.c
+ * Fortis.c
  *
  * (c) 2009 teamducktales
  *
@@ -36,16 +36,16 @@
 #include "global.h"
 #include "map.h"
 #include "remotes.h"
-#include "Cnbox.h"
+#include "Fortis.h"
 
 /* ***************** some constants **************** */
 
 #define rcDeviceName "/dev/rc"
-#define cCNBOXDataLen    128
+#define cFortisDataLen    128
 
 typedef struct
 {
-} tCNBOXPrivate;
+} tFortisPrivate;
 
 /* ***************** our key assignment **************** */
 
@@ -54,70 +54,66 @@ static tLongKeyPressSupport cLongKeyPressSupport =
 	10, 140,
 };
 
-static tButton cButtonCnbox[] =
+static tButton cButtonFortis[] =
 {
-	{"MEDIA"          , "07", KEY_MEDIA},
-	{"ARCHIVE"        , "17", KEY_ARCHIVE},
-	{"MENU"           , "4A", KEY_MENU},
-	{"RED"            , "5B", KEY_RED},
-	{"GREEN"          , "1F", KEY_GREEN},
-	{"YELLOW"         , "08", KEY_YELLOW},
-	{"BLUE"           , "03", KEY_BLUE},
-	{"EXIT"           , "1D", KEY_HOME},
-	{"BACK"           , "15", KEY_HOME},
-	{"TEXT"           , "03", KEY_TEXT},
-	{"EPG"            , "09", KEY_EPG},
-	{"REWIND"         , "1E", KEY_REWIND},
-	{"FASTFORWARD"    , "01", KEY_FASTFORWARD},
-	{"PLAY"           , "12", KEY_PLAY},
-//    {"PAUSE"          , "", KEY_PAUSE},
-	{"RECORD"         , "1C", KEY_RECORD},
-	{"STOP"           , "10", KEY_STOP},
-	{"POWER"          , "5F", KEY_POWER},
-	{"MUTE"           , "57", KEY_MUTE},
-	{"CHANNELUP"      , "20", KEY_PAGEUP},
-	{"CHANNELDOWN"    , "21", KEY_PAGEDOWN},
-	{"VOLUMEUP"       , "22", KEY_VOLUMEUP},
-	{"VOLUMEDOWN"     , "23", KEY_VOLUMEDOWN},
-	{"HELP"           , "11", KEY_HELP}, //THIS IS WRONG SHOULD BE KEY_INFO
-	{"OK"             , "45", KEY_OK},
-	{"UP"             , "18", KEY_UP},
-	{"RIGHT"          , "49", KEY_RIGHT},
-	{"DOWN"           , "46", KEY_DOWN},
-	{"LEFT"           , "41", KEY_LEFT},
-	{"RECALL"         , "15", KEY_MEMO},
-	{"INFO"           , "06", KEY_INFO},
-	{"ZOOM"           , "1a", KEY_ZOOM},
-	{"FIND"           , "16", KEY_PC},
-	{"RESOLUTION"     , "07", KEY_SCREEN},
-	{"TVRADIO"        , "14", KEY_MODE},
-	{"SLOW"           , "0D", KEY_SLOW},
-	{"FILE"           , "17", KEY_DIRECTORY},
-	{"FAV"            , "00", KEY_FAVORITES},
+	{"MENU"           , "04", KEY_MENU},
+	{"RED"            , "4B", KEY_RED},
+	{"GREEN"          , "4A", KEY_GREEN},
+	{"YELLOW"         , "49", KEY_YELLOW},
+	{"BLUE"           , "48", KEY_BLUE},
+	{"EXIT"           , "1C", KEY_HOME},
+	{"TEXT"           , "0D", KEY_TEXT},
+	{"EPG"            , "08", KEY_EPG},
+	{"REWIND"         , "58", KEY_REWIND},
+	{"FASTFORWARD"    , "5C", KEY_FASTFORWARD},
+	{"PLAY"           , "55", KEY_PLAY},
+	{"PAUSE"          , "07", KEY_PAUSE},
+	{"RECORD"         , "56", KEY_RECORD},
+	{"STOP"           , "54", KEY_STOP},
+	{"STANDBY"        , "0A", KEY_POWER},
+	{"MUTE"           , "0C", KEY_MUTE},
+	{"CHANNELUP"      , "5E", KEY_PAGEUP},
+	{"CHANNELDOWN"    , "5F", KEY_PAGEDOWN},
+	{"VOLUMEUP"       , "4E", KEY_VOLUMEUP},
+	{"VOLUMEDOWN"     , "4F", KEY_VOLUMEDOWN},
+	{"INFO"           , "06", KEY_HELP}, //THIS IS WRONG SHOULD BE KEY_INFO
+	{"OK"             , "1F", KEY_OK},
+	{"UP"             , "00", KEY_UP},
+	{"RIGHT"          , "02", KEY_RIGHT},
+	{"DOWN"           , "01", KEY_DOWN},
+	{"LEFT"           , "03", KEY_LEFT},
+	{"RECALL"         , "09", KEY_MEMO},
+	{"ZOOM"           , "0B", KEY_ZOOM},
+	{"VFORMAT"        , "0E", KEY_ANGLE},
+	{"RESOLUTION"     , "0F", KEY_SCREEN},
+	{"TVRADIO"        , "1A", KEY_MODE},
+	{"SLEEP"          , "1E", KEY_SLOW},
+	{"OPEN"           , "40", KEY_DIRECTORY},
+	{"FAV"            , "41", KEY_FAVORITES},
 	{"CHECK"          , "42", KEY_SELECT},
 	{"UPUP"           , "43", KEY_TEEN},
 	{"DOWNDOWN"       , "44", KEY_TWEN},
-	{"NEXT"           , "02", KEY_NEXT},
-	{"PREVIOUS"       , "42", KEY_PREVIOUS},
-	{"OPTION"         , "19", KEY_OPTION},
-	{"STATUS"         , "0C", KEY_TV2},
-	{"SLEEP"          , "24", KEY_TV},
-	{"0BUTTON"        , "1B", KEY_0},
-	{"1BUTTON"        , "56", KEY_1},
-	{"2BUTTON"        , "5A", KEY_2},
-	{"3BUTTON"        , "5E", KEY_3},
-	{"4BUTTON"        , "55", KEY_4},
-	{"5BUTTON"        , "59", KEY_5},
-	{"6BUTTON"        , "5D", KEY_6},
-	{"7BUTTON"        , "54", KEY_7},
-	{"8BUTTON"        , "58", KEY_8},
-	{"9BUTTON"        , "5C", KEY_9},
+	{"NEXT"           , "4C", KEY_NEXT},
+	{"LAST"           , "50", KEY_PREVIOUS},
+	{"PIP"            , "51", KEY_OPTION},
+	{"SWAP"           , "52", KEY_GOTO},
+	{"LIST"           , "53", KEY_SUBTITLE},
+	{"0BUTTON"        , "10", KEY_0},
+	{"1BUTTON"        , "11", KEY_1},
+	{"2BUTTON"        , "12", KEY_2},
+	{"3BUTTON"        , "13", KEY_3},
+	{"4BUTTON"        , "14", KEY_4},
+	{"5BUTTON"        , "15", KEY_5},
+	{"6BUTTON"        , "16", KEY_6},
+	{"7BUTTON"        , "17", KEY_7},
+	{"8BUTTON"        , "18", KEY_8},
+	{"9BUTTON"        , "19", KEY_9},
 	{""               , ""  , KEY_NULL}
 };
 
 /* ***************** our fp button assignment **************** */
 
-static tButton cButtonCnboxFrontpanel[] =
+static tButton cButtonFortisFrontpanel[] =
 {
 	{"STANDBY"        , "00", KEY_POWER},
 	{"OK"             , "06", KEY_OK},
@@ -132,11 +128,11 @@ static tButton cButtonCnboxFrontpanel[] =
 static int pInit(Context_t *context, int argc, char *argv[])
 {
 	int vFd;
-	tCNBOXPrivate *private = malloc(sizeof(tCNBOXPrivate));
+	tFortisPrivate *private = malloc(sizeof(tFortisPrivate));
 
 	((RemoteControl_t *)context->r)->private = private;
 
-	memset(private, 0, sizeof(tCNBOXPrivate));
+	memset(private, 0, sizeof(tFortisPrivate));
 
 	vFd = open(rcDeviceName, O_RDWR);
 
@@ -158,7 +154,7 @@ static int pInit(Context_t *context, int argc, char *argv[])
 
 static int pRead(Context_t *context)
 {
-	unsigned char   vData[cCNBOXDataLen];
+	unsigned char   vData[cFortisDataLen];
 	eKeyType        vKeyType = RemoteControl;
 	int             vCurrentCode = -1;
 	static   int    vNextKey = 0;
@@ -170,7 +166,7 @@ static int pRead(Context_t *context)
 		int vLoop;
 		int n =
 #endif
-			read(context->fd, vData, cCNBOXDataLen);
+			read(context->fd, vData, cFortisDataLen);
 
 #if 0
 		printf("(len %d): ", n);
@@ -181,24 +177,27 @@ static int pRead(Context_t *context)
 		printf("\n");
 #endif
 
-		if (vData[0] == 0xF1)
+		if ((vData[2] != 0x51) && (vData[2] != 0x63) && (vData[2] != 0x80))
+			continue;
+
+		if (vData[2] == 0x63)
 			vKeyType = RemoteControl;
+		else if (vData[2] == 0x51)
+			vKeyType = FrontPanel;
 		else
 			continue;
 
 		if (vKeyType == RemoteControl)
 		{
-			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData[2] & ~0x80);
+			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData[5] & ~0x80);
 
 			if (vCurrentCode != 0)
 			{
-#if 0
-				vNextKey = (vData[5] & 0x80 == 0 ? vNextKey + 1 : vNextKey) % 0x100;
+				vNextKey = (vData[5] & (0x80 == 0 ? vNextKey + 1 : vNextKey)) % 0x100;
 
 				/* printf("nextFlag %d\n", vNextKey);*/
 
 				vCurrentCode += (vNextKey << 16);
-#endif
 				break;
 			}
 		}
@@ -229,7 +228,7 @@ static int pNotification(Context_t *context, const int cOn)
 
 static int pShutdown(Context_t *context)
 {
-	tCNBOXPrivate *private = (tCNBOXPrivate *)((RemoteControl_t *)context->r)->private;
+	tFortisPrivate *private = (tFortisPrivate *)((RemoteControl_t *)context->r)->private;
 
 	close(context->fd);
 	free(private);
@@ -237,16 +236,16 @@ static int pShutdown(Context_t *context)
 	return 0;
 }
 
-RemoteControl_t CNBOX_RC =
+RemoteControl_t Fortis_RC =
 {
-	"Crenova Remote2 RemoteControl",
-	CNBox,
+	"Fortis RemoteControl",
+	Fortis,
 	&pInit,
 	&pShutdown,
 	&pRead,
 	&pNotification,
-	cButtonCnbox,
-	cButtonCnboxFrontpanel,
+	cButtonFortis,
+	cButtonFortisFrontpanel,
 	NULL,
 	1,
 	&cLongKeyPressSupport,
