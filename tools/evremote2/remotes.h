@@ -42,6 +42,7 @@ extern RemoteControl_t Cuberevo_RC;
 extern RemoteControl_t Ipbox_RC;
 extern RemoteControl_t CNBOX_RC;
 extern RemoteControl_t VitaminHD5000_RC;
+extern RemoteControl_t LircdName_RC;
 
 static RemoteControl_t *AvailableRemoteControls[] =
 {
@@ -61,6 +62,7 @@ static RemoteControl_t *AvailableRemoteControls[] =
 	&Ipbox_RC,
 	&CNBOX_RC,
 	&VitaminHD5000_RC,
+	&LircdName_RC,
 	NULL
 };
 

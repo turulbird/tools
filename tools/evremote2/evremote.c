@@ -350,7 +350,7 @@ int getModel()
 {
 	int         vFd             = -1;
 	const int   cSize           = 128;
-	char        vName[129]      = "Unknown";
+	char        vName[129]      = "LircdName";
 	int         vLen            = -1;
 	eBoxType    vBoxType        = Unknown;
 
@@ -440,7 +440,7 @@ int getModel()
 			vBoxType = VitaminHD5000;
 
 		else
-			vBoxType = Unknown;
+			vBoxType = LircdName;
 	}
 
 	printf("vBoxType: %d\n", vBoxType);

@@ -54,7 +54,7 @@ static tLongKeyPressSupport cLongKeyPressSupport =
 };
 #endif
 
-long long GetNow(void)
+static long long GetNow(void)
 {
 #define MIN_RESOLUTION 1 // ms
 	static bool initialized = false;
@@ -380,7 +380,7 @@ static int pInit(Context_t *context, int argc, char *argv[])
 	return vHandle;
 }
 
-int pShutdown(Context_t *context)
+static int pShutdown(Context_t *context)
 {
 
 	close(context->fd);
