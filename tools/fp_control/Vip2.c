@@ -19,7 +19,7 @@
  *
  */
 
-/******************** includes ************************ */
+/* ******************* includes ************************ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,7 +36,7 @@
 
 static int setText(Context_t *context, char *theText);
 
-/******************** constants ************************ */
+/* ******************* constants ************************ */
 
 #define cVFD_DEVICE "/dev/vfd"
 
@@ -44,12 +44,12 @@ static int setText(Context_t *context, char *theText);
 
 typedef struct
 {
-	int    display;
-	int    display_custom;
-	char  *timeFormat;
+	int	display;
+	int	display_custom;
+	char	*timeFormat;
 
-	time_t wakeupTime;
-	int    wakeupDecrement;
+	time_t	wakeupTime;
+	int	wakeupDecrement;
 } tVIP2Private;
 
 /* ******************* helper/misc functions ****************** */
@@ -66,7 +66,7 @@ void setAotomTime(time_t theGMTTime, char *destString)
 	now_tm = gmtime(&theGMTTime);
 
 	printf("Set Time (UTC): %02d:%02d:%02d %02d-%02d-%04d\n",
-		   now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec, now_tm->tm_mday, now_tm->tm_mon + 1, now_tm->tm_year + 1900);
+		now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec, now_tm->tm_mday, now_tm->tm_mon+1, now_tm->tm_year+1900);
 
 	double mjd = modJulianDate(now_tm);
 	int mjd_int = mjd;
@@ -81,7 +81,7 @@ void setAotomTime(time_t theGMTTime, char *destString)
 unsigned long getAotomTime(char *aotomTimeString)
 {
 	unsigned int 	mjd 	= ((aotomTimeString[1] & 0xFF) * 256) + (aotomTimeString[2] & 0xFF);
-	unsigned long 	epoch 	= ((mjd - 40587) * 86400);
+	unsigned long 	epoch 	= ((mjd - 40587)*86400);
 
 	unsigned int 	hour 	= aotomTimeString[3] & 0xFF;
 	unsigned int 	min 	= aotomTimeString[4] & 0xFF;
@@ -90,7 +90,7 @@ unsigned long getAotomTime(char *aotomTimeString)
 	epoch += (hour * 3600 + min * 60 + sec);
 
 	printf("MJD = %d epoch = %ld, time = %02d:%02d:%02d\n", mjd,
-		   epoch, hour, min, sec);
+		epoch, hour, min, sec);
 
 	return epoch;
 }
@@ -100,27 +100,27 @@ unsigned long getAotomTime(char *aotomTimeString)
 static int init(Context_t *context)
 {
 	tVIP2Private *private = malloc(sizeof(tVIP2Private));
-	int vFd;
+	int	vFd;
 
-	printf("%s\n", __func__);
+//	printf("%s\n", __func__);
 
 	vFd = open(cVFD_DEVICE, O_RDWR);
 
 	if (vFd < 0)
 	{
-		fprintf(stderr, "cannot open %s\n", cVFD_DEVICE);
+		fprintf(stderr, "Cannot open %s\n", cVFD_DEVICE);
 		perror("");
 	}
 
 	((Model_t *)context->m)->private = private;
 	memset(private, 0, sizeof(tVIP2Private));
 
-	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement);
+	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement, disp);
 
 	return vFd;
 }
 
-static int usage(Context_t *context, char *prg_name)
+static int usage(Context_t *context, char *prg_name, char *cmd_name)
 {
 	fprintf(stderr, "%s: not implemented\n", __func__);
 	return -1;
@@ -128,7 +128,7 @@ static int usage(Context_t *context, char *prg_name)
 
 static int setTime(Context_t *context, time_t *theGMTTime)
 {
-	struct aotom_ioctl_data vData;
+	struct	aotom_ioctl_data vData;
 
 	printf("%s\n", __func__);
 
@@ -139,7 +139,6 @@ static int setTime(Context_t *context, time_t *theGMTTime)
 		perror("settime: ");
 		return -1;
 	}
-
 	return 0;
 }
 
@@ -147,7 +146,7 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 {
 	char fp_time[8];
 
-	fprintf(stderr, "waiting on current time from fp ...\n");
+	fprintf(stderr, "Waiting for current time from fp...\n");
 
 	/* front controller time */
 	if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
@@ -169,28 +168,30 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 		fprintf(stderr, "error reading time from fp\n");
 		*theGMTTime = 0;
 	}
-
 	return 0;
 }
 
 static int setTimer(Context_t *context, time_t *theGMTTime)
 {
-	struct aotom_ioctl_data vData;
-	time_t                  curTime;
-	time_t                  wakeupTime;
-	struct tm               *ts;
-	tVIP2Private *private = (tVIP2Private *) ((Model_t *)context->m)->private;
+	struct	aotom_ioctl_data vData;
+	time_t	curTime;
+	time_t	wakeupTime;
+	struct	tm *ts;
 
 	time(&curTime);
 	ts = localtime(&curTime);
 
 	fprintf(stderr, "Current Time: %02d:%02d:%02d %02d-%02d-%04d\n",
-			ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
+		ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon+1, ts->tm_year+1900);
 
 	if (theGMTTime == NULL)
+	{
 		wakeupTime = read_timers_utc(curTime);
+	}
 	else
+	{
 		wakeupTime = *theGMTTime;
+	}
 
 	if ((wakeupTime <= 0) || (wakeupTime == LONG_MAX))
 	{
@@ -198,26 +199,24 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		fprintf(stderr, "no e2 timer found clearing fp wakeup time ... good bye ...\n");
 
 		vData.u.standby.time[0] = '\0';
-
 		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
 		{
 			perror("standby: ");
 			return -1;
 		}
-
 	}
 	else
 	{
 		unsigned long diff;
-		char   	    fp_time[8];
+		char   	fp_time[8];
 
-		fprintf(stderr, "waiting on current time from fp ...\n");
+		fprintf(stderr, "Waiting for current time from fp ...\n");
 
 		/* front controller time */
 		if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
 		{
 			perror("gettime: ");
-			return -1;
+		return -1;
 		}
 
 		/* difference from now to wake up */
@@ -226,14 +225,14 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		/* if we get the fp time */
 		if (fp_time[0] != '\0')
 		{
-			fprintf(stderr, "success reading time from fp\n");
+//			fprintf(stderr, "success reading time from fp\n");
 
 			/* current front controller time */
 			curTime = (time_t) getAotomTime(fp_time);
 		}
 		else
 		{
-			fprintf(stderr, "error reading time ... assuming localtime\n");
+			fprintf(stderr, "Error reading time, assuming localtime.\n");
 			/* noop current time already set */
 		}
 
@@ -244,14 +243,13 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
 		{
 			perror("standby: ");
-			return -1;
+		return -1;
 		}
 	}
-
 	return 0;
 }
 
-static int getTimer(Context_t *context, time_t *theGMTTime)
+static int getWTime(Context_t *context, time_t *theGMTTime)
 {
 	fprintf(stderr, "%s: not implemented\n", __func__);
 	return -1;
@@ -259,11 +257,13 @@ static int getTimer(Context_t *context, time_t *theGMTTime)
 
 static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 {
-	time_t     curTime;
+	time_t	curTime;
 
-	/* shutdown immediate */
+	/* shutdown immediately */
 	if (*shutdownTimeGMT == -1)
+	{
 		return (setTimer(context, NULL));
+	}
 
 	while (1)
 	{
@@ -276,17 +276,15 @@ static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 			/* set most recent e2 timer and bye bye */
 			return (setTimer(context, NULL));
 		}
-
 		usleep(100000);
 	}
-
 	return -1;
 }
 
 static int reboot(Context_t *context, time_t *rebootTimeGMT)
 {
-	time_t                  curTime;
-	struct aotom_ioctl_data vData;
+	time_t	curTime;
+	struct	aotom_ioctl_data vData;
 
 	while (1)
 	{
@@ -300,15 +298,14 @@ static int reboot(Context_t *context, time_t *rebootTimeGMT)
 				return -1;
 			}
 		}
-
 		usleep(100000);
 	}
-
 	return 0;
 }
 
 static int Sleep(Context_t *context, time_t *wakeUpGMT)
 {
+#if 0
 	time_t     curTime;
 	int        sleep = 1;
 	int        vFd;
@@ -317,9 +314,9 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 	int        retval;
 	struct tm  *ts;
 	char       output[cMAXCharsVIP2 + 1];
-	tVIP2Private *private = (tVIP2Private *) ((Model_t *)context->m)->private;
-#if 0
-	printf("%s\n", __func__);
+	tVIP2Private *private = (tVIP2Private *)((Model_t *)context->m)->private;
+
+//	printf("%s\n", __func__);
 
 	vFd = open(cRC_DEVICE, O_RDWR);
 
@@ -327,7 +324,7 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 	{
 		fprintf(stderr, "cannot open %s\n", cRC_DEVICE);
 		perror("");
-		return -1;
+	return -1;
 	}
 
 	printf("%s 1\n", __func__);
@@ -335,7 +332,7 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 	while (sleep)
 	{
 		time(&curTime);
-		ts = localtime(&curTime);
+		ts = localtime (&curTime);
 
 		if (curTime >= *wakeUpGMT)
 		{
@@ -363,106 +360,94 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 			setText(context, output);
 		}
 	}
-
 #endif
-
 	return 0;
 }
 
 static int setText(Context_t *context, char *theText)
 {
-	char vHelp[128];
+	char	vHelp[128];
 
 	strncpy(vHelp, theText, cMAXCharsVIP2);
 	vHelp[cMAXCharsVIP2] = '\0';
 
 	/* printf("%s, %d\n", vHelp, strlen(vHelp));*/
-
 	write(context->fd, vHelp, strlen(vHelp));
-
 	return 0;
 }
 
 static int setLed(Context_t *context, int which, int on)
 {
-	struct aotom_ioctl_data vData;
+	struct	aotom_ioctl_data vData;
 
 	vData.u.led.led_nr = which;
 	vData.u.led.on = on;
 
 	if (ioctl(context->fd, VFDSETLED, &vData) < 0)
 	{
-		perror("setled: ");
+		perror("setLed: ");
 		return -1;
 	}
-
 	return 0;
 }
 
 static int setIcon(Context_t *context, int which, int on)
 {
-	struct aotom_ioctl_data vData;
+	struct	aotom_ioctl_data vData;
 
 	vData.u.icon.icon_nr = which;
 	vData.u.icon.on = on;
 
 	if (ioctl(context->fd, VFDICONDISPLAYONOFF, &vData) < 0)
 	{
-		perror("seticon: ");
+		perror("setIcon: ");
 		return -1;
 	}
-
 	return 0;
 }
 
 static int setBrightness(Context_t *context, int brightness)
 {
-	struct aotom_ioctl_data vData;
+	struct	aotom_ioctl_data vData;
 
 	if (brightness < 0 || brightness > 7)
+	{
 		return -1;
-
+	}
 	vData.u.brightness.level = brightness;
 
 	printf("%d\n", context->fd);
-
 	if (ioctl(context->fd, VFDBRIGHTNESS, &vData) < 0)
 	{
 		perror("setbrightness: ");
 		return -1;
 	}
-
 	return 0;
 }
 
-static int setPwrLed(Context_t *context, int brightness)
-{
-	fprintf(stderr, "%s: not implemented\n", __func__);
-	return -1;
-}
-
-
 static int setLight(Context_t *context, int on)
 {
-
 	if (on)
+	{
 		setBrightness(context, 7);
+	}
 	else
+	{
 		setBrightness(context, 0);
-
+	}
 	return 0;
 }
 
 static int Exit(Context_t *context)
 {
-	tVIP2Private *private = (tVIP2Private *)
-							((Model_t *)context->m)->private;
+	tVIP2Private *private = (tVIP2Private *)((Model_t *)context->m)->private;
 
 	if (context->fd > 0)
+	{
 		close(context->fd);
+	}
 
 	free(private);
-
 	exit(1);
 }
 
@@ -475,13 +460,12 @@ static int Clear(Context_t *context)
 		perror("clear: ");
 		return -1;
 	}
-
 	return 0;
 }
 
 Model_t VIP2_model =
 {
-	.Name             = "Edision vip2 frontpanel control utility",
+	.Name             = "Edision VIP2 frontpanel control utility",
 	.Type             = Vip2,
 	.Init             = init,
 	.Clear            = Clear,
@@ -489,7 +473,8 @@ Model_t VIP2_model =
 	.SetTime          = setTime,
 	.GetTime          = getTime,
 	.SetTimer         = setTimer,
-	.GetTimer         = getTimer,
+	.GetWTime         = getWTime,
+	.SetWTime         = NULL,
 	.Shutdown         = shutdown,
 	.Reboot           = reboot,
 	.Sleep            = Sleep,
@@ -497,13 +482,16 @@ Model_t VIP2_model =
 	.SetLed           = setLed,
 	.SetIcon          = setIcon,
 	.SetBrightness    = setBrightness,
-	.SetPwrLed        = setPwrLed,
+	.GetWakeupReason  = NULL,
 	.SetLight         = setLight,
-	.Exit             = Exit,
 	.SetLedBrightness = NULL,
 	.GetVersion       = NULL,
 	.SetRF            = NULL,
 	.SetFan           = NULL,
-	.private          = NULL,
+	.GetWakeupTime    = NULL,
+	.SetDisplayTime   = NULL,
+	.SetTimeMode      = NULL,
+	.ModelSpecific    = NULL,
+	.Exit             = Exit
 };
 
