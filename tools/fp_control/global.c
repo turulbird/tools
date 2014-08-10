@@ -62,7 +62,7 @@ static Model_t *AvailableModels[] =
 };
 
 //#ifdef E2_WAKEUP_TIME_PROC
-
+#if 0
 static time_t read_e2_wakeup(time_t curTime)
 {
 	char line[12];
@@ -90,7 +90,7 @@ static time_t read_e2_wakeup(time_t curTime)
 	}
 	return recordTime;
 }
-//#else
+#else
 static time_t read_e2_timers(time_t curTime)
 {
 	char   recordString[12];
@@ -127,7 +127,7 @@ static time_t read_e2_timers(time_t curTime)
 
 	return recordTime;
 }
-//#endif
+#endif
 
 static time_t read_neutrino_timers(time_t curTime)
 {
@@ -210,7 +210,7 @@ static time_t read_wakeup_file()
 // Important: system has to have a valid current time
 // This is a little bit tricky, we can only detect if the time is valid
 // and this check happens +-5min arround the timer
-int getWakeupReasonPseudo(eWakeupReason *reason)
+int getWakeupReasonPseudo(int *reason)
 {
 	time_t curTime    = 0;
 	time_t wakeupTime = LONG_MAX;
