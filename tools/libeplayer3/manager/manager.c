@@ -43,13 +43,14 @@ extern Manager_t SubtitleManager;
 extern Manager_t DvbSubtitleManager;
 extern Manager_t TeletextManager;
 
-ManagerHandler_t ManagerHandler = {
-    "ManagerHandler",
-    &AudioManager,
-    &VideoManager,
-    &SubtitleManager
-  , &DvbSubtitleManager
-  , &TeletextManager
+ManagerHandler_t ManagerHandler =
+{
+	"ManagerHandler",
+	&AudioManager,
+	&VideoManager,
+	&SubtitleManager
+	, &DvbSubtitleManager
+	, &TeletextManager
 };
 
 /* ***************************** */
@@ -59,38 +60,37 @@ ManagerHandler_t ManagerHandler = {
 /* ***************************** */
 /* Functions                     */
 /* ***************************** */
-void copyTrack(Track_t* to, Track_t* from)
+void copyTrack(Track_t *to, Track_t *from)
 {
-    *to = *from;
+	*to = *from;
 
-    if (from->Name != NULL)
-        to->Name       = strdup(from->Name);
-    else
-        to->Name       = strdup("Unknown");
+	if (from->Name != NULL)
+		to->Name       = strdup(from->Name);
+	else
+		to->Name       = strdup("Unknown");
 
-    if (from->Encoding != NULL)
-        to->Encoding       = strdup(from->Encoding);
-    else
-        to->Encoding       = strdup("Unknown");
+	if (from->Encoding != NULL)
+		to->Encoding       = strdup(from->Encoding);
+	else
+		to->Encoding       = strdup("Unknown");
 
-    if (from->language != NULL)
-        to->language       = strdup(from->language);
-    else
-        to->language       = strdup("Unknown");
+	if (from->language != NULL)
+		to->language       = strdup(from->language);
+	else
+		to->language       = strdup("Unknown");
 }
 
-void freeTrack(Track_t* track)
+void freeTrack(Track_t *track)
 {
-    if (track->Name != NULL)
-        free(track->Name);
+	if (track->Name != NULL)
+		free(track->Name);
 
-    if (track->Encoding != NULL)
-        free(track->Encoding);
+	if (track->Encoding != NULL)
+		free(track->Encoding);
 
-    if (track->language != NULL)
-        free(track->language);
+	if (track->language != NULL)
+		free(track->language);
 
-    if (track->aacbuf != NULL)
-        free(track->aacbuf);
-
+	if (track->aacbuf != NULL)
+		free(track->aacbuf);
 }

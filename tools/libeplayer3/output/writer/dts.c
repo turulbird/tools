@@ -62,7 +62,7 @@
 static short debug_level = 0;
 
 #define dts_printf(level, fmt, x...) do { \
-if (debug_level >= level) printf("[%s:%s] " fmt, __FILE__, __FUNCTION__, ## x); } while (0)
+		if (debug_level >= level) printf("[%s:%s] " fmt, __FILE__, __FUNCTION__, ## x); } while (0)
 #else
 #define dts_printf(level, fmt, x...)
 #endif
@@ -90,86 +90,88 @@ if (debug_level >= level) printf("[%s:%s] " fmt, __FILE__, __FUNCTION__, ## x); 
 /* ***************************** */
 static int reset()
 {
-    return 0;
+	return 0;
 }
 
-static int writeData(void* _call)
+static int writeData(void *_call)
 {
-    WriterAVCallData_t* call = (WriterAVCallData_t*) _call;
+	WriterAVCallData_t *call = (WriterAVCallData_t *) _call;
 
-    unsigned char   PesHeader[PES_AUDIO_HEADER_SIZE];
+	unsigned char   PesHeader[PES_AUDIO_HEADER_SIZE];
 
-    dts_printf(10, "\n");
+	dts_printf(10, "\n");
 
-    if (call == NULL)
-    {
-        dts_err("call data is NULL...\n");
-        return 0;
-    }
+	if (call == NULL)
+	{
+		dts_err("call data is NULL...\n");
+		return 0;
+	}
 
-    dts_printf(10, "AudioPts %lld\n", call->Pts);
+	dts_printf(10, "AudioPts %lld\n", call->Pts);
 
-    if ((call->data == NULL) || (call->len <= 0))
-    {
-        dts_err("parsing NULL Data. ignoring...\n");
-        return 0;
-    }
+	if ((call->data == NULL) || (call->len <= 0))
+	{
+		dts_err("parsing NULL Data. ignoring...\n");
+		return 0;
+	}
 
-    if (call->fd < 0)
-    {
-        dts_err("file pointer < 0. ignoring ...\n");
-        return 0;
-    }
+	if (call->fd < 0)
+	{
+		dts_err("file pointer < 0. ignoring ...\n");
+		return 0;
+	}
 
 // #define DO_BYTESWAP
 #ifdef DO_BYTESWAP
-    unsigned char *Data = (unsigned char *) malloc(call->len);
-    memcpy(Data, call->data, call->len);
+	unsigned char *Data = (unsigned char *) malloc(call->len);
+	memcpy(Data, call->data, call->len);
 
-    /* 16-bit byte swap all data before injecting it */
-    for (i=0; i< call->len; i+=2)
-    {
-        unsigned char Tmp = Data[i];
-        Data[i] = Data[i+1];
-        Data[i+1] = Tmp;
-    }
+	/* 16-bit byte swap all data before injecting it */
+	for (i = 0; i < call->len; i += 2)
+	{
+		unsigned char Tmp = Data[i];
+		Data[i] = Data[i + 1];
+		Data[i + 1] = Tmp;
+	}
 #endif
 
-    struct iovec iov[2];
+	struct iovec iov[2];
 
-    iov[0].iov_base = PesHeader;
-    iov[0].iov_len = InsertPesHeader (PesHeader, call->len, MPEG_AUDIO_PES_START_CODE/*PRIVATE_STREAM_1_PES_START_CODE*/, call->Pts, 0);
+	iov[0].iov_base = PesHeader;
+	iov[0].iov_len = InsertPesHeader(PesHeader, call->len, MPEG_AUDIO_PES_START_CODE/*PRIVATE_STREAM_1_PES_START_CODE*/, call->Pts, 0);
 #ifdef DO_BYTESPWAP
-    iov[1].iov_base = Data;
+	iov[1].iov_base = Data;
 #else
-    iov[1].iov_base = call->data;
+	iov[1].iov_base = call->data;
 #endif
-    iov[1].iov_len = call->len;
+	iov[1].iov_len = call->len;
 
-    int len = writev(call->fd, iov, 2);
+	int len = writev(call->fd, iov, 2);
 
 #ifdef DO_BYTESWAP
-    free(Data);
+	free(Data);
 #endif
 
-    dts_printf(10, "< len %d\n", len);
-    return len;
+	dts_printf(10, "< len %d\n", len);
+	return len;
 }
 
 /* ***************************** */
 /* Writer  Definition            */
 /* ***************************** */
 
-static WriterCaps_t caps = {
-    "dts",
-    eAudio,
-    "A_DTS",
-    AUDIO_ENCODING_DTS
+static WriterCaps_t caps =
+{
+	"dts",
+	eAudio,
+	"A_DTS",
+	AUDIO_ENCODING_DTS
 };
 
-struct Writer_s WriterAudioDTS = {
-    &reset,
-    &writeData,
-    NULL,
-    &caps
+struct Writer_s WriterAudioDTS =
+{
+	&reset,
+	&writeData,
+	NULL,
+	&caps
 };

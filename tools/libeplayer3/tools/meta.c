@@ -27,12 +27,14 @@ int main(int argc, char *argv[])
 	unsigned int i;
 	int err;
 
-	if (argc < 2) {
+	if (argc < 2)
+	{
 		printf("give me a filename please\n");
 		return -1;
 	}
 
-	if (strstr(argv[1], "://") == NULL) {
+	if (strstr(argv[1], "://") == NULL)
+	{
 		strcpy(file, "file://");
 	}
 
@@ -40,7 +42,8 @@ int main(int argc, char *argv[])
 
 	av_register_all();
 
-	if ((err = avformat_open_input(&avContext, file, NULL, 0)) != 0) {
+	if ((err = avformat_open_input(&avContext, file, NULL, 0)) != 0)
+	{
 		char error[512];
 
 		printf("avformat_open_input failed %d (%s)\n", err, file);
@@ -50,7 +53,8 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	if (avformat_find_stream_info(avContext, NULL) < 0) {
+	if (avformat_find_stream_info(avContext, NULL) < 0)
+	{
 		printf("Error avformat_find_stream_info\n");
 	}
 
@@ -58,10 +62,12 @@ int main(int argc, char *argv[])
 	dump_metadata();
 
 	printf("\nstream specific metadata:\n");
-	for (i = 0; i < avContext->nb_streams; i++) {
+	for (i = 0; i < avContext->nb_streams; i++)
+	{
 		AVStream *stream = avContext->streams[i];
 
-		if (stream) {
+		if (stream)
+		{
 			AVDictionaryEntry *tag = NULL;
 			if (stream->metadata != NULL)
 				while ((tag = av_dict_get(stream->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))

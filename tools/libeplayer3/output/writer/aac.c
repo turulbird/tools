@@ -60,7 +60,7 @@
 static short debug_level = 0;
 
 #define aac_printf(level, fmt, x...) do { \
-if (debug_level >= level) printf("[%s:%s] " fmt, __FILE__, __FUNCTION__, ## x); } while (0)
+		if (debug_level >= level) printf("[%s:%s] " fmt, __FILE__, __FUNCTION__, ## x); } while (0)
 #else
 #define aac_printf(level, fmt, x...)
 #endif
@@ -118,21 +118,21 @@ LOAS = Low Overhead Audio Stream (LOAS), a self-synchronizing streaming format
 /*
 AvailableBytes = Writen Bytes
 Sync = Bits.Get(11);
-if (Sync == AAC_AUDIO_LOAS_ASS_SYNC_WORD{0x2b7}) 
+if (Sync == AAC_AUDIO_LOAS_ASS_SYNC_WORD{0x2b7})
    Type = AAC_AUDIO_LOAS_FORMAT;
    FrameSize = Bits.Get(13) + AAC_LOAS_ASS_SYNC_LENGTH_HEADER_SIZE{3};
    if (FrameSize > AAC_LOAS_ASS_MAX_FRAME_SIZE{8192})
       // ERROR
    AvailableBytes = AvailableBytes - AAC_LOAS_ASS_MAX_FRAME_SIZE{8192};
-   
+
    ImplicitSbrExtension = true;
    ExplicitSbrExtension = false;
-   
+
    if (AvailableBytes > 0)
       useSameStreamMux = Bits->Get(1);
    else
       useSameStreamMux = true;
-   
+
    if ( !useSameStreamMux )
       audioMuxVersion = Bits->Get(1); // Has to be 0
       if (!audioMuxVersion)
@@ -141,7 +141,7 @@ if (Sync == AAC_AUDIO_LOAS_ASS_SYNC_WORD{0x2b7})
          audioObjectType = Bits->Get(5);
          if ((audioObjectType != AAC_AUDIO_PROFILE_LC{2}) && (audioObjectType != AAC_AUDIO_PROFILE_SBR{5}))
             // Error
-         
+
          samplingFrequencyIndex = Bits->Get(4);
          channelConfiguration = Bits->Get(4);
          if (audioObjectType == AAC_AUDIO_PROFILE_SBR{5})
@@ -170,7 +170,7 @@ else
       Bits.FlushUnseen(1 + 1 + 1 + 1); //original/copy, home, copyright_identification_bit, copyright_identification_start
       FrameSize = Bits.Get(13); // aac_frame_length
       if (FrameSize < AAC_ADTS_MIN_FRAME_SIZE{7})
-         // Error 
+         // Error
       Bits.FlushUnseen(11); //adts_buffer_fullness
       no_raw_data_blocks_in_frame = Bits.Get(2);
       // multiple the sample count by two in case a sbr object is present
@@ -185,18 +185,18 @@ else
          if (Sync == AAC_AUDIO_ADIF_SYNC_WORD{0x41444946})
             Type = AAC_AUDIO_ADIF_FORMAT;
             //not supported
-      
-   
+
 */
 
-static unsigned char DefaultAACHeader[]    =  {
-    0xff,
-    0xf1,
-    /*0x00, 0x00*/0x50,  //((Profile & 0x03) << 6)  | (SampleIndex << 2) | ((Channels >> 2) & 0x01);s
-    0x80,                //(Channels & 0x03) << 6;
-    0x00,
-    0x1f,
-    0xfc
+static unsigned char DefaultAACHeader[]    =
+{
+	0xff,
+	0xf1,
+	/*0x00, 0x00*/0x50,  //((Profile & 0x03) << 6)  | (SampleIndex << 2) | ((Channels >> 2) & 0x01);s
+	0x80,                //(Channels & 0x03) << 6;
+	0x00,
+	0x1f,
+	0xfc
 };
 
 /* ***************************** */
@@ -208,79 +208,81 @@ static unsigned char DefaultAACHeader[]    =  {
 /* ***************************** */
 static int reset()
 {
-    return 0;
+	return 0;
 }
 
-static int writeData(void* _call)
+static int writeData(void *_call)
 {
-    WriterAVCallData_t* call = (WriterAVCallData_t*) _call;
+	WriterAVCallData_t *call = (WriterAVCallData_t *) _call;
 
-    unsigned char PesHeader[PES_MAX_HEADER_SIZE];
-    unsigned char ExtraData[AAC_HEADER_LENGTH];
-    unsigned int  PacketLength;
+	unsigned char PesHeader[PES_MAX_HEADER_SIZE];
+	unsigned char ExtraData[AAC_HEADER_LENGTH];
+	unsigned int  PacketLength;
 
-    aac_printf(10, "\n");
+	aac_printf(10, "\n");
 
-    if (call == NULL)
-    {
-        aac_err("call data is NULL...\n");
-        return 0;
-    }
+	if (call == NULL)
+	{
+		aac_err("call data is NULL...\n");
+		return 0;
+	}
 
-    aac_printf(10, "AudioPts %lld\n", call->Pts);
+	aac_printf(10, "AudioPts %lld\n", call->Pts);
 
-    PacketLength    = call->len + AAC_HEADER_LENGTH;
+	PacketLength    = call->len + AAC_HEADER_LENGTH;
 
-    if ((call->data == NULL) || (call->len <= 0))
-    {
-        aac_err("parsing NULL Data. ignoring...\n");
-        return 0;
-    }
+	if ((call->data == NULL) || (call->len <= 0))
+	{
+		aac_err("parsing NULL Data. ignoring...\n");
+		return 0;
+	}
 
-    if (call->fd < 0)
-    {
-        aac_err("file pointer < 0. ignoring ...\n");
-        return 0;
-    }
+	if (call->fd < 0)
+	{
+		aac_err("file pointer < 0. ignoring ...\n");
+		return 0;
+	}
 
-    if (call->private_data == NULL)
-    {
-        aac_printf(10, "private_data = NULL\n");
-	memcpy (ExtraData, DefaultAACHeader, AAC_HEADER_LENGTH);
-    }
-    else
-    	memcpy (ExtraData, call->private_data, AAC_HEADER_LENGTH);
+	if (call->private_data == NULL)
+	{
+		aac_printf(10, "private_data = NULL\n");
+		memcpy(ExtraData, DefaultAACHeader, AAC_HEADER_LENGTH);
+	}
+	else
+		memcpy(ExtraData, call->private_data, AAC_HEADER_LENGTH);
 
-    ExtraData[3]       |= (PacketLength >> 11) & 0x3;
-    ExtraData[4]        = (PacketLength >> 3) & 0xff;
-    ExtraData[5]       |= (PacketLength << 5) & 0xe0;
+	ExtraData[3]       |= (PacketLength >> 11) & 0x3;
+	ExtraData[4]        = (PacketLength >> 3) & 0xff;
+	ExtraData[5]       |= (PacketLength << 5) & 0xe0;
 
-    unsigned int  HeaderLength = InsertPesHeader (PesHeader, PacketLength, AAC_AUDIO_PES_START_CODE, call->Pts, 0);
+	unsigned int  HeaderLength = InsertPesHeader(PesHeader, PacketLength, AAC_AUDIO_PES_START_CODE, call->Pts, 0);
 
-    struct iovec iov[3];
-    iov[0].iov_base = PesHeader;
-    iov[0].iov_len = HeaderLength;
-    iov[1].iov_base = ExtraData;
-    iov[1].iov_len = AAC_HEADER_LENGTH;
-    iov[2].iov_base = call->data;
-    iov[2].iov_len = call->len;
-    return writev(call->fd, iov, 3);
+	struct iovec iov[3];
+	iov[0].iov_base = PesHeader;
+	iov[0].iov_len = HeaderLength;
+	iov[1].iov_base = ExtraData;
+	iov[1].iov_len = AAC_HEADER_LENGTH;
+	iov[2].iov_base = call->data;
+	iov[2].iov_len = call->len;
+	return writev(call->fd, iov, 3);
 }
 
 /* ***************************** */
 /* Writer  Definition            */
 /* ***************************** */
 
-static WriterCaps_t caps = {
-    "aac",
-    eAudio,
-    "A_AAC",
-    AUDIO_ENCODING_AAC
+static WriterCaps_t caps =
+{
+	"aac",
+	eAudio,
+	"A_AAC",
+	AUDIO_ENCODING_AAC
 };
 
-struct Writer_s WriterAudioAAC = {
-    &reset,
-    &writeData,
-    NULL,
-    &caps
+struct Writer_s WriterAudioAAC =
+{
+	&reset,
+	&writeData,
+	NULL,
+	&caps
 };

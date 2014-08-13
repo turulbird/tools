@@ -39,7 +39,7 @@
 static short debug_level = 0;
 
 #define writer_printf(level, x...) do { \
-if (debug_level >= level) printf(x); } while (0)
+		if (debug_level >= level) printf(x); } while (0)
 #else
 #define writer_printf(level, x...)
 #endif
@@ -66,75 +66,75 @@ if (debug_level >= level) printf(x); } while (0)
 /*  Functions                    */
 /* ***************************** */
 
-Writer_t* getWriter(char* encoding)
+Writer_t *getWriter(char *encoding)
 {
-    int i;
+	int i;
 
-    for (i = 0; AvailableWriter[i] != NULL; i++)
-    {
-        if (strcmp(AvailableWriter[i]->caps->textEncoding, encoding) == 0)
-        {
-            writer_printf(50, "%s: found writer \"%s\" for \"%s\"\n", __func__, AvailableWriter[i]->caps->name, encoding);
-            return AvailableWriter[i];
-        }
-    }
+	for (i = 0; AvailableWriter[i] != NULL; i++)
+	{
+		if (strcmp(AvailableWriter[i]->caps->textEncoding, encoding) == 0)
+		{
+			writer_printf(50, "%s: found writer \"%s\" for \"%s\"\n", __func__, AvailableWriter[i]->caps->name, encoding);
+			return AvailableWriter[i];
+		}
+	}
 
-    writer_printf(1, "%s: no writer found for \"%s\"\n", __func__, encoding);
+	writer_printf(1, "%s: no writer found for \"%s\"\n", __func__, encoding);
 
-    return NULL;
+	return NULL;
 }
 
-Writer_t* getDefaultVideoWriter()
+Writer_t *getDefaultVideoWriter()
 {
-    int i;
+	int i;
 
-    for (i = 0; AvailableWriter[i] != NULL; i++)
-    {
-        if (strcmp(AvailableWriter[i]->caps->textEncoding, "V_MPEG2") == 0)
-        {
-            writer_printf(50, "%s: found writer \"%s\"\n", __func__, AvailableWriter[i]->caps->name);
-            return AvailableWriter[i];
-        }
-    }
+	for (i = 0; AvailableWriter[i] != NULL; i++)
+	{
+		if (strcmp(AvailableWriter[i]->caps->textEncoding, "V_MPEG2") == 0)
+		{
+			writer_printf(50, "%s: found writer \"%s\"\n", __func__, AvailableWriter[i]->caps->name);
+			return AvailableWriter[i];
+		}
+	}
 
-    writer_printf(1, "%s: no writer found\n", __func__);
+	writer_printf(1, "%s: no writer found\n", __func__);
 
-    return NULL;
+	return NULL;
 }
 
-Writer_t* getDefaultAudioWriter()
+Writer_t *getDefaultAudioWriter()
 {
-    int i;
+	int i;
 
-    for (i = 0; AvailableWriter[i] != NULL; i++)
-    {
-        if (strcmp(AvailableWriter[i]->caps->textEncoding, "A_MP3") == 0)
-        {
-            writer_printf(50, "%s: found writer \"%s\"\n", __func__, AvailableWriter[i]->caps->name);
-            return AvailableWriter[i];
-        }
-    }
+	for (i = 0; AvailableWriter[i] != NULL; i++)
+	{
+		if (strcmp(AvailableWriter[i]->caps->textEncoding, "A_MP3") == 0)
+		{
+			writer_printf(50, "%s: found writer \"%s\"\n", __func__, AvailableWriter[i]->caps->name);
+			return AvailableWriter[i];
+		}
+	}
 
-    writer_printf(1, "%s: no writer found\n", __func__);
+	writer_printf(1, "%s: no writer found\n", __func__);
 
-    return NULL;
+	return NULL;
 }
 
-Writer_t* getDefaultFramebufferWriter()
+Writer_t *getDefaultFramebufferWriter()
 {
-    int i;
+	int i;
 
-    for (i = 0; AvailableWriter[i] != NULL; i++)
-    {
-        writer_printf(10, "%s\n", AvailableWriter[i]->caps->textEncoding);
-        if (strcmp(AvailableWriter[i]->caps->textEncoding, "framebuffer") == 0)
-        {
-            writer_printf(50, "%s: found writer \"%s\"\n", __func__, AvailableWriter[i]->caps->name);
-            return AvailableWriter[i];
-        }
-    }
+	for (i = 0; AvailableWriter[i] != NULL; i++)
+	{
+		writer_printf(10, "%s\n", AvailableWriter[i]->caps->textEncoding);
+		if (strcmp(AvailableWriter[i]->caps->textEncoding, "framebuffer") == 0)
+		{
+			writer_printf(50, "%s: found writer \"%s\"\n", __func__, AvailableWriter[i]->caps->name);
+			return AvailableWriter[i];
+		}
+	}
 
-    writer_printf(1, "%s: no writer found\n", __func__);
+	writer_printf(1, "%s: no writer found\n", __func__);
 
-    return NULL;
+	return NULL;
 }

@@ -7,11 +7,12 @@
 #include "playback.h"
 #include <pthread.h>
 
-typedef struct Context_s {
-    PlaybackHandler_t	* playback;
-    ContainerHandler_t	* container;
-    OutputHandler_t		* output;
-    ManagerHandler_t	* manager;
+typedef struct Context_s
+{
+	PlaybackHandler_t    *playback;
+	ContainerHandler_t   *container;
+	OutputHandler_t      *output;
+	ManagerHandler_t     *manager;
 } Context_t;
 
 int container_ffmpeg_update_tracks(Context_t *context, char *filename, int initial);
