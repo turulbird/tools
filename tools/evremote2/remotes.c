@@ -31,7 +31,6 @@ int selectRemote(Context_t  *context, eBoxType type)
 		{
 			context->r = AvailableRemoteControls[i];
 			return 0;
-			break;
 		}
 
 	return -1;
