@@ -57,7 +57,7 @@
 static short debug_level = 0;
 
 #define flac_printf(level, fmt, x...) do { \
-if (debug_level >= level) printf("[%s:%s] " fmt, __FILE__, __FUNCTION__, ## x); } while (0)
+		if (debug_level >= level) printf("[%s:%s] " fmt, __FILE__, __FUNCTION__, ## x); } while (0)
 #else
 #define flac_printf(level, fmt, x...)
 #endif
@@ -86,63 +86,65 @@ if (debug_level >= level) printf("[%s:%s] " fmt, __FILE__, __FUNCTION__, ## x); 
 
 static int reset()
 {
-    return 0;
+	return 0;
 }
 
-static int writeData(void* _call)
+static int writeData(void *_call)
 {
-    WriterAVCallData_t* call = (WriterAVCallData_t*) _call;
+	WriterAVCallData_t *call = (WriterAVCallData_t *) _call;
 
-    unsigned char  PesHeader[PES_MAX_HEADER_SIZE];
+	unsigned char  PesHeader[PES_MAX_HEADER_SIZE];
 
-    flac_printf(10, "\n");
+	flac_printf(10, "\n");
 
-    if (call == NULL)
-    {
-        flac_err("call data is NULL...\n");
-        return 0;
-    }
+	if (call == NULL)
+	{
+		flac_err("call data is NULL...\n");
+		return 0;
+	}
 
-    flac_printf(10, "AudioPts %lld\n", call->Pts);
+	flac_printf(10, "AudioPts %lld\n", call->Pts);
 
-    if ((call->data == NULL) || (call->len <= 0))
-    {
-        flac_err("parsing NULL Data. ignoring...\n");
-        return 0;
-    }
+	if ((call->data == NULL) || (call->len <= 0))
+	{
+		flac_err("parsing NULL Data. ignoring...\n");
+		return 0;
+	}
 
-    if (call->fd < 0)
-    {
-        flac_err("file pointer < 0. ignoring ...\n");
-        return 0;
-    }
+	if (call->fd < 0)
+	{
+		flac_err("file pointer < 0. ignoring ...\n");
+		return 0;
+	}
 
-    struct iovec iov[2];
-    iov[0].iov_base = PesHeader;
-    iov[0].iov_len = InsertPesHeader (PesHeader, call->len , MPEG_AUDIO_PES_START_CODE, call->Pts, 0);
-    iov[1].iov_base = call->data;
-    iov[1].iov_len = call->len;
+	struct iovec iov[2];
+	iov[0].iov_base = PesHeader;
+	iov[0].iov_len = InsertPesHeader(PesHeader, call->len , MPEG_AUDIO_PES_START_CODE, call->Pts, 0);
+	iov[1].iov_base = call->data;
+	iov[1].iov_len = call->len;
 
-    int len = writev(call->fd, iov, 2);
+	int len = writev(call->fd, iov, 2);
 
-    flac_printf(10, "flac_Write-< len=%d\n", len);
-    return len;
+	flac_printf(10, "flac_Write-< len=%d\n", len);
+	return len;
 }
 
 /* ***************************** */
 /* Writer  Definition            */
 /* ***************************** */
 
-static WriterCaps_t caps_flac = {
-    "flac",
-    eAudio,
-    "A_FLAC",
-    AUDIO_ENCODING_LPCM //AUDIO_ENCODING_FLAC
+static WriterCaps_t caps_flac =
+{
+	"flac",
+	eAudio,
+	"A_FLAC",
+	AUDIO_ENCODING_LPCM //AUDIO_ENCODING_FLAC
 };
 
-struct Writer_s WriterAudioFLAC = {
-    &reset,
-    &writeData,
-    NULL,
-    &caps_flac
+struct Writer_s WriterAudioFLAC =
+{
+	&reset,
+	&writeData,
+	NULL,
+	&caps_flac
 };

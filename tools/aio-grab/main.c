@@ -144,7 +144,7 @@ void fast_resize(const unsigned char *source, unsigned char *dest, int xsource, 
 void (*resize)(const unsigned char *source, unsigned char *dest, int xsource, int ysource, int xdest, int ydest, int colors);
 void combine(unsigned char *output, const unsigned char *video, const unsigned char *osd, int vleft, int vtop, int vwidth, int vheight, int xres, int yres);
 
-static enum {UNKNOWN, AZBOX863x, AZBOX865x, PALLAS, ST, VULCAN, XILLEON, BRCM7400, BRCM7401, BRCM7405, BRCM7325, BRCM7335, BRCM7358, BRCM7241, BRCM7356, BRCM7424, BRCM7425} stb_type = UNKNOWN;
+static enum {UNKNOWN, AZBOX863x, AZBOX865x, ST, PALLAS, VULCAN, XILLEON, BRCM7400, BRCM7401, BRCM7405, BRCM7325, BRCM7335, BRCM7346, BRCM7358, BRCM7362, BRCM7241, BRCM7356, BRCM7424, BRCM7425} stb_type = UNKNOWN;
 
 static int chr_luma_stride = 0x40;
 static int chr_luma_register_offset = 0;
@@ -236,11 +236,21 @@ int main(int argc, char **argv)
 					stb_type = BRCM7325;
 					break;
 				}
+				else if (strstr(buf,"7346"))
+				{
+					stb_type = BRCM7346;
+					break;
+				}
 				else if (strstr(buf,"7358"))
 				{
 					stb_type = BRCM7358;
 					break;
 				}
+				else if (strstr(buf,"7362"))
+				{
+					stb_type = BRCM7362;
+					break;
+				}				
 				else if (strstr(buf,"7241"))
 				{
 					stb_type = BRCM7241;
@@ -338,7 +348,14 @@ int main(int argc, char **argv)
 			chr_luma_register_offset = 0x34;
 			mem2memdma_register = 0;
 			break;
+		case BRCM7362:
+			registeroffset = 0x10600000;
+			chr_luma_stride = 0x40;
+			chr_luma_register_offset = 0x34;
+			mem2memdma_register = 0;
+			break;			
 		case BRCM7241:
+		case BRCM7346:
 		case BRCM7356:
 		case BRCM7424:
 		case BRCM7425:
@@ -558,7 +575,7 @@ int main(int argc, char **argv)
 		if (xres_o != xres || yres_o != yres)
 		{
 			if (!quiet)
-				fprintf(stderr, "Resizing OSD to %d x %d ...\n", xres, yres);
+				fprintf(stderr, "Resizing OSD to     : %d x %d \n", xres, yres);
 			resize(osd, output, xres_o, yres_o, xres, yres, 4);
 			memcpy(osd, output, xres * yres * 4);
 		}
@@ -1116,13 +1133,11 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 		memset(temp, 0x00, 4 * 1024 * 1024); /* just to invalidate the page */
 
 		fd_bpa = open("/dev/bpamem0", O_RDWR);
-
 		if (fd_bpa < 0)
 		{
 			fprintf(stderr, "cannot access /dev/bpamem0! err = %d\n", fd_bpa);
 			return;
 		}
-
 		bpa_data.bpa_part  = "LMI_VID";
 		bpa_data.phys_addr = 0x00000000;
 		bpa_data.mem_size  = 0;
@@ -1152,7 +1167,7 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 		}
 
 		if (!quiet)
-			fprintf(stderr, "Using bpa2 part %s - 0x%lx %lu\n", bpa_data.bpa_part, bpa_data.phys_addr, bpa_data.mem_size);
+			fprintf(stderr, "Using bpa2 part     : %s - 0x%lx %lu\n", bpa_data.bpa_part, bpa_data.phys_addr, bpa_data.mem_size);
 
 		//bpa_data.phys_addr = 0x4a824000;
 		//bpa_data.mem_size = 28311552;
@@ -1180,10 +1195,13 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 
 		if(decode_map == MAP_FAILED)
 		{
-			fprintf(stderr, "could not map bpa mem");
+			fprintf(stderr, "could not map bpa mem\n");
 			close(fd_bpa);
 			return;
 		}
+
+		if (!quiet)
+			fprintf(stderr, "decode surface size : %d\n", bpa_data.mem_size );
 
 		//luma
 		layer_offset = 0;
@@ -1226,19 +1244,19 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 		decode_surface = temp;
 
 		//now we have 16,6ms(60hz) to 50ms(20hz) to get the whole picture
-		for (even = 0; even < 2; ++even)
+		for (even = 0; even < 2; even++)
 		{
 			offset        = layer_offset + (even  << 8 /* * 0x100*/);
 			OUTITERoffset = even * xblock << 8 /* * 256=16x16px*/;
 
 			for (iyblock = even; iyblock < yblock; iyblock+=2)
 			{
-				for (ixblock = 0; ixblock < xblock; ++ixblock)
+				for (ixblock = 0; ixblock < xblock; ixblock++)
 				{
 					int line;
 
 					OUTITER = OUTITERoffset;
-					for (line = 0; line < 16; ++line)
+					for (line = 0; line < 16; line++)
 					{
 						OUT_LU_16(offset, line);
 						OUTITER += (stride - 16 /*we have already incremented by 16*/);
@@ -1270,21 +1288,21 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 		OUTINC        = 2;
 		out           = chroma;
 
-		for (cr = 0; cr < 2; ++cr)
+		for (cr = 0; cr < 2; cr++)
 		{
-			for (even = 0; even < 2; ++even)
+			for (even = 0; even < 2; even++)
 			{
 				offset        = layer_offset + (even  << 8 /* * 0x100*/);
 				OUTITERoffset = even * (xblock << 7 /* * 128=8x8px * 2*/) + cr;
 
 				for (iyblock = even; iyblock < yblock; iyblock+=2)
 				{
-					for (ixblock = 0; ixblock < xblock; ++ixblock)
+					for (ixblock = 0; ixblock < xblock; ixblock++)
 					{
 						int line;
 						OUTITER = OUTITERoffset;
 
-						for (line = 0; line < 8; ++line)
+						for (line = 0; line < 8; line++)
 						{
 							OUT_CH_8(offset, line, !cr);
 							OUTITER += (stride - 16 /*we have already incremented by OUTINC*8=16*/);
@@ -1301,7 +1319,10 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 		timeval_subtract(&result_tv,&stop_tv,&start_tv);
 
 		if (!quiet)
-			fprintf(stderr, "framesync after %dms\n", delay);
+		{
+			fprintf(stderr, "framesync after     : %dms\n", delay);
+			fprintf(stderr, "frame copy duration : %fms\n", (((float)result_tv.tv_sec)*1000.0f+((float)result_tv.tv_usec)/1000.0f));
+		}
 
 		munmap(decode_map, bpa_data.mem_size);
 
@@ -1746,7 +1767,7 @@ void getosd(unsigned char *osd, int *xres, int *yres)
 	*xres=var_screeninfo.xres;
 	*yres=var_screeninfo.yres;
 	if (!quiet)
-		fprintf(stderr, "... Framebuffer-Size: %d x %d\n",*xres,*yres);
+		fprintf(stderr, "Framebuffer-Size    : %d x %d\n",*xres,*yres);
 }
 
 // bicubic pixmap resizing

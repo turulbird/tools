@@ -184,6 +184,7 @@ int checkTuxTxt(const int cCode)
 
 			if (write(sSockethandle, (void *) vTmpS, sizeof("00000000")) <= 0)
 				fprintf(stderr, "Error while forwarding!\n");
+			free(vTmpS);
 		}
 		else
 			fprintf(stderr, "Error while forwarding!\n");
