@@ -1,8 +1,9 @@
-if ENABLE_MULTICOM324
-
-lib_LTLIBRARIES = libmme_host.la
+AUTOMAKE_OPTIONS = subdir-objects
 
 AM_CFLAGS = -Wall -D__LINUX__
+
+if ENABLE_MULTICOM324
+lib_LTLIBRARIES = libmme_host.la
 
 libmme_host_la_SOURCES = ../../../driver/multicom/mme/mme_linux_user.c \
 			 ../../../driver/multicom/mme/ExecutionLoop.c \
