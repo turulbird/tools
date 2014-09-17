@@ -51,12 +51,12 @@ static int setIcon(Context_t *context, int which, int on);
 
 typedef struct
 {
-	int	display;
-	int	display_custom;
-	char	*timeFormat;
+	int display;
+	int display_custom;
+	char *timeFormat;
 
-	time_t	wakeupTime;
-	int	wakeupDecrement;
+	time_t wakeupTime;
+	int wakeupDecrement;
 } tUFC960Private;
 
 /* ******************* helper/misc functions ****************** */
@@ -64,9 +64,7 @@ typedef struct
 static void setMode(int fd)
 {
 	struct micom_ioctl_data micom;
-
 	micom.u.mode.compat = 1;
-
 	if (ioctl(fd, VFDSETMODE, &micom) < 0)
 	{
 		perror("setMode: ");
@@ -81,15 +79,12 @@ static void setMode(int fd)
 static void setMicomTime(time_t theGMTTime, char* destString)
 {
 	/* from u-boot micom */
-	struct tm* now_tm;
-	now_tm = gmtime (&theGMTTime);
-
+	struct tm *now_tm;
+	now_tm = gmtime(&theGMTTime);
 	printf("Set Time (UTC): %02d:%02d:%02d %02d-%02d-%04d\n",
-		now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec, now_tm->tm_mday, now_tm->tm_mon+1, now_tm->tm_year+1900);
-
+		   now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec, now_tm->tm_mday, now_tm->tm_mon + 1, now_tm->tm_year + 1900);
 	double mjd = modJulianDate(now_tm);
 	int mjd_int = mjd;
-
 	destString[0] = (mjd_int >> 8);
 	destString[1] = (mjd_int & 0xff);
 	destString[2] = now_tm->tm_hour;
@@ -99,18 +94,13 @@ static void setMicomTime(time_t theGMTTime, char* destString)
 
 static unsigned long getMicomTime(char *micomTimeString)
 {
-	unsigned int 	mjd 	= ((micomTimeString[1] & 0xFF) * 256) + (micomTimeString[2] & 0xFF);
-	unsigned long 	epoch 	= ((mjd - 40587)*86400);
-
-	unsigned int 	hour 	= micomTimeString[3] & 0xFF;
-	unsigned int 	min 	= micomTimeString[4] & 0xFF;
-	unsigned int 	sec 	= micomTimeString[5] & 0xFF;
-
+	unsigned int    mjd     = ((micomTimeString[1] & 0xFF) * 256) + (micomTimeString[2] & 0xFF);
+	unsigned long   epoch   = ((mjd - 40587) * 86400);
+	unsigned int    hour    = micomTimeString[3] & 0xFF;
+	unsigned int    min     = micomTimeString[4] & 0xFF;
+	unsigned int    sec     = micomTimeString[5] & 0xFF;
 	epoch += (hour * 3600 + min * 60 + sec);
-
-	printf("MJD = %d epoch = %ld, time = %02d:%02d:%02d\n", mjd,
-		epoch, hour, min, sec);
-		
+	printf("MJD = %d epoch = %ld, time = %02d:%02d:%02d\n", mjd, epoch, hour, min, sec);
 	return epoch;
 }
 
@@ -119,23 +109,17 @@ static unsigned long getMicomTime(char *micomTimeString)
 static int init(Context_t *context)
 {
 	tUFC960Private *private = malloc(sizeof(tUFC960Private));
-	int	vFd;
-
+	int vFd;
 	printf("%s\n", __func__);
-
 	vFd = open(cVFD_DEVICE, O_RDWR);
-
 	if (vFd < 0)
 	{
 		fprintf(stderr, "cannot open %s\n", cVFD_DEVICE);
 		perror("");
 	}
-
 	((Model_t *)context->m)->private = private;
 	memset(private, 0, sizeof(tUFC960Private));
-
 	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement, disp);
-
 	return vFd;
 }
 
@@ -147,12 +131,9 @@ static int usage(Context_t *context, char *prg_name, char *cmd_name)
 
 static int setTime(Context_t *context, time_t *theGMTTime)
 {
-	struct	micom_ioctl_data vData;
-
+	struct micom_ioctl_data vData;
 //	printf("%s\n", __func__);
-
 	setMicomTime(*theGMTTime, vData.u.time.time);
-
 	if (ioctl(context->fd, VFDSETTIME, &vData) < 0)
 	{
 		perror("settime: ");
@@ -164,21 +145,17 @@ static int setTime(Context_t *context, time_t *theGMTTime)
 static int getTime(Context_t *context, time_t *theGMTTime)
 {
 	char fp_time[8];
-
 	fprintf(stderr, "Waiting on current time from fp...\n");
-
 	/* front controller time */
 	if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
 	{
 		perror("gettime: ");
 		return -1;
 	}
-
 	/* if we get the fp time */
 	if (fp_time[0] != '\0')
 	{
 		fprintf(stderr, "success reading time from fp\n");
-
 		/* current front controller time */
 		*theGMTTime = (time_t) getMicomTime(fp_time);
 	}
@@ -193,32 +170,27 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 static int setTimer(Context_t *context, time_t *theGMTTime)
 {
 	struct micom_ioctl_data vData;
-	time_t	curTime    = 0;
-	time_t	curTimeFp  = 0;
-	time_t	wakeupTime = 0;
-	struct	tm *ts;
-	struct	tm *tsFp;
-	struct	tm *tsWakeupTime;
-	
+	time_t curTime    = 0;
+	time_t curTimeFp  = 0;
+	time_t wakeupTime = 0;
+	struct tm *ts;
+	struct tm *tsFp;
+	struct tm *tsWakeupTime;
 //	printf("%s ->\n", __func__);
-
 	// Get current Frontpanel time
 	getTime(context, &curTimeFp);
 	tsFp = gmtime(&curTimeFp);
 	fprintf(stderr, "Current Fp Time:     %02d:%02d:%02d %02d-%02d-%04d (UTC)\n",
-		tsFp->tm_hour, tsFp->tm_min, tsFp->tm_sec,
-		tsFp->tm_mday, tsFp->tm_mon+1, tsFp->tm_year+1900);
-
+			tsFp->tm_hour, tsFp->tm_min, tsFp->tm_sec,
+			tsFp->tm_mday, tsFp->tm_mon + 1, tsFp->tm_year + 1900);
 	// Get current Linux time
 	time(&curTime);
 	ts = gmtime(&curTime);
 	fprintf(stderr, "Current Linux Time:  %02d:%02d:%02d %02d-%02d-%04d (UTC)\n",
-		ts->tm_hour, ts->tm_min, ts->tm_sec,
-		ts->tm_mday, ts->tm_mon+1, ts->tm_year+1900);
-
+			ts->tm_hour, ts->tm_min, ts->tm_sec,
+			ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
 	// Set current Linux time as new current Frontpanel time
 	setTime(context, &curTime);
-
 	if (theGMTTime == NULL)
 	{
 		wakeupTime = read_timers_utc(curTime);
@@ -227,7 +199,6 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	{
 		wakeupTime = *theGMTTime;
 	}
-
 	if ((wakeupTime <= 0) || (wakeupTime == LONG_MAX))
 	{
 		/* clear timer */
@@ -238,15 +209,13 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		// Print wakeup time
 		tsWakeupTime = gmtime(&wakeupTime);
 		fprintf(stderr, "Planned Wakeup Time: %02d:%02d:%02d %02d-%02d-%04d (UTC)\n",
-			tsWakeupTime->tm_hour, tsWakeupTime->tm_min, tsWakeupTime->tm_sec,
-			tsWakeupTime->tm_mday, tsWakeupTime->tm_mon+1, tsWakeupTime->tm_year+1900);
-
+				tsWakeupTime->tm_hour, tsWakeupTime->tm_min, tsWakeupTime->tm_sec,
+				tsWakeupTime->tm_mday, tsWakeupTime->tm_mon + 1, tsWakeupTime->tm_year + 1900);
 		setMicomTime(wakeupTime, vData.u.standby.time);
 		fprintf(stderr, "Setting Planned Fp Wakeup Time to = %02X%02X %d %d %d (mtime)\n",
 			vData.u.standby.time[0], vData.u.standby.time[1], vData.u.standby.time[2],
 			vData.u.standby.time[3], vData.u.standby.time[4]);
 	}
-
 	fprintf(stderr, "Entering DeepStandby. Goodbye...\n");
 	fflush(stdout);
 	fflush(stderr);
@@ -267,20 +236,16 @@ static int getWTime(Context_t *context, time_t *theGMTTime)
 
 static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 {
-	time_t	curTime;
-
+	time_t  curTime;
 	/* shutdown immediately */
 	if (*shutdownTimeGMT == -1)
 	{
 		return (setTimer(context, NULL));
 	}
-
 	while (1)
 	{
 		time(&curTime);
-
 		/*printf("curTime = %d, shutdown %d\n", curTime, *shutdownTimeGMT);*/
-
 		if (curTime >= *shutdownTimeGMT)
 		{
 			/* set most recent e2 timer and bye bye */
@@ -293,13 +258,11 @@ static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 
 static int reboot(Context_t *context, time_t *rebootTimeGMT)
 {
-	time_t	curTime;
-	struct	micom_ioctl_data vData;
-
+	time_t curTime;
+	struct micom_ioctl_data vData;
 	while (1)
 	{
 		time(&curTime);
-
 		if (curTime >= *rebootTimeGMT)
 		{
 			if (ioctl(context->fd, VFDREBOOT, &vData) < 0)
@@ -308,7 +271,6 @@ static int reboot(Context_t *context, time_t *rebootTimeGMT)
 				return -1;
 			}
 		}
-
 		usleep(100000);
 	}
 	return 0;
@@ -316,35 +278,29 @@ static int reboot(Context_t *context, time_t *rebootTimeGMT)
 
 static int Sleep(Context_t *context, time_t *wakeUpGMT)
 {
-	time_t	curTime;
-	int	sleep = 1;
-	int	vFd;
-	fd_set	rfds;
-	struct	timeval tv;
-	int	retval, i, rd;
-	struct	tm *ts;
-	char	output[cMAXCharsUFC960 + 1];
-	struct	input_event ev[64];
+	time_t curTime;
+	int sleep = 1;
+	int vFd;
+	fd_set rfds;
+	struct timeval tv;
+	int retval, i, rd;
+	struct tm *ts;
+	char output[cMAXCharsUFC960 + 1];
+	struct input_event ev[64];
 	tUFC960Private *private = (tUFC960Private *)((Model_t *)context->m)->private;
-
 	printf("%s\n", __func__);
-
 	vFd = open(cEVENT_DEVICE, O_RDWR);
-
 	if (vFd < 0)
 	{
 		fprintf(stderr, "Cannot open %s\n", cEVENT_DEVICE);
 		perror("");
 	return -1;
 	}
-
 //	printf("%s 1\n", __func__);
-
 	while (sleep)
 	{
 		time(&curTime);
 		ts = localtime(&curTime);
-
 		if (curTime >= *wakeUpGMT)
 		{
 			sleep = 0;
@@ -355,24 +311,20 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 			FD_SET(vFd, &rfds);
 			tv.tv_sec = 0;
 			tv.tv_usec = 100000;
-
 			retval = select(vFd + 1, &rfds, NULL, NULL, &tv);
-
 			if (retval > 0)
 			{
 				rd = read(vFd, ev, sizeof(struct input_event) * 64);
-
 				if (rd < (int) sizeof(struct input_event))
 				{
 					continue;
 				}
-
 				for (i = 0; i < rd / sizeof(struct input_event); i++)
 				{
 					if (ev[i].type == EV_SYN)
 					{
 					}
-					else if (ev[i].type == EV_MSC && (ev[i].code == MSC_RAW || ev[i].code == MSC_SCAN)) 
+					else if (ev[i].type == EV_MSC && (ev[i].code == MSC_RAW || ev[i].code == MSC_SCAN))
 					{
 					}
 					else
@@ -385,7 +337,6 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 				}
 			}
 		}
-
 		if (private->display)
 		{
 			strftime(output, cMAXCharsUFC960 + 1, private->timeFormat, ts);
@@ -397,27 +348,20 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 
 static int setText(Context_t *context, char *theText)
 {
-	char	vHelp[128];
-
+	char vHelp[128];
 	strncpy(vHelp, theText, cMAXCharsUFC960);
 	vHelp[cMAXCharsUFC960] = '\0';
-
 	/* printf("%s, %d\n", vHelp, strlen(vHelp));*/
-
 	write(context->fd, vHelp, strlen(vHelp));
-
 	return 0;
 }
 
 static int setLed(Context_t *context, int which, int on)
 {
-	struct	micom_ioctl_data vData;
-
+	struct micom_ioctl_data vData;
 	vData.u.led.led_nr = which;
 	vData.u.led.on = on;
-
 	setMode(context->fd);
-
 	if (ioctl(context->fd, VFDSETLED, &vData) < 0)
 	{
 		perror("setLed: ");
@@ -429,12 +373,9 @@ static int setLed(Context_t *context, int which, int on)
 static int setIcon(Context_t *context, int which, int on)
 {
 	struct micom_ioctl_data vData;
-
 	vData.u.icon.icon_nr = which;
 	vData.u.icon.on = on;
-
 	setMode(context->fd);
-
 	if (ioctl(context->fd, VFDICONDISPLAYONOFF, &vData) < 0)
 	{
 		perror("setIcon: ");
@@ -445,19 +386,14 @@ static int setIcon(Context_t *context, int which, int on)
 
 static int setBrightness(Context_t *context, int brightness)
 {
-	struct	micom_ioctl_data vData;
-
+	struct micom_ioctl_data vData;
 	if (brightness < 0 || brightness > 5)
 	{
 		return -1;
 	}
-
 	vData.u.brightness.level = brightness;
-
 	printf("%d\n", context->fd);
-
 	setMode(context->fd);
-
 	if (ioctl(context->fd, VFDBRIGHTNESS, &vData) < 0)
 	{
 		perror("setBrightness: ");
@@ -483,24 +419,19 @@ static int setLight(Context_t *context, int on)
 /* FIXME: not sure if this really works for ufc960 ->must be checked */
 static int getWakeupReason(Context_t *context, int *reason)
 {
-	char	mode[8];
-
+	char mode[8];
 	fprintf(stderr, "waiting on wakeupmode from fp ...\n");
-
 	/* front controller time */
 	if (ioctl(context->fd, VFDGETWAKEUPMODE, &mode) < 0)
 	{
 		perror("getWakeupReason: ");
 		return -1;
 	}
-
 	/* if we get the fp time */
 	if (mode[0] != '\0')
 	{
 		fprintf(stderr, "success reading wakeupdmode from fp\n");
-
 		*reason = mode[1] && 0xff;
-
 		printf("reason = 0x%x\n", *reason);
 	}
 	else
@@ -515,24 +446,19 @@ static int getWakeupReason(Context_t *context, int *reason)
 /* FIXME: not sure if this really works for ufc960 ->must be checked */
 static int getVersion(Context_t *context, int *version)
 {
-	char	strVersion[8];
-
+	char strVersion[8];
 	fprintf(stderr, "Waiting on version from fp ...\n");
-
 	/* front controller time */
 	if (ioctl(context->fd, VFDGETVERSION, &strVersion) < 0)
 	{
 		perror("getVersion: ");
 		return -1;
 	}
-
 	/* if we get the version info */
 	if (strVersion[0] != '\0')
 	{
 		fprintf(stderr, "Success reading version from fp\n");
-
 		*version = strVersion[1] * 10 | strVersion[2];
-
 		printf("Version = %d\n", *version);
 	}
 	else
@@ -546,7 +472,6 @@ static int getVersion(Context_t *context, int *version)
 static int Exit(Context_t *context)
 {
 	tUFC960Private *private = (tUFC960Private *)((Model_t *)context->m)->private;
-
 	if (context->fd > 0)
 	{
 		close(context->fd);
@@ -558,37 +483,28 @@ static int Exit(Context_t *context)
 static int Clear(Context_t *context)
 {
 	int i;
-
 	setText(context, "                ");
-
 	setBrightness(context, 5);
-
 	for (i = 1; i <= 6 ; i++)
 	{
 		setLed(context, i, 0);
 	}
-
 	for (i = 1; i <= 16 ; i++)
 	{
 		setIcon(context, i, 0);
 	}
-
 	return 0;
 }
 
 static int setLedBrightness(Context_t *context, int brightness)
 {
 	struct micom_ioctl_data vData;
-
 	if (brightness < 0 || brightness > 0xff)
 	{
 		return -1;
 	}
-
 	vData.u.brightness.level = brightness;
-
 	setMode(context->fd);
-
 	printf("%d\n", context->fd);
 	if (ioctl(context->fd, VFDLEDBRIGHTNESS, &vData) < 0)
 	{

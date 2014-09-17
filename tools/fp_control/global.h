@@ -2,9 +2,9 @@
 #define GLOBAL_H_
 
 #ifndef bool
-	#define bool unsigned char
-	#define false 0
-	#define true  1
+#define bool unsigned char
+#define false 0
+#define true  1
 #endif
 
 #define VFDDISPLAYCHARS         0xc0425a00
@@ -58,10 +58,10 @@ typedef enum {NONE, TIMER, POWERON} eWakeupReason;
 typedef enum {Unknown, Ufs910_1W, Ufs910_14W, Ufs922, Ufc960, Tf7700, Hl101, Vip2, Fortis, Hs5101, Ufs912, Spark, Cuberevo, Adb_Box, CNBox} eBoxType;
 
 typedef struct Context_s
-{ /* Model_t */ 
-	void	*m; /* instance data */
-	int	fd; /* filedescriptor of fd */
-
+{
+	/* Model_t */
+	void *m; /* instance data */
+	int fd; /* filedescriptor of fd */
 } Context_t;
 
 typedef struct Model_s
@@ -97,7 +97,6 @@ typedef struct Model_s
 	int	(*SetTimeMode)      (Context_t *context, int twentyFour);
 	int	(*ModelSpecific)    (Context_t *context, int len, int *testdata); /* added by audioniek */
 	void	*private;
-
 } Model_t;
 
 extern Model_t Ufs910_1W_model;

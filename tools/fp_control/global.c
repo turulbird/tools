@@ -104,8 +104,8 @@ static time_t read_e2_timers(time_t curTime)
 	{
 		while(fgets(line, 999, fd) != NULL)
 		{
-			line[999]='\0';
-			if (!strncmp("<timer begin=\"",line,14) )
+			line[999] = '\0';
+			if (!strncmp("<timer begin=\"", line, 14))
 			{
 				unsigned long int tmp = 0;
 				strncpy(recordString, line+14, 10);
@@ -124,14 +124,13 @@ static time_t read_e2_timers(time_t curTime)
 	}
 	else
 		printf(" - Error reading %s\n", E2TIMERSXML);
-
 	return recordTime;
 }
 #endif
 
 static time_t read_neutrino_timers(time_t curTime)
 {
-	char   line[1000];
+	char line[1000];
 	time_t recordTime = LONG_MAX;
 	FILE   *fd        = fopen (NEUTRINO_TIMERS, "r");
 
@@ -151,7 +150,6 @@ static time_t read_neutrino_timers(time_t curTime)
 				char* str;
 
 				str = strstr(line, "=");
-
 				if (str != NULL)
 				{
 					tmp = atol(str + 1);
@@ -164,7 +162,6 @@ static time_t read_neutrino_timers(time_t curTime)
 	}
 	else
 		printf(" - Error reading %s\n", NEUTRINO_TIMERS);
-
 	if (recordTime != LONG_MAX)
 	{
 		int wakeupDecrement = 5*60;
@@ -201,7 +198,6 @@ static time_t read_wakeup_file()
 		fscanf(wakeupFile,"%ld", &wakeupTime);
 		fclose(wakeupFile);
 	}
-
 	return wakeupTime;
 }
 
@@ -219,7 +215,6 @@ int getWakeupReasonPseudo(int *reason)
 
 	time(&curTime);
 	wakeupTime = read_wakeup_file();
-
 	if ((curTime - FIVE_MIN) < wakeupTime && (curTime + FIVE_MIN) > wakeupTime)
 	{
 		*reason = TIMER;
@@ -266,7 +261,6 @@ time_t read_timers_utc(time_t curTime)
 	}
 
 	write_wakeup_file(wakeupTime);
-
 	return wakeupTime;
 }
 
@@ -276,30 +270,24 @@ time_t read_fake_timer_utc(time_t curTime)
 	struct tm tsWake;
 	struct tm *ts;
 	time_t wakeupTime = LONG_MAX;
-
 	ts = gmtime(&curTime);
-
 	tsWake.tm_hour = ts->tm_hour;
 	tsWake.tm_min  = ts->tm_min;
 	tsWake.tm_sec  = ts->tm_sec;
 	tsWake.tm_mday = ts->tm_mday;
 	tsWake.tm_mon  = ts->tm_mon;
 	tsWake.tm_year = ts->tm_year + 1;
-
 	wakeupTime = mktime(&tsWake);
-
 	return wakeupTime;
 }
 /* ******************************************** */
 
 double modJulianDate(struct tm *theTime)
 {
-
 	double date;
 	int month;
 	int day; 
 	int year;
-
 	year  = theTime->tm_year + 1900;
 	month = theTime->tm_mon + 1;
 	day   = theTime->tm_mday;
@@ -314,7 +302,6 @@ double modJulianDate(struct tm *theTime)
 	date += (theTime->tm_sec)/86400.0;
 
 	date -= 2400000.5;
-
 	return date;
 }
 
@@ -324,7 +311,6 @@ int searchModel(Context_t *context, eBoxType type)
 {
 	int i;
 	for (i = 0; AvailableModels[i] != NULL; i++)
-
 		if (AvailableModels[i]->Type == type)
 		{
 			context->m = AvailableModels[i];
@@ -369,18 +355,17 @@ int checkConfig(int* display, int* display_custom, char** timeFormat, int* wakeu
 		}
 		else if (!strncmp("DISPLAYCUSTOM=", buffer, 14))
 		{
-			char * option = &buffer[14]; //get buffer from character 14 on
+			char *option = &buffer[14];  //get buffer from character 14 on
 			*display_custom = 1;
 //			display_customstr = "TRUE ";
 			*timeFormat = strdup(option);
 		}
 		else if (!strncmp("WAKEUPDECREMENT=", buffer, 16))
 		{
-			char * option = &buffer[16];
+			char *option = &buffer[16];
 			*wakeup = atoi(option) / 60;
 		}
 	}
-	
 	if (*timeFormat == NULL)
 	{
 		*timeFormat = "?";

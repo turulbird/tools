@@ -9,14 +9,14 @@
 #define VFDDISPLAYWRITEONOFF  0xc0425a05
 #define VFDDISPLAYCHARS       0xc0425a00
 
-#define VFDCLEARICONS	      0xc0425af6
+#define VFDCLEARICONS         0xc0425af6
 #define VFDSETRF              0xc0425af7
 #define VFDSETFAN             0xc0425af8
 #define VFDGETWAKEUPMODE      0xc0425af9
 #define VFDGETTIME            0xc0425afa
 #define VFDSETTIME            0xc0425afb
 #define VFDSTANDBY            0xc0425afc
-#define VFDREBOOT		      0xc0425afd
+#define VFDREBOOT             0xc0425afd
 #define VFDSETLED             0xc0425afe
 #define VFDSETMODE            0xc0425aff
 

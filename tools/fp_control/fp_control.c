@@ -47,7 +47,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* software version of fp_control. please increase on every change */
-static const char* sw_version = "1.05NdV 20140810.1";
+static const char *sw_version = "1.05NdV 20140810.1";
 
 typedef struct
 {
@@ -56,12 +56,12 @@ typedef struct
 	char *arg_description;
 } tArgs;
 
-time_t	*theGMTTime;
-char	vName[129] = "Unknown";
-int	Vdisplay = 0;
-int	Vdisplay_custom = 0;
-char	*VtimeFormat = "Unknown";
-int	Vwakeup = 5;
+time_t *theGMTTime;
+char vName[129] = "Unknown";
+int Vdisplay = 0;
+int Vdisplay_custom = 0;
+char *VtimeFormat = "Unknown";
+int Vwakeup = 5;
 const char *wakeupreason[4] = { "Unknown", "Power on", "From deep standby", "Timer" };
 
 tArgs vArgs[] =
@@ -104,25 +104,21 @@ int usage(Context_t *context, char *prg, char *cmd)
 	/* let the model print out what it can handle in reality */
 	if ((((Model_t *)context->m)->Usage == NULL) || (((Model_t *)context->m)->Usage(context, prg, cmd) < 0))
 	{
-		int	i;
-
+		int i;
 		/* or printout a default usage */
 		fprintf(stderr, "General usage:\n\n");
 		fprintf(stderr, "%s argument [optarg1] [optarg2]\n", prg);
-
-		for (i = 0; ;i++)
+		for (i = 0; ; i++)
 		{
 			if (vArgs[i].arg == NULL)
 				break;
-
 			if ((cmd == NULL) || (strcmp(cmd, vArgs[i].arg) == 0) || (strstr(vArgs[i].arg_long, cmd) != NULL))
 				fprintf(stderr, "%s   %s   %s\n", vArgs[i].arg, vArgs[i].arg_long, vArgs[i].arg_description);
 		}
 	}
-
-	if (((Model_t*)context->m)->Exit)
+	if (((Model_t *)context->m)->Exit)
 	{
-		((Model_t*)context->m)->Exit(context);
+		((Model_t *)context->m)->Exit(context);
 	}
 	exit(1);
 }
@@ -135,13 +131,9 @@ int usage(Context_t *context, char *prg, char *cmd)
 void getTimeFromArg(char *timeStr, char *dateStr, time_t *theGMTTime)
 {
 	struct tm  theTime;
-
 //	printf("%s\n", __func__);
-
 	sscanf(timeStr, "%d:%d:%d", &theTime.tm_hour, &theTime.tm_min, &theTime.tm_sec);
-
 	sscanf(dateStr, "%d-%d-%d", &theTime.tm_mday, &theTime.tm_mon, &theTime.tm_year);
-
 	theTime.tm_year -= 1900;
 	theTime.tm_mon   = theTime.tm_mon - 1;
 
@@ -151,10 +143,8 @@ void getTimeFromArg(char *timeStr, char *dateStr, time_t *theGMTTime)
 	   supply localtime anyway. On a spark7162 local time is used
 	   internally. */
 	*theGMTTime = mktime(&theTime);
-
 	/* new_time = localtime(&dummy);*/
 //	printf("%s <\n", __func__);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,8 +152,7 @@ void getTimeFromArg(char *timeStr, char *dateStr, time_t *theGMTTime)
 
 void processCommand (Context_t *context, int argc, char *argv[])
 {
-	int	i;
-
+	int i;
 	if (((Model_t *)context->m)->Init)
 	{
 		context->fd = ((Model_t *)context->m)->Init(context);
@@ -208,42 +197,35 @@ void processCommand (Context_t *context, int argc, char *argv[])
 #endif
 			else if ((strcmp(argv[i], "-g") == 0) || (strcmp(argv[i], "--getTime") == 0))
 			{
-				time_t	theGMTTime;  //TODO: print time according to receiver mask
-
+				time_t theGMTTime;  //TODO: print time according to receiver mask
 				/* get the frontcontroller time */
 				if (((Model_t *)context->m)->GetTime)
 				{
 					if (((Model_t *)context->m)->GetTime(context, &theGMTTime) == 0)
 					{
 //						struct tm *gmt = gmtime(&theGMTTime);
-						struct	tm *gmt = localtime(&theGMTTime);
+						struct tm *gmt = localtime(&theGMTTime);
 						printf("Current front processor time: %02d:%02d:%02d %02d-%02d-%04d (local)\n",
-							gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon+1, gmt->tm_year+1900);
+							   gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon + 1, gmt->tm_year + 1900);
 					}
 				}
-
 			}
 			else if ((strcmp(argv[i], "-gs") == 0) || (strcmp(argv[i], "--getTimeAndSet") == 0))
 			{
-				time_t	theGMTTime;
-
+				time_t theGMTTime;
 				/* get the frontcontroller time */
 				if (((Model_t *)context->m)->GetTime)
 				{
 					if (((Model_t *)context->m)->GetTime(context, &theGMTTime) == 0)
 					{
-						struct	tm *gmt = gmtime(&theGMTTime);
-
-						struct	timeval tv;
-						time_t	allsec;
-
+						struct tm *gmt = gmtime(&theGMTTime);
+						struct timeval tv;
+						time_t allsec;
 						allsec = mktime(gmt);
 						tv.tv_sec = allsec;
-
 //						settimeofday(&tv, 0);   // only works on spark, so we make a system-call later
-
 						fprintf(stderr, "Setting RTC to current frontpanel time: %02d:%02d:%02d %02d-%02d-%04d\n",
-							gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon+1, gmt->tm_year+1900);
+								gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon + 1, gmt->tm_year + 1900);
 						char cmd[50];
 						sprintf(cmd, "date -s %04d.%02d.%02d-%02d:%02d:%02d\n", gmt->tm_year+1900, gmt->tm_mon+1, gmt->tm_mday, gmt->tm_hour, gmt->tm_min, gmt->tm_sec);
 						system(cmd);
@@ -260,9 +242,8 @@ void processCommand (Context_t *context, int argc, char *argv[])
 					if (((Model_t *)context->m)->GetWTime(context, &theGMTTime) == 0)
 					{
 						struct tm *gmt = gmtime(&theGMTTime);
-
 						fprintf(stderr, "Current wake up time: %02d:%02d:%02d %02d-%02d-%04d\n",
-							gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon+1, gmt->tm_year+1900);
+								gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon + 1, gmt->tm_year + 1900);
 					}
 				}
 			}
@@ -285,11 +266,9 @@ void processCommand (Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-s") == 0) || (strcmp(argv[i], "--setTime") == 0))
 			{
 				time_t theGMTTime;
-
 				if (argc == 4)
 				{
 					getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
-
 					/* set the frontcontroller time */
 					if (((Model_t *)context->m)->SetTime)
 					{
@@ -314,11 +293,9 @@ void processCommand (Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-st") == 0) || (strcmp(argv[i], "--setWakeTime") == 0))
 			{
 				time_t theGMTTime;
-
 				if (argc == 4)
 				{
 					getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
-
 					/* set the frontcontroller wake up time */
 					if (((Model_t *)context->m)->SetWTime)
 					{
@@ -334,7 +311,6 @@ void processCommand (Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-d") == 0) || (strcmp(argv[i], "--shutDown") == 0))
 			{
 				time_t theGMTTime;
-
 				if (argc == 4)
 				{
 					getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
@@ -363,11 +339,9 @@ void processCommand (Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-r") == 0) || (strcmp(argv[i], "--reboot") == 0))
 			{
 				time_t theGMTTime;
-
 				if (argc == 4)
 				{
 					getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
-
 					/* reboot at the given time */
 					if (((Model_t *)context->m)->Reboot)
 					{
@@ -393,11 +367,9 @@ void processCommand (Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-p") == 0) || (strcmp(argv[i], "--sleep") == 0))
 			{
 				time_t theGMTTime;
-
 				if (argc == 4)
 				{
 					getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
-
 					/* sleep for a while, or wake-up on another reason (rc ...) */
 					if (((Model_t *)context->m)->Sleep)
 						((Model_t *)context->m)->Sleep(context, &theGMTTime);
@@ -425,10 +397,8 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				if (i + 2 <= argc)
 				{
 					int which, on;
-
 					which = atoi(argv[i + 1]);
 					on = atoi(argv[i + 2]);
-
 					/* set display led */
 					if (((Model_t *)context->m)->SetLed)
 					{
@@ -442,10 +412,8 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				if (i + 2 <= argc)
 				{
 					int which, on;
-
 					which = atoi(argv[i + 1]);
 					on = atoi(argv[i + 2]);
-
 					/* set display icon */
 					if (((Model_t *)context->m)->SetIcon)
 					{
@@ -459,9 +427,7 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				if (i + 1 <= argc)
 				{
 					int brightness;
-
 					brightness = atoi(argv[i + 1]);
-
 					/* set display brightness */
 					if (((Model_t *)context->m)->SetBrightness)
 					{
@@ -474,7 +440,6 @@ void processCommand (Context_t *context, int argc, char *argv[])
 			{
 				int ret = -1;
 				int reason;
-
 				if (((Model_t *)context->m)->GetWakeupReason)
 				{
 					ret = ((Model_t *)context->m)->GetWakeupReason(context, &reason);
@@ -483,7 +448,6 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				{
 					ret = getWakeupReasonPseudo(&reason);
 				}
-				
 				if (ret == 0)
 				{
 					printf("Wakeup reason = %d (%s)\n\n", reason & 0x03, wakeupreason[reason & 0x03]);
@@ -496,12 +460,11 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				{
 					int on = 1; // default is on
 					on = atoi(argv[i + 1]);
-
 					if (((Model_t *)context->m)->SetLight)
 					{
 						((Model_t *)context->m)->SetLight(context, on);
 					}
-			 	}
+				}
 				i += 1;
 			}
 			else if ((strcmp(argv[i], "-c") == 0) || (strcmp(argv[i], "--clear") == 0))
@@ -514,11 +477,10 @@ void processCommand (Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-led") == 0) || (strcmp(argv[i], "--setLedBrightness") == 0))
 			{
 				if (i + 1 <= argc)
-				{  /* set LED brightness */
+				{
+					/* set LED brightness */
 					int brightness;
-
 					brightness = atoi(argv[i + 1]);
-
 					if (((Model_t *)context->m)->SetLedBrightness)
 					{
 						((Model_t *)context->m)->SetLedBrightness(context, brightness);
@@ -529,19 +491,16 @@ void processCommand (Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-v") == 0) || (strcmp(argv[i], "--version") == 0))
 			{
 				int version = -1;
-
 				printf("\nProgram version info:\n");
 				printf("fp_control version %s\n", sw_version);
 				printf("\nConfiguration of receiver:\n");
 				printf("Display: %d        Time format: %s", Vdisplay, VtimeFormat);
 				printf("Displaycustom: %d  Wakeupdecrement: %d mins\n", Vdisplay_custom, Vwakeup);
-
 				/* get FP version info */
 				if (((Model_t *)context->m)->GetVersion)
 				{
 					((Model_t *)context->m)->GetVersion(context, &version);
 				}
-
 				if (version == -1)
 				{
 					printf("Error: FP version is unknown\n");
@@ -552,9 +511,7 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				if (i + 1 <= argc)
 				{
 					int on;
-
 					on = atoi(argv[i + 1]);
-
 					/* set fan on/off */
 					if (((Model_t *)context->m)->SetFan)
 					{
@@ -568,9 +525,7 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				if (i + 1 <= argc)
 				{
 					int on;
-
 					on = atoi(argv[i + 1]);
-
 					/* set rf on/off */
 					if (((Model_t *)context->m)->SetRF)
 					{
@@ -584,9 +539,7 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				if (i + 1 <= argc)
 				{
 					int on;
-
 					on = atoi(argv[i + 1]);
-
 					/* set display time */
 					if (((Model_t *)context->m)->SetDisplayTime)
 					{
@@ -600,9 +553,7 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				if (i + 1 <= argc)
 				{
 					int twentyFour;
-
 					twentyFour = atoi(argv[i + 1]);
-
 					/* set 12/24 hour mode */
 					if (((Model_t *)context->m)->SetTimeMode)
 					{
@@ -616,7 +567,6 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				int len, j;
 				int testdata[17];
 //				int return_size;
-
 				len = argc - 2;
 				if ((len > 0) && (len <= 16))
 				{
@@ -624,13 +574,12 @@ void processCommand (Context_t *context, int argc, char *argv[])
 					{
 						testdata[0] = len;
 //						printf("j=0 testdata=%02x\n",testdata[0]);
-						for (j=1; j<=len; j++)
+						for (j = 1; j <= len; j++)
 						{
-							testdata[j] = atoi(argv[j+1]) & 0xFF;
+							testdata[j] = atoi(argv[j + 1]) & 0xFF;
 //							printf("j=%d testdata=%02x\n",j,testdata[j]);
 						}
 						/* do model specific function */
-
 						if (((Model_t *)context->m)->ModelSpecific)
 						{
 							((Model_t *)context->m)->ModelSpecific(context, len, testdata);
@@ -649,7 +598,7 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				else
 				{
 					printf("Wrong number of arguments, minimum is 1, maximum is 16.\n");
-		 			usage(context, argv[0], argv[1]);
+					usage(context, argv[0], argv[1]);
 				}
 				i += len;
 			}
@@ -664,7 +613,6 @@ void processCommand (Context_t *context, int argc, char *argv[])
 	{
 		usage(context, argv[0], NULL);
 	}
-
 	if (((Model_t *)context->m)->Exit)
 	{
 		((Model_t *)context->m)->Exit(context);
@@ -679,12 +627,9 @@ int getKathreinUfs910BoxType()
 {
 	char vType;
 	int vFdBox = open("/proc/boxtype", O_RDONLY);
-
 	read(vFdBox, &vType, 1);
-
 	close(vFdBox);
-
-	return vType == '0'?0 : vType == '1' || vType == '3' ? 1: -1;
+	return vType == '0' ? 0 : vType == '1' || vType == '3' ? 1 : -1;
 }
 
 int getModel()
@@ -694,17 +639,13 @@ int getModel()
 	char        vName[129]      = "Unknown";
 	int         vLen            = -1;
 	eBoxType    vBoxType        = Unknown;
-
 	vFd = open("/proc/stb/info/model", O_RDONLY);
 	vLen = read(vFd, vName, cSize);
-
 	close(vFd);
-
 	if (vLen > 0)
 	{
 		vName[vLen - 1] = '\0';
-
-		if (!strncasecmp(vName,"ufs910", 6))
+		if (!strncasecmp(vName, "ufs910", 6))
 		{
 			switch(getKathreinUfs910BoxType())
 			{
@@ -773,7 +714,6 @@ int getModel()
 			vBoxType = Cuberevo;
 		else
 			vBoxType = Unknown;
-
 		if (disp)
 		{
 			printf("Receiver: %s\n", vName);
@@ -786,20 +726,16 @@ int main(int argc, char *argv[])
 {
 	eBoxType vBoxType = Unknown;
 	Context_t context;
-
 	if (disp)
 	{
 		printf("\n%s Version %s\n", argv[0], sw_version);
 	}
-
 	vBoxType = getModel();
-
 	if (searchModel(&context, vBoxType) != 0)
 	{
 		printf("Model not found\n");
 		return -1;
 	}
-
 	processCommand(&context, argc, argv);
 	return 0;
 }

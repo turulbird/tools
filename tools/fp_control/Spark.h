@@ -63,7 +63,7 @@ struct get_version_s
 /* YYMMDDhhmmss */
 struct get_wakeuptime
 {
-    char time[12];
+	char time[12];
 };
 
 struct set_modelspecific_s
