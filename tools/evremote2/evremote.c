@@ -423,6 +423,12 @@ int getModel()
 			vBoxType = CNBox;
 		else if (!strncasecmp(vName, "hs5101", 6))
 			vBoxType = Hs5101;
+		else if ((!strncasecmp(vName, "adb_box", 7)) ||
+				 (!strncasecmp(vName, "sagemcom88", 10)) ||
+				 (!strncasecmp(vName, "esi_88", 6)) ||
+				 (!strncasecmp(vName, "esi88", 5)) ||
+				 (!strncasecmp(vName, "dsi87", 5)))
+			vBoxType = Adb_Box;
 		else if ((!strncasecmp(vName, "ipbox9900", 9)) || (!strncasecmp(vName, "ipbox99", 7)) || (!strncasecmp(vName, "ipbox55", 7)))
 			vBoxType = Ipbox;
 		else if (!strncasecmp(vName, "ufs912", 5))
@@ -478,12 +484,14 @@ int main(int argc, char *argv[])
 	 */
 	ignoreSIGPIPE();
 
-	if (argc >= 2 && !strncmp(argv[1], "useLircdName", 8))
+	if (argc >= 2 && !strncmp(argv[1], "useLircdName", 12))
+	{
 		vBoxType = LircdName;
 		if (argc >= 3)
 		  cmdBtnPeriod = atoi(argv[2]);
 		if (argc >= 4)
 		  cmdBtnDelay = atoi(argv[3]);
+	}
 	else
 		vBoxType = getModel();
 
