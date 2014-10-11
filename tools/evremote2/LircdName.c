@@ -40,8 +40,6 @@
 
 #define REPEATDELAY 20 // ms
 #define REPEATFREQ 130 // ms
-#define KEYPRESSDELAY 200 // ms
-#define SAMEKEYPRESSDELAY 300 // ms
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
@@ -315,12 +313,12 @@ static int pRead(Context_t *context)
 		if (count == 0)
 		{
 		//time checking
-			if ((LastKeyCode == vCurrentCode) && (GetNow() - LastKeyPressedTime < SAMEKEYPRESSDELAY))   // (diffMilli(LastKeyPressedTime, CurrKeyPressedTime) <= REPEATDELAY) )
+			if ((LastKeyCode == vCurrentCode) && (GetNow() - LastKeyPressedTime < REPEATDELAY))   // (diffMilli(LastKeyPressedTime, CurrKeyPressedTime) <= REPEATDELAY) )
 			{
 				printf("[LircdName RCU] skiping next press of same key coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
 				return -1;
 			}
-			else if (GetNow() - LastKeyPressedTime < KEYPRESSDELAY)
+			else if (GetNow() - LastKeyPressedTime < REPEATDELAY)
 			{
 				printf("[LircdName RCU] skiping different keys coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
 				return -1;
@@ -330,7 +328,7 @@ static int pRead(Context_t *context)
                 nextflag++;
 		}
 		else
-			printf("[RCU LircdName] KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
+			printf("[RCU LircdName] same KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
 
 		LastKeyCode = vCurrentCode;
 		LastKeyPressedTime = GetNow();
