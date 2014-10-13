@@ -38,8 +38,8 @@
 #include "map.h"
 #include "remotes.h"
 
-#define REPEATDELAY 20 // ms
-#define REPEATFREQ 130 // ms
+#define REPEATDELAY 75 // ms
+#define REPEATFREQ 75 // ms
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
@@ -218,6 +218,7 @@ static tButton cButtons_LircdName[] =
 
     {"KEY_TWEN"      , "=>", KEY_TWEN},
     {"KEY_BREAK"      , "=>", KEY_BREAK},
+    {"KEY_PLAYPAUSE"	, "=>"  , KEY_PLAYPAUSE}, 
 	{""               	, ""  , KEY_NULL},
 };
 /* fixme: move this to a structure and
@@ -228,7 +229,7 @@ static struct sockaddr_un  vAddr;
 static int LastKeyCode = -1;
 static char LastKeyName[30];
 static long long LastKeyPressedTime;
-
+static int LircdBtnDelay = REPEATDELAY;
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
@@ -236,6 +237,8 @@ static int pInit(Context_t *context, int argc, char *argv[])
 
 	vAddr.sun_family = AF_UNIX;
 
+	if (argc >= 4)
+		LircdBtnDelay = (atoi(argv[3]) == 0) ? REPEATDELAY : atoi(argv[3]);
 	// in new lircd its moved to /var/run/lirc/lircd by default and need use key to run as old version
 	if (access("/var/run/lirc/lircd", F_OK) == 0)
 		strcpy(vAddr.sun_path, "/var/run/lirc/lircd");
@@ -258,6 +261,8 @@ static int pInit(Context_t *context, int argc, char *argv[])
 		return -1;
 	}
 
+	printf("[LircdName RCU] init delay %d ms\n", LircdBtnDelay);
+	
 	return vHandle;
 }
 
@@ -313,12 +318,12 @@ static int pRead(Context_t *context)
 		if (count == 0)
 		{
 		//time checking
-			if ((LastKeyCode == vCurrentCode) && (GetNow() - LastKeyPressedTime < REPEATDELAY))   // (diffMilli(LastKeyPressedTime, CurrKeyPressedTime) <= REPEATDELAY) )
+			if ((LastKeyCode == vCurrentCode) && (GetNow() - LastKeyPressedTime < LircdBtnDelay))   // (diffMilli(LastKeyPressedTime, CurrKeyPressedTime) <= REPEATDELAY) )
 			{
 				printf("[LircdName RCU] skiping next press of same key coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
 				return -1;
 			}
-			else if (GetNow() - LastKeyPressedTime < REPEATDELAY)
+			else if (GetNow() - LastKeyPressedTime < LircdBtnDelay)
 			{
 				printf("[LircdName RCU] skiping different keys coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
 				return -1;
@@ -334,7 +339,6 @@ static int pRead(Context_t *context)
 		LastKeyPressedTime = GetNow();
 		strcpy(LastKeyName, KeyName);
 
-		//printf("[LircdName RCU] nextflag: nf -> %i\n", nextflag);
 		vCurrentCode += (nextflag << 16);
 	}
 	else
@@ -353,7 +357,7 @@ static int pNotification(Context_t *context, const int cOn)
 
 RemoteControl_t LircdName_RC =
 {
-	"LircdName Universal RemoteControl v.1",
+	"LircdName Universal RemoteControl v.1.2",
 	LircdName,
 	&pInit,
 	&pShutdown,
