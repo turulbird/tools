@@ -103,6 +103,9 @@ int processSimple(Context_t *context, int argc, char *argv[])
 static unsigned int gBtnPeriod  = 100;
 static unsigned int gBtnDelay = 10;
 
+static unsigned int cmdBtnPeriod  = 0;
+static unsigned int cmdBtnDelay = 0;
+
 static struct timeval profilerLast;
 
 static unsigned int gKeyCode = 0;
@@ -213,8 +216,14 @@ int processComplex(Context_t *context, int argc, char *argv[])
 	if (((RemoteControl_t *)context->r)->LongKeyPressSupport != NULL)
 	{
 		tLongKeyPressSupport lkps = *((RemoteControl_t *)context->r)->LongKeyPressSupport;
-		gBtnPeriod = lkps.period;
-		gBtnDelay = lkps.delay;
+		if (cmdBtnPeriod)
+		  gBtnPeriod = cmdBtnPeriod;
+		else
+		  gBtnPeriod = lkps.period;
+		if (cmdBtnDelay)
+			gBtnDelay = cmdBtnDelay;
+		else
+			gBtnDelay = lkps.delay;
 		printf("Using period=%d delay=%d\n", gBtnPeriod, gBtnDelay);
 	}
 
@@ -443,7 +452,7 @@ int getModel()
 		else if (!strncasecmp(vName, "vitamin_hd5000", 14))
 			vBoxType = VitaminHD5000;
 
-		else
+		else /* for other boxes we use LircdName driver as a default */
 			vBoxType = LircdName;
 	}
 
@@ -475,7 +484,16 @@ int main(int argc, char *argv[])
 	 */
 	ignoreSIGPIPE();
 
-	vBoxType = getModel();
+	if (argc >= 2 && !strncmp(argv[1], "useLircdName", 12))
+	{
+		vBoxType = LircdName;
+		if (argc >= 3)
+		  cmdBtnPeriod = atoi(argv[2]);
+		if (argc >= 4)
+		  cmdBtnDelay = atoi(argv[3]);
+	}
+	else
+		vBoxType = getModel();
 
 	if (vBoxType != Unknown)
 		if (!getEventDevice())
@@ -504,40 +522,37 @@ int main(int argc, char *argv[])
 	tButton vButtonExtension[cMaxButtonExtension];
 	int vButtonExtensionCounter = 0;
 
-	if (argc >= 2)
+	if (argc == 3 && !strncmp(argv[1], "-r", 2))
 	{
-		if (argc == 3 && !strncmp(argv[1], "-r", 2))
+		char   vKeyName[64];
+		char   vKeyWord[64];
+		int    vKeyCode;
+		char *vRemoteFile  = argv[2];
+		FILE *vRemoteFileD = NULL;
+
+		vRemoteFileD = fopen(vRemoteFile, "r");
+
+		if (vRemoteFileD != NULL)
 		{
-			char   vKeyName[64];
-			char   vKeyWord[64];
-			int    vKeyCode;
-			char *vRemoteFile  = argv[2];
-			FILE *vRemoteFileD = NULL;
-
-			vRemoteFileD = fopen(vRemoteFile, "r");
-
-			if (vRemoteFileD != NULL)
+			while (fscanf(vRemoteFileD, "%s %s %d", vKeyName, vKeyWord, &vKeyCode) == 3)
 			{
-				while (fscanf(vRemoteFileD, "%s %s %d", vKeyName, vKeyWord, &vKeyCode) == 3)
-				{
-					strncpy(vButtonExtension[vButtonExtensionCounter].KeyName, vKeyName, 20);
-					strncpy(vButtonExtension[vButtonExtensionCounter].KeyWord, vKeyWord, 2);
-					vButtonExtension[vButtonExtensionCounter].KeyCode = vKeyCode;
-					vButtonExtensionCounter++;
+				strncpy(vButtonExtension[vButtonExtensionCounter].KeyName, vKeyName, 20);
+				strncpy(vButtonExtension[vButtonExtensionCounter].KeyWord, vKeyWord, 2);
+				vButtonExtension[vButtonExtensionCounter].KeyCode = vKeyCode;
+				vButtonExtensionCounter++;
 
-					if (vButtonExtensionCounter + 1 == cMaxButtonExtension)
-						break;
-				}
-
-				fclose(vRemoteFileD);
-
-				strncpy(vButtonExtension[vButtonExtensionCounter].KeyName, "\0", 1);
-				strncpy(vButtonExtension[vButtonExtensionCounter].KeyWord, "\0", 1);
-				vButtonExtension[vButtonExtensionCounter].KeyCode = KEY_NULL;
-
-				printf("RemoteControl Extension Map:\n");
-				printKeyMap(vButtonExtension);
+				if (vButtonExtensionCounter + 1 == cMaxButtonExtension)
+					break;
 			}
+
+			fclose(vRemoteFileD);
+
+			strncpy(vButtonExtension[vButtonExtensionCounter].KeyName, "\0", 1);
+			strncpy(vButtonExtension[vButtonExtensionCounter].KeyWord, "\0", 1);
+			vButtonExtension[vButtonExtensionCounter].KeyCode = KEY_NULL;
+
+			printf("RemoteControl Extension Map:\n");
+			printKeyMap(vButtonExtension);
 		}
 	}
 

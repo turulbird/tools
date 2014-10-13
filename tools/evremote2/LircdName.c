@@ -38,13 +38,12 @@
 #include "map.h"
 #include "remotes.h"
 
-#define REPEATDELAY 350 // ms
-#define REPEATFREQ 55 // ms
-#define KEYPRESSDELAY 250 // ms
+#define REPEATDELAY 20 // ms
+#define REPEATFREQ 130 // ms
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
-	REPEATDELAY, REPEATFREQ
+	REPEATDELAY, REPEATFREQ /*delay, period*/
 };
 
 static long long GetNow(void)
@@ -95,113 +94,130 @@ static long long GetNow(void)
 static tButton cButtons_LircdName[] =
 {
 
-	{"KEY_OK"		, "00", KEY_OK},
-	{"KEY_POWER"        , "01", KEY_POWER},
-	{"KEY_PROGRAM"	, "02", KEY_PROGRAM}, 
-	{"KEY_EPG"		, "03", KEY_EPG},
-	{"KEY_PVR"		, "04", KEY_PVR},
-	{"KEY_HELP"       	, "05", KEY_HELP},
+	{"KEY_OK"		, "=>", KEY_OK},
+    {"KEY_UP"       , "=>", KEY_UP},
+    {"KEY_DOWN"         , "=>", KEY_DOWN},
+    {"KEY_RIGHT"        , "=>", KEY_RIGHT},
+    {"KEY_LEFT"         , "=>", KEY_LEFT},
 
-	{"KEY_OPTION"	, "06", KEY_OPTION},
-	{"KEY_UP"		, "07", KEY_UP},
-	{"KEY_VOLUMEUP"	, "08", KEY_VOLUMEUP},
-	{"KEY_PAGEUP"	, "09", KEY_PAGEUP},
-	{"KEY_1"        	, "0c", KEY_1},
-	{"KEY_GOTO"       	, "0f", KEY_GOTO},
+    {"KEY_RED"      , "=>", KEY_RED},
+    {"KEY_GREEN"    , "=>", KEY_GREEN},
+    {"KEY_YELLOW"   , "=>", KEY_YELLOW},
+    {"KEY_BLUE"     , "=>", KEY_BLUE},
+    {"KEY_POWER"        , "=>", KEY_POWER},
 
-	{"KEY_PAGEDOWN"	, "20", KEY_PAGEDOWN},
-	{"KEY_DOWN"        	, "21", KEY_DOWN},
-	{"KEY_MUTE"		, "22", KEY_MUTE},
-	{"KEY_HOME"		, "23", KEY_HOME},
-	{"KEY_TEXT"		, "24", KEY_TEXT},
+    {"KEY_VOLUMEUP" , "=>", KEY_VOLUMEUP},
+    {"KEY_VOLUMEDOWN"   , "=>", KEY_VOLUMEDOWN},
+    {"KEY_MUTE"     , "=>", KEY_MUTE},
+    {"KEY_PAGEUP"   , "=>", KEY_PAGEUP},
+    {"KEY_PAGEDOWN" , "=>", KEY_PAGEDOWN},
+    
+    {"KEY_MENU"     , "=>", KEY_MENU},
+    {"KEY_HOME"     , "=>", KEY_HOME},
+    {"KEY_OPTION"   , "=>", KEY_OPTION},
+    {"KEY_EPG"      , "=>", KEY_EPG},
+    {"KEY_GOTO"         , "=>", KEY_GOTO},
 
-	{"KEY_MENU"    	, "25", KEY_MENU},
-	{"KEY_RED"		, "26", KEY_RED},
-	{"KEY_VOLUMEDOWN"	, "28", KEY_VOLUMEDOWN},
+    {"KEY_PROGRAM"  , "=>", KEY_PROGRAM}, 
+    {"KEY_TEXT"     , "=>", KEY_TEXT},
+    {"KEY_HELP"         , "=>", KEY_HELP},
+    {"KEY_LIST"     , "=>", KEY_LIST},
+    {"KEY_MEDIA"        , "=>", KEY_MEDIA},
 
-	{"KEY_7"        	, "30", KEY_7},
-	{"KEY_8"        	, "31", KEY_8},
-	{"KEY_9"        	, "32", KEY_9},
-	{"KEY_0"        	, "33", KEY_0},
-	{"KEY_MEDIA"        , "34", KEY_MEDIA},
+    {"KEY_1"            , "=>", KEY_1},
+    {"KEY_2"            , "=>", KEY_2},
+    {"KEY_3"            , "=>", KEY_3},
+    {"KEY_4"            , "=>", KEY_4},
+    {"KEY_5"            , "=>", KEY_5},
+    
+    {"KEY_6"            , "=>", KEY_6},
+    {"KEY_7"            , "=>", KEY_7},
+    {"KEY_8"            , "=>", KEY_8},
+    {"KEY_9"            , "=>", KEY_9},
+    {"KEY_0"            , "=>", KEY_0},
 
-	{"KEY_STOP"		, "35", KEY_STOP},
-	{"KEY_REWIND"	, "36", KEY_REWIND},
-	{"KEY_PAUSE"	, "37", KEY_PAUSE},
-	{"KEY_PLAY"		, "38", KEY_PLAY},
+    {"KEY_PVR"      , "=>", KEY_PVR},
+    {"KEY_PLAY"     , "=>", KEY_PLAY},
+    {"KEY_PAUSE"    , "=>", KEY_PAUSE},
+    {"KEY_RECORD"   , "=>", KEY_RECORD},
+    {"KEY_STOP"     , "=>", KEY_STOP},
+    {"KEY_FASTFORWARD"  , "=>", KEY_FASTFORWARD},
+    {"KEY_REWIND"   , "=>", KEY_REWIND},
 
-	{"KEY_3"        	, "40", KEY_3},
-	{"KEY_4"        	, "41", KEY_4},
-	{"KEY_5"        	, "42", KEY_5},
-	{"KEY_6"        	, "43", KEY_6},
-	{"KEY_MODE"		, "44", KEY_MODE},
-	{"KEY_YELLOW"	, "45", KEY_YELLOW},
+    {"KEY_MODE"     , "=>", KEY_MODE},
+    {"KEY_SUBTITLE" , "=>", KEY_SUBTITLE},
+    {"KEY_V"       , "=>", KEY_V},
+    {"KEY_AUX"         , "=>", KEY_AUX},
+    {"KEY_TIME"           , "=>", KEY_TIME},
+    
+    {"KEY_TV2"       , "=>", KEY_TV2},
+    {"KEY_BACK"         , "=>", KEY_BACK},
+    {"KEY_FIND"           , "=>", KEY_FIND},
+    {"KEY_ARCHIVE"         , "=>", KEY_ARCHIVE},
+    {"KEY_INFO"           , "=>", KEY_INFO},
+    
+    {"KEY_FAVORITES"            , "=>", KEY_FAVORITES},
+    {"KEY_SAT"            , "=>", KEY_SAT},
+    {"KEY_PREVIOUS"           , "=>", KEY_PREVIOUS},
+    {"KEY_PREVIOUS"           , "=>", KEY_NEXT},
+    {"KEY_F"           , "=>", KEY_F},
+    
+    {"KEY_SLOW"           , "=>", KEY_SLOW},
+    {"KEY_P"      , "=>", KEY_P},
+    {"KEY_CLOSE"            , "=>", KEY_CLOSE},
+    {"KEY_T"            , "=>", KEY_T},
+    {"KEY_F1"             , "=>", KEY_F1},
+    
+    {"KEY_F2"             , "=>", KEY_F2},
+    {"KEY_F3"             , "=>", KEY_F3},
+    {"KEY_SELECT"      , "=>", KEY_SELECT},
+    {"KEY_POWER2"      , "=>", KEY_POWER2},
+    {"KEY_CLEAR"      , "=>", KEY_CLEAR},
 
-	{"KEY_RIGHT"       	, "50", KEY_RIGHT},
-	{"KEY_LEFT"       	, "51", KEY_LEFT},
-	{"KEY_GREEN"	, "52", KEY_GREEN},
-	{"KEY_2"        	, "53", KEY_2},
-	{"KEY_BLUE"		, "54", KEY_BLUE},
+    {"KEY_VENDOR"      , "=>", KEY_VENDOR},
+    {"KEY_CHANNEL"      , "=>", KEY_CHANNEL},
+    {"KEY_MHP"      , "=>", KEY_MHP},
+    {"KEY_LANGUAGE"      , "=>", KEY_LANGUAGE},
+    {"KEY_TITLE"      , "=>", KEY_TITLE},
+    
+    {"KEY_ANGLE"      , "=>", KEY_ANGLE},      
+    {"KEY_ZOOM"      , "=>", KEY_ZOOM},      
+    {"KEY_KEYBOARD"      , "=>", KEY_KEYBOARD},
+    {"KEY_SCREEN"      , "=>", KEY_SCREEN},
+    {"KEY_PC"      , "=>", KEY_PC},
 
-	{"KEY_FASTFORWARD"	, "60", KEY_FASTFORWARD},
-	{"KEY_RECORD"	, "61", KEY_RECORD},
-	{"KEY_LIST"		, "62", KEY_LIST},
-	{"KEY_SUBTITLE"	, "63", KEY_SUBTITLE},
+    {"KEY_TV"      , "=>", KEY_TV},
+    {"KEY_VCR"      , "=>", KEY_VCR},
+    {"KEY_VCR2"      , "=>", KEY_VCR2},
+    {"KEY_SAT2"      , "=>", KEY_SAT2},
+    {"KEY_CD"      , "=>", KEY_CD},
 
-//------long
+    {"KEY_TAPE"      , "=>", KEY_TAPE},
+    {"KEY_RADIO"      , "=>", KEY_RADIO},
+    {"KEY_TUNER"      , "=>", KEY_TUNER},
+    {"KEY_PLAYER"      , "=>", KEY_PLAYER},
+    {"KEY_DVD"      , "=>", KEY_DVD},
 
-	{"KEY_OK"		, "40", KEY_OK},
-	{"KEY_POWER"        , "41", KEY_POWER},
-	{"KEY_PROGRAM"	, "42", KEY_PROGRAM},
-	{"KEY_EPG"		, "43", KEY_EPG},
-	{"KEY_PVR"		, "44", KEY_PVR},
-	{"KEY_HELP"       	, "45", KEY_HELP},
-	{"KEY_OPTION"	, "46", KEY_OPTION},
-	{"KEY_UP"		, "47", KEY_UP},
-	{"KEY_VOLUMEUP"	, "48", KEY_VOLUMEUP},
-	{"KEY_PAGEUP"	, "49", KEY_PAGEUP},
-	{"KEY_1"        	, "4c", KEY_1},
-	{"KEY_GOTO"       	, "4f", KEY_GOTO},
+    {"KEY_MP3"      , "=>", KEY_MP3},        
+    {"KEY_AUDIO"      , "=>", KEY_AUDIO},        
+    {"KEY_VIDEO"      , "=>", KEY_VIDEO},      
+    {"KEY_DIRECTORY"      , "=>", KEY_DIRECTORY},
+    {"KEY_MEMO"      , "=>", KEY_MEMO},  
 
-	{"KEY_PAGEDOWN"	, "60", KEY_PAGEDOWN},
-	{"KEY_DOWN"        	, "61", KEY_DOWN},
-	{"KEY_MUTE"		, "62", KEY_MUTE},
-	{"KEY_HOME"		, "63", KEY_HOME},
-	{"KEY_TEXT"		, "64", KEY_TEXT},
+    {"KEY_CALENDAR"      , "=>", KEY_CALENDAR},
+    {"KEY_CHANNELUP"      , "=>", KEY_CHANNELUP},
+    {"KEY_CHANNELDOWN"      , "=>", KEY_CHANNELDOWN},
+    {"KEY_FIRST"      , "=>", KEY_FIRST},
+    {"KEY_LAST"      , "=>", KEY_LAST},
 
-	{"KEY_MENU"    	, "65", KEY_MENU},
-	{"KEY_RED"		, "66", KEY_RED},
-	{"KEY_VOLUMEDOWN"	, "68", KEY_VOLUMEDOWN},
+    {"KEY_AB"      , "=>", KEY_AB},
+    {"KEY_RESTART"      , "=>", KEY_RESTART},
+    {"KEY_SHUFFLE"      , "=>", KEY_SHUFFLE},
+    {"KEY_DIGITS"      , "=>", KEY_DIGITS},
+    {"KEY_TEEN"      , "=>", KEY_TEEN},
 
-	{"KEY_7"        	, "70", KEY_7},
-	{"KEY_8"        	, "71", KEY_8},
-	{"KEY_9"        	, "72", KEY_9},
-	{"KEY_0"        	, "73", KEY_0},
-	{"KEY_MEDIA"        , "74", KEY_MEDIA},
-
-	{"KEY_STOP"		, "75", KEY_STOP},
-	{"KEY_REWIND"	, "76", KEY_REWIND},
-	{"KEY_PAUSE"	, "77", KEY_PAUSE},
-	{"KEY_PLAY"		, "78", KEY_PLAY},
-
-	{"KEY_3"        	, "80", KEY_3},
-	{"KEY_4"        	, "81", KEY_4},
-	{"KEY_5"        	, "82", KEY_5},
-	{"KEY_6"        	, "83", KEY_6},
-	{"KEY_MODE"		, "84", KEY_MODE},
-	{"KEY_YELLOW"	, "85", KEY_YELLOW},
-
-	{"KEY_RIGHT"       	, "90", KEY_RIGHT},
-	{"KEY_LEFT"       	, "91", KEY_LEFT},
-	{"KEY_GREEN"	, "92", KEY_GREEN},
-	{"KEY_2"        	, "93", KEY_2},
-	{"KEY_BLUE"		, "94", KEY_BLUE},
-
-	{"KEY_FASTFORWARD"	, "a0", KEY_FASTFORWARD},
-	{"KEY_RECORD"	, "a1", KEY_RECORD},
-	{"KEY_LIST"		, "a2", KEY_LIST},
-	{"KEY_SUBTITLE"	, "a3", KEY_SUBTITLE},
-
+    {"KEY_TWEN"      , "=>", KEY_TWEN},
+    {"KEY_BREAK"      , "=>", KEY_BREAK},
 	{""               	, ""  , KEY_NULL},
 };
 /* fixme: move this to a structure and
@@ -260,8 +276,8 @@ static int pRead(Context_t *context)
 	const int cSize = 128;
 	int vCurrentCode = -1;
 	char *buffer;
-	//When LIRC in XMP, we need to find key by name -> codes are a bit strange
-	char KeyName[30];
+	char KeyName[30]; 	//For flexibility we use Lircd keys names
+	int LastKeyNameChar;	//for long detection on RCU sending different codes for short/long
 	int count;
 	tButton *cButtons = cButtons_LircdName;
 
@@ -275,48 +291,48 @@ static int pRead(Context_t *context)
 	if (sscanf(vBuffer, "%*x %x %29s", &count, KeyName) != 2)  // '29' in '%29s' is LIRC_KEY_BUF-1!
 	{
 		printf("[LircdName RCU] Warning: unparseable lirc command: %s\n", vBuffer);
-		return 0;
+		return -1;
+	}
+
+	//some RCUs send different codes for single click and long push. This breakes e2 LONG detection, because lircd counter starts from beginning
+	//workarround is to define names for long codes ending '&' in lircd.conf and using this marker to copunt data correctly
+	LastKeyNameChar = strlen(KeyName) -1 ;
+	if (KeyName[LastKeyNameChar] == 0x26) //&
+	{
+		//printf("[LircdName RCU] LONG detected\n");
+		count += 1;
+		KeyName[LastKeyNameChar] = 0;
 	}
 
 	vCurrentCode = getInternalCodeLircKeyName(cButtons, KeyName);
 
-	//printf("LastKeyPressedTime: %lld\n", LastKeyPressedTime);
-	//printf("CurrKeyPressedTime: %lld\n", GetNow());
-	//printf("         diffMilli: %lld\n", GetNow() - LastKeyPressedTime);
-
 	if (vCurrentCode != 0)
 	{
-		//time checking
-		if ((vBuffer[17] == '0') && (vBuffer[18] == '0'))
+
+		static int nextflag = 0;
+		if (count == 0)
 		{
+		//time checking
 			if ((LastKeyCode == vCurrentCode) && (GetNow() - LastKeyPressedTime < REPEATDELAY))   // (diffMilli(LastKeyPressedTime, CurrKeyPressedTime) <= REPEATDELAY) )
 			{
-				printf("[LircdName RCU] skiping same key coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
-				return 0;
+				printf("[LircdName RCU] skiping next press of same key coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
+				return -1;
 			}
-			else if (GetNow() - LastKeyPressedTime < KEYPRESSDELAY)
+			else if (GetNow() - LastKeyPressedTime < REPEATDELAY)
 			{
 				printf("[LircdName RCU] skiping different keys coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
-				return 0;
+				return -1;
 			}
 			else
-				printf("[RCU LircdName] key code: %s, KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", vData, KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
+				printf("[RCU LircdName] new KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
+                nextflag++;
 		}
-		else if (GetNow() - LastKeyPressedTime < REPEATFREQ)
-		{
-			printf("[LircdName RCU] skiping repeated key coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
-			return 0;
-		}
+		else
+			printf("[RCU LircdName] same KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
 
 		LastKeyCode = vCurrentCode;
 		LastKeyPressedTime = GetNow();
 		strcpy(LastKeyName, KeyName);
-		static int nextflag = 0;
-
-		if (('0' == vBuffer[17]) && ('0' == vBuffer[18]))
-		{
-			nextflag++;
-		}
 
 		//printf("[LircdName RCU] nextflag: nf -> %i\n", nextflag);
 		vCurrentCode += (nextflag << 16);
@@ -337,7 +353,7 @@ static int pNotification(Context_t *context, const int cOn)
 
 RemoteControl_t LircdName_RC =
 {
-	"LircdName Universal RemoteControl",
+	"LircdName Universal RemoteControl v.1",
 	LircdName,
 	&pInit,
 	&pShutdown,
