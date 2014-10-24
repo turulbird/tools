@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <linux/reboot.h>
+#include <sys/reboot.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -230,6 +232,7 @@ static int LastKeyCode = -1;
 static char LastKeyName[30];
 static long long LastKeyPressedTime;
 static int LircdBtnDelay = REPEATDELAY;
+static int KeyPowerCounter = 0;
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
@@ -308,15 +311,29 @@ static int pRead(Context_t *context)
 		count += 1;
 		KeyName[LastKeyNameChar] = 0;
 	}
-
+	
 	vCurrentCode = getInternalCodeLircKeyName(cButtons, KeyName);
 
 	if (vCurrentCode != 0)
 	{
-
 		static int nextflag = 0;
 		if (count == 0)
 		{
+		//Emergency reboot after 5xPOWER, we count only presses within 2 seconds, not lONGs
+		if (!strncasecmp(LastKeyName, "KEY_POWER", 9) && !strncasecmp(KeyName, "KEY_POWER", 9)  && (GetNow() - LastKeyPressedTime < 2000))
+		{
+			KeyPowerCounter += 1;
+			printf("[LircdName RCU] KEY_POWER pressed %d time(s)\n", KeyPowerCounter);
+			if (KeyPowerCounter >= 5)
+			{
+				printf("[LircdName RCU] EMERGENCY REBOOT !!!\n");
+				fflush(stdout);
+				reboot(LINUX_REBOOT_CMD_RESTART);
+				return -1;
+			}
+		}
+		else
+			KeyPowerCounter = 0;
 		//time checking
 			if ((LastKeyCode == vCurrentCode) && (GetNow() - LastKeyPressedTime < LircdBtnDelay))   // (diffMilli(LastKeyPressedTime, CurrKeyPressedTime) <= REPEATDELAY) )
 			{
@@ -329,8 +346,11 @@ static int pRead(Context_t *context)
 				return -1;
 			}
 			else
+			{
 				printf("[RCU LircdName] new KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
+			}
                 nextflag++;
+			
 		}
 		else
 			printf("[RCU LircdName] same KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
