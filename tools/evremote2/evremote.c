@@ -221,7 +221,10 @@ int processComplex(Context_t *context, int argc, char *argv[])
 		printf("Using period=%d delay=%d\n", gBtnPeriod, gBtnDelay);
 	}
 
-	setInputEventRepeatRate(500, 200);
+	if (cmdBtnPeriod  && cmdBtnDelay && (cmdBtnPeriod + cmdBtnDelay) < 200)
+		setInputEventRepeatRate(500, cmdBtnPeriod + cmdBtnDelay);
+	else
+		setInputEventRepeatRate(500, 200);
 
 	sem_init(&keydown_sem, 0, 0);
 	pthread_create(&keydown_thread, NULL, detectKeyUpTask, context);

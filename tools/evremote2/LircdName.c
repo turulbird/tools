@@ -161,7 +161,7 @@ static tButton cButtons_LircdName[] =
     {"KEY_FAVORITES"            , "=>", KEY_FAVORITES},
     {"KEY_SAT"            , "=>", KEY_SAT},
     {"KEY_PREVIOUS"           , "=>", KEY_PREVIOUS},
-    {"KEY_PREVIOUS"           , "=>", KEY_NEXT},
+    {"KEY_NEXT"           , "=>", KEY_NEXT},
     {"KEY_F"           , "=>", KEY_F},
     
     {"KEY_SLOW"           , "=>", KEY_SLOW},
@@ -221,7 +221,8 @@ static tButton cButtons_LircdName[] =
     {"KEY_TWEN"      , "=>", KEY_TWEN},
     {"KEY_BREAK"      , "=>", KEY_BREAK},
     {"KEY_PLAYPAUSE"	, "=>"  , KEY_PLAYPAUSE}, 
-	{""               	, ""  , KEY_NULL},
+    {"KEY_EXIT" , "=>", KEY_EXIT},
+    {""               	, ""  , KEY_NULL},
 };
 /* fixme: move this to a structure and
  * use the private structure of RemoteControl_t
