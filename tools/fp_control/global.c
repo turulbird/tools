@@ -1,18 +1,18 @@
 /*
  * global.c
- * 
+ *
  * (c) 2009 dagobert/donald@teamducktales
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -36,13 +36,13 @@
 #define NEUTRINO_TIMERS "/var/tuxbox/config/timerd.conf"
 
 #define CONFIG "/etc/vdstandby.cfg"
-char * sDisplayStd = "%a %d %H:%M:%S";
+char *sDisplayStd = "%a %d %H:%M:%S";
 
 #define WAKEUPFILE "/var/wakeup"
 #define WAS_TIMER_WAKEUP "/proc/stb/fp/was_timer_wakeup"
 
 #define E2_WAKEUP_TIME_PROC
-disp = 1;
+int disp = 1;
 
 static Model_t *AvailableModels[] =
 {
@@ -62,16 +62,13 @@ static Model_t *AvailableModels[] =
 	NULL
 };
 
-//#ifdef E2_WAKEUP_TIME_PROC
 #if 0
 static time_t read_e2_wakeup(time_t curTime)
 {
 	char line[12];
 	time_t recordTime = LONG_MAX;
-	FILE   *fd        = fopen (E2WAKEUPTIME, "r");
-
+	FILE *fd = fopen(E2WAKEUPTIME, "r");
 	printf("Getting Enigma2 wakeup time");
-
 	if (fd > 0)
 	{
 		fgets(line, 11, fd);
@@ -83,7 +80,7 @@ static time_t read_e2_wakeup(time_t curTime)
 		}
 		else
 			printf(" - Done\n");
-			fclose (fd);
+		fclose(fd);
 	}
 	else
 	{
@@ -94,37 +91,45 @@ static time_t read_e2_wakeup(time_t curTime)
 #else
 static time_t read_e2_timers(time_t curTime)
 {
-	char   recordString[12];
-	char   line[1000];
+	char recordString[12];
+	char line[1000];
 	time_t recordTime = LONG_MAX;
-	FILE   *fd        = fopen (E2TIMERSXML, "r");
-
+	FILE *fd = fopen(E2TIMERSXML, "r");
 	printf("Getting 1st Enigma2 timer");
-
 	if (fd > 0)
 	{
-		while(fgets(line, 999, fd) != NULL)
+		while (fgets(line, 999, fd) != NULL)
 		{
 			line[999] = '\0';
 			if (!strncmp("<timer begin=\"", line, 14))
 			{
 				unsigned long int tmp = 0;
-				strncpy(recordString, line+14, 10);
+				strncpy(recordString, line + 14, 10);
 				recordString[11] = '\0';
 				tmp = atol(recordString);
 				recordTime = (tmp < recordTime && tmp > curTime ? tmp : recordTime);
 			}
 		}
-		if (recordTime == LONG_MAX )
-		{	
+		if (recordTime == LONG_MAX)
+		{
 			printf(" (none set)");
 			recordTime = -1;
 		}
+		else
+		{
+//			int wakeupDecrement = 5 * 60;
+//			int platzhalter;
+//			char *platzhalters;
+//			checkConfig(&platzhalter, &platzhalter, &platzhalters, &wakeupDecrement, disp);
+			recordTime -= Vwakeup;
+		}
 		printf(" - Done\n");
-		fclose (fd);
+		fclose(fd);
 	}
 	else
+	{
 		printf(" - Error reading %s\n", E2TIMERSXML);
+	}
 	return recordTime;
 }
 #endif
@@ -133,23 +138,18 @@ static time_t read_neutrino_timers(time_t curTime)
 {
 	char line[1000];
 	time_t recordTime = LONG_MAX;
-	FILE   *fd        = fopen (NEUTRINO_TIMERS, "r");
-
+	FILE *fd = fopen(NEUTRINO_TIMERS, "r");
 	printf("Getting 1st neutrino timer");
-
 	if (fd > 0)
 	{
 //		printf("Opening %s\n", NEUTRINO_TIMERS);
-		
-		while(fgets(line, 999, fd) != NULL)
+		while (fgets(line, 999, fd) != NULL)
 		{
-			line[999]='\0';
-
-			if (strstr(line, "ALARM_TIME_") != NULL )
+			line[999] = '\0';
+			if (strstr(line, "ALARM_TIME_") != NULL)
 			{
 				time_t tmp = 0;
-				char* str;
-
+				char *str;
 				str = strstr(line, "=");
 				if (str != NULL)
 				{
@@ -159,13 +159,13 @@ static time_t read_neutrino_timers(time_t curTime)
 			}
 		}
 		printf(" - Done\n");
-		fclose (fd);
+		fclose(fd);
 	}
 	else
 		printf(" - Error reading %s\n", NEUTRINO_TIMERS);
 	if (recordTime != LONG_MAX)
 	{
-		int wakeupDecrement = 5*60;
+		int wakeupDecrement = 5 * 60;
 		int platzhalter;
 		char *platzhalters;
 		checkConfig(&platzhalter, &platzhalter, &platzhalters, &wakeupDecrement, disp);
@@ -178,8 +178,7 @@ static time_t read_neutrino_timers(time_t curTime)
 static void write_wakeup_file(time_t wakeupTime)
 {
 	FILE *wakeupFile;
-
-	wakeupFile = fopen(WAKEUPFILE,"w");
+	wakeupFile = fopen(WAKEUPFILE, "w");
 	if (wakeupFile)
 	{
 		fprintf(wakeupFile, "%ld", wakeupTime);
@@ -192,11 +191,10 @@ static time_t read_wakeup_file()
 {
 	time_t wakeupTime = LONG_MAX;
 	FILE  *wakeupFile;
-
-	wakeupFile = fopen(WAKEUPFILE,"r");
+	wakeupFile = fopen(WAKEUPFILE, "r");
 	if (wakeupFile)
 	{
-		fscanf(wakeupFile,"%ld", &wakeupTime);
+		fscanf(wakeupFile, "%ld", &wakeupTime);
 		fclose(wakeupFile);
 	}
 	return wakeupTime;
@@ -211,9 +209,7 @@ int getWakeupReasonPseudo(int *reason)
 {
 	time_t curTime    = 0;
 	time_t wakeupTime = LONG_MAX;
-
 	printf("getWakeupReasonPseudo: IMPORTANT: Valid Linux System Time is mandatory\n");
-
 	time(&curTime);
 	wakeupTime = read_wakeup_file();
 	if ((curTime - FIVE_MIN) < wakeupTime && (curTime + FIVE_MIN) > wakeupTime)
@@ -230,7 +226,7 @@ int getWakeupReasonPseudo(int *reason)
 int syncWasTimerWakeup(eWakeupReason reason)
 {
 	FILE *wasTimerWakeupProc = fopen(WAS_TIMER_WAKEUP, "w");
-	if(wasTimerWakeupProc == NULL)
+	if (wasTimerWakeupProc == NULL)
 	{
 		fprintf(stderr, "setWakeupReason failed to open %s\n", WAS_TIMER_WAKEUP);
 		return -1;
@@ -253,14 +249,11 @@ int syncWasTimerWakeup(eWakeupReason reason)
 time_t read_timers_utc(time_t curTime)
 {
 	time_t wakeupTime = LONG_MAX;  //flag no timer read (yet)
-
 	wakeupTime = read_e2_timers(curTime);  //get next e2timer
-
 	if (wakeupTime == LONG_MAX) //if none
 	{
 		wakeupTime = read_neutrino_timers(curTime);  //try neutrino timer
 	}
-
 	write_wakeup_file(wakeupTime);
 	return wakeupTime;
 }
@@ -287,21 +280,18 @@ double modJulianDate(struct tm *theTime)
 {
 	double date;
 	int month;
-	int day; 
+	int day;
 	int year;
 	year  = theTime->tm_year + 1900;
 	month = theTime->tm_mon + 1;
 	day   = theTime->tm_mday;
-
-	date = day - 32076 + 
-		1461 * (year + 4800 + (month - 14)/12)/4 +
-		367 * (month - 2 - (month - 14)/12*12)/12 - 
-		3 * ((year + 4900 + (month - 14)/12)/100)/4;
-
-	date += (theTime->tm_hour + 12.0)/24.0;
-	date += (theTime->tm_min)/1440.0;
-	date += (theTime->tm_sec)/86400.0;
-
+	date = day - 32076 +
+		   1461 * (year + 4800 + (month - 14) / 12) / 4 +
+		   367 * (month - 2 - (month - 14) / 12 * 12) / 12 -
+		   3 * ((year + 4900 + (month - 14) / 12) / 100) / 4;
+	date += (theTime->tm_hour + 12.0) / 24.0;
+	date += (theTime->tm_min) / 1440.0;
+	date += (theTime->tm_sec) / 86400.0;
 	date -= 2400000.5;
 	return date;
 }
@@ -320,31 +310,33 @@ int searchModel(Context_t *context, eBoxType type)
 	return -1;
 }
 
-int checkConfig(int* display, int* display_custom, char** timeFormat, int* wakeup, int verbose)
+int checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeup, int verbose)
 {
 	const int MAX = 100;
 	char buffer[MAX];
-	
 	*display = 0;
 	*display_custom = 0;
 	*timeFormat = "Unknown";
 	*wakeup = 5 * 60;
 	FILE *fd_config = fopen(CONFIG, "r");  //read box /etc/vdstandby.cfg
-
-	if ((fd_config == NULL) && (verbose))
+	if (fd_config == NULL)
 	{
-		printf("Config file (%s) not found,\nusing standard config:", CONFIG);
-		printf("Config:\nDisplay: %d              Time format: %d\n", *display, *display_custom);
-		printf("Displaycustom: %s  Wakeupdecrement: %d mins\n", *timeFormat, *wakeup / 60);
+		Vwakeup = 5 * 60; //default wakeupdecrement is 5 minutes
+
+		if (verbose)
+		{
+			printf("Config file (%s) not found,\nusing standard config:", CONFIG);
+			printf("Config:\nDisplay: %d              Time format: %d\n", *display, *display_custom);
+			printf("Displaycustom: %s  Wakeupdecrement: %d minutes %d seconds\n", *timeFormat, Vwakeup/60, Vwakeup%60);
+		}
 		return -1;
 	}
-	
 	while (fgets(buffer, MAX, fd_config))
 	{
 		if (!strncmp("DISPLAY=", buffer, 8))
 		{
-			char * option = &buffer[8];
-			if (!strncmp("TRUE", option, 2))
+			char *option = &buffer[8];
+			if (!strncmp("TRUE", option, 4))
 			{
 				*display = 1;
 			}
@@ -357,7 +349,6 @@ int checkConfig(int* display, int* display_custom, char** timeFormat, int* wakeu
 		{
 			char *option = &buffer[14];  //get buffer from character 14 on
 			*display_custom = 1;
-//			display_customstr = "TRUE ";
 			*timeFormat = strdup(option);
 		}
 		else if (!strncmp("WAKEUPDECREMENT=", buffer, 16))
@@ -370,18 +361,24 @@ int checkConfig(int* display, int* display_custom, char** timeFormat, int* wakeu
 	{
 		*timeFormat = "?";
 	}
-
 	if (verbose)
 	{
 		printf("Configuration of receiver:\n");
 		printf("Display: %d        Time format: %s", *display, *timeFormat);
-		printf("Displaycustom: %d  Wakeupdecrement: %d mins\n\n", *display_custom, *wakeup / 60);
+		printf("Displaycustom: %d  Wakeupdecrement: %d minute(s)", *display_custom, *wakeup / 60);
+		if (*wakeup % 60 != 0)
+		{
+			printf(" %d second(s)\n\n", *wakeup % 60);
+		}
+		else
+		{
+			printf("\n\n");
+		}
 	}
 	Vdisplay = *display;
 	VtimeFormat = *timeFormat;
 	Vdisplay_custom = *display_custom;
 	Vwakeup = *wakeup;
-
 	fclose(fd_config);
 	return 0;
 }

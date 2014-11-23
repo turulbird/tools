@@ -47,7 +47,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* software version of fp_control. please increase on every change */
-static const char *sw_version = "1.05NdV 20140810.1";
+static const char *sw_version = "1.05NdV 20141123.1";
 
 typedef struct
 {
@@ -58,44 +58,45 @@ typedef struct
 
 time_t *theGMTTime;
 char vName[129] = "Unknown";
-int Vdisplay = 0;
+int Vdisplay = 0; //
 int Vdisplay_custom = 0;
 char *VtimeFormat = "Unknown";
-int Vwakeup = 5;
+int Vwakeup = 5 * 60; //default wakeup decrement in minutes
 const char *wakeupreason[4] = { "Unknown", "Power on", "From deep standby", "Timer" };
 
 tArgs vArgs[] =
 {
-   { "-e", "  --setTimer           ","Args: None or [time date] in format HH:MM:SS dd-mm-YYYY \
+	{ "-e", "  --setTimer           ", "Args: None or [time date] in format HH:MM:SS dd-mm-YYYY \
 \n\tSet the most recent timer from e2 or neutrino to the frontcontroller and standby \
-\n\tSet the current frontcontroller wake-up time" },
-   { "-d", "  --shutDown           ","Args: [time date] Format: HH:MM:SS dd-mm-YYYY\n\tMimics shutdown command. Shutdown receiver via fc at given time." },
-   { "-g", "  --getTime            ","Args: No arguments\n\tReturn current set frontcontroller time" },
-   { "-gs", " --getTimeAndSet      ","Args: No arguments\n\tSet system time to current frontcontroller time" },
-// { "-gw", " --getWakeupTime      ","Args: No arguments\n\tReturn current wakeup time" },
-   { "-s", "  --setTime            ","Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller time" },
-   { "-sst", "--setWakeTime        ","Args: No arguments\n\tSet the frontcontroller time equal to system time" },
-   { "-gt", " --getWakeTime        ","Args: No arguments\n\tGet the frontcontroller wake up time" },
-   { "-st", " --setWakeTime        ","Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller wake up time" },
-   { "-r", "  --reboot             ","Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tReboot receiver via fc at given time" },
-   { "-p", "  --sleep              ","Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tReboot receiver via fc at given time" },
-   { "-t", "  --settext            ","Arg : text\n\tSet text to frontpanel." },
-   { "-l", "  --setLed             ","Args: led on\n\tSet a led on or off" },
-   { "-i", "  --setIcon            ","Args: icon on\n\tSet an icon on or off" },
-   { "-b", "  --setBrightness      ","Arg : brightness 0..7\n\tSet display brightness" },
-   { "-led", " --setLedBrightness   ","Arg : brightness\n\tSet LED brightness" },
-   { "-w", "  --getWakeupReason    ","Args: No arguments\n\tGet the wake-up reason" },
-   { "-L", "  --setLight           ","Arg : 0/1\n\tSet light" },
-   { "-c", "  --clear              ","Args: No arguments\n\tClear display, all icons and leds off" },
-   { "-v", "  --version            ","Args: No arguments\n\tGet version from fc" },
-   { "-sf", " --setFan             ","Arg : 0/1\n\tSet fan on/off" },
-   { "-sr", " --setRF              ","Arg : 0/1\n\tSet rf modulator on/off" },
-   { "-dt", " --display_time       ","Arg : 0/1\n\tSet time display on/off" },
-   { "-tm", " --time_mode          ","Arg : 0/1\n\tSet 12 or 24 hour time mode" },
-// { "-v0", " --verboseoff         ","Args: No arguments\n\tSwitches screen output off (default)" },
-// { "-v1", " --verboseon          ","Args: No arguments\n\tSwitches screen output on" },
-   { "-ms", " --set_model_specific ","Args: int\n\tModel specific set function" },
-   { NULL, NULL, NULL }
+\n\tSet the current frontcontroller wake-up time" 
+	},
+	{ "-d", "  --shutDown           ", "Args: [time date] Format: HH:MM:SS dd-mm-YYYY\n\tMimics shutdown command. Shutdown receiver via fc at given time." },
+	{ "-g", "  --getTime            ", "Args: No arguments\n\tReturn current set frontcontroller time" },
+	{ "-gs", " --getTimeAndSet      ", "Args: No arguments\n\tSet system time to current frontcontroller time" },
+	{ "-gw", " --getWakeupTime      ", "Args: No arguments\n\tReturn current wakeup time" },
+	{ "-s", "  --setTime            ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller time" },
+	{ "-sst", "--setWakeTime        ", "Args: No arguments\n\tSet the frontcontroller time equal to system time" },
+	{ "-gt", " --getWakeTime        ", "Args: No arguments\n\tGet the frontcontroller wake up time" },
+	{ "-st", " --setWakeTime        ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller wake up time" },
+	{ "-r", "  --reboot             ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tReboot receiver via fc at given time" },
+	{ "-p", "  --sleep              ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tReboot receiver via fc at given time" },
+	{ "-t", "  --settext            ", "Arg : text\n\tSet text to frontpanel." },
+	{ "-l", "  --setLed             ", "Args: led on\n\tSet a led on or off" },
+	{ "-i", "  --setIcon            ", "Args: icon on\n\tSet an icon on or off" },
+	{ "-b", "  --setBrightness      ", "Arg : brightness 0..7\n\tSet display brightness" },
+	{ "-led", " --setLedBrightness   ", "Arg : brightness\n\tSet LED brightness" },
+	{ "-w", "  --getWakeupReason    ", "Args: No arguments\n\tGet the wake-up reason" },
+	{ "-L", "  --setLight           ", "Arg : 0/1\n\tSet light" },
+	{ "-c", "  --clear              ", "Args: No arguments\n\tClear display, all icons and leds off" },
+	{ "-v", "  --version            ", "Args: No arguments\n\tGet version from fc" },
+	{ "-sf", " --setFan             ", "Arg : 0/1\n\tSet fan on/off" },
+	{ "-sr", " --setRF              ", "Arg : 0/1\n\tSet rf modulator on/off" },
+	{ "-dt", " --display_time       ", "Arg : 0/1\n\tSet time display on/off" },
+	{ "-tm", " --time_mode          ", "Arg : 0/1\n\tSet 12 or 24 hour time mode" },
+//	{ "-v0", " --verboseoff         ","Args: No arguments\n\tSwitches screen output off (default)" },
+//	{ "-v1", " --verboseon          ","Args: No arguments\n\tSwitches screen output on" },
+	{ "-ms", " --set_model_specific ", "Args: int\n\tModel specific set function" },
+	{ NULL, NULL, NULL }
 };
 
 
@@ -136,7 +137,6 @@ void getTimeFromArg(char *timeStr, char *dateStr, time_t *theGMTTime)
 	sscanf(dateStr, "%d-%d-%d", &theTime.tm_mday, &theTime.tm_mon, &theTime.tm_year);
 	theTime.tm_year -= 1900;
 	theTime.tm_mon   = theTime.tm_mon - 1;
-
 	theTime.tm_isdst = -1; /* say mktime that we do not know */
 	/* FIXME: hmm this is not a gmt or, isn't it? */
 	/* Audioniek: why does this need fixing? The user will probably
@@ -150,14 +150,13 @@ void getTimeFromArg(char *timeStr, char *dateStr, time_t *theGMTTime)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void processCommand (Context_t *context, int argc, char *argv[])
+void processCommand(Context_t *context, int argc, char *argv[])
 {
 	int i;
 	if (((Model_t *)context->m)->Init)
 	{
 		context->fd = ((Model_t *)context->m)->Init(context);
 	}
-
 	if (argc > 1)
 	{
 		i = 1;
@@ -167,7 +166,7 @@ void processCommand (Context_t *context, int argc, char *argv[])
 			{
 				if (argc == 4)
 				{
-					time_t	theGMTTime;
+					time_t theGMTTime;
 					getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
 					/* set the frontcontroller timer from args */
 					if (((Model_t *)context->m)->SetTimer)((Model_t *)context->m)->SetTimer(context, &theGMTTime);
@@ -227,7 +226,7 @@ void processCommand (Context_t *context, int argc, char *argv[])
 						fprintf(stderr, "Setting RTC to current frontpanel time: %02d:%02d:%02d %02d-%02d-%04d\n",
 								gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon + 1, gmt->tm_year + 1900);
 						char cmd[50];
-						sprintf(cmd, "date -s %04d.%02d.%02d-%02d:%02d:%02d\n", gmt->tm_year+1900, gmt->tm_mon+1, gmt->tm_mday, gmt->tm_hour, gmt->tm_min, gmt->tm_sec);
+						sprintf(cmd, "date -s %04d.%02d.%02d-%02d:%02d:%02d\n", gmt->tm_year + 1900, gmt->tm_mon + 1, gmt->tm_mday, gmt->tm_hour, gmt->tm_min, gmt->tm_sec);
 						system(cmd);
 					}
 				}
@@ -235,7 +234,6 @@ void processCommand (Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-gt") == 0) || (strcmp(argv[i], "--getWakeTime") == 0))
 			{
 				time_t theGMTTime;
-
 				/* get the current wake up time from frontcontroller */
 				if (((Model_t *)context->m)->GetWTime)
 				{
@@ -247,22 +245,22 @@ void processCommand (Context_t *context, int argc, char *argv[])
 					}
 				}
 			}
-//			else if ((strcmp(argv[i], "-gw") == 0) || (strcmp(argv[i], "--getWakeupTime") == 0))
-//			{
-//				time_t theGMTTime;
-//
-//				/* get the frontcontroller wakeup time */
-//				if (((Model_t*)context->m)->GetWakeupTime)
-//				{
-//					if (((Model_t*)context->m)->GetWakeupTime(context, &theGMTTime) == 0)
-//					{
-//						struct tm *gmt = gmtime(&theGMTTime);
-//
-//						fprintf(stderr, "Wakeup Time: %02d:%02d:%02d %02d-%02d-%04d\n",
-//							gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon+1, gmt->tm_year+1900);
-//					}
-//				}
-//			}
+			else if ((strcmp(argv[i], "-gw") == 0) || (strcmp(argv[i], "--getWakeupTime") == 0))
+			{
+				time_t theGMTTime;
+
+				/* get the frontcontroller wakeup time */
+				if (((Model_t*)context->m)->GetWakeupTime)
+				{
+					if (((Model_t*)context->m)->GetWakeupTime(context, &theGMTTime) == 0)
+					{
+						struct tm *gmt = gmtime(&theGMTTime);
+
+						fprintf(stderr, "Wakeup Time: %02d:%02d:%02d %02d-%02d-%04d\n",
+							gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon+1, gmt->tm_year+1900);
+					}
+				}
+			}
 			else if ((strcmp(argv[i], "-s") == 0) || (strcmp(argv[i], "--setTime") == 0))
 			{
 				time_t theGMTTime;
@@ -314,7 +312,6 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				if (argc == 4)
 				{
 					getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
-
 					/* shutdown at the given time */
 					if (((Model_t *)context->m)->Shutdown)
 					{
@@ -468,7 +465,8 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				i += 1;
 			}
 			else if ((strcmp(argv[i], "-c") == 0) || (strcmp(argv[i], "--clear") == 0))
-			{  /* clear the display */
+			{
+				/* clear the display */
 				if (((Model_t *)context->m)->Clear)
 				{
 					((Model_t *)context->m)->Clear(context);
@@ -495,7 +493,7 @@ void processCommand (Context_t *context, int argc, char *argv[])
 				printf("fp_control version %s\n", sw_version);
 				printf("\nConfiguration of receiver:\n");
 				printf("Display: %d        Time format: %s", Vdisplay, VtimeFormat);
-				printf("Displaycustom: %d  Wakeupdecrement: %d mins\n", Vdisplay_custom, Vwakeup);
+				printf("Displaycustom: %d  Wakeupdecrement: %d seconds\n", Vdisplay_custom, Vwakeup);
 				/* get FP version info */
 				if (((Model_t *)context->m)->GetVersion)
 				{
@@ -647,7 +645,7 @@ int getModel()
 		vName[vLen - 1] = '\0';
 		if (!strncasecmp(vName, "ufs910", 6))
 		{
-			switch(getKathreinUfs910BoxType())
+			switch (getKathreinUfs910BoxType())
 			{
 				case 0:
 					vBoxType = Ufs910_1W;
@@ -705,12 +703,12 @@ int getModel()
 		else if (!strncasecmp(vName, "adb_box", 7))
 			vBoxType = Adb_Box;
 		else if ((!strncasecmp(vName, "cuberevo", 8)) ||
-			(!strncasecmp(vName, "cuberevo-mini", 13)) ||
-			(!strncasecmp(vName, "cuberevo-mini2", 14)) ||
-			(!strncasecmp(vName, "cuberevo-mini-fta", 17)) ||
-			(!strncasecmp(vName, "cuberevo-250hd", 14)) ||
-			(!strncasecmp(vName, "cuberevo-2000hd", 15)) ||
-			(!strncasecmp(vName, "cuberevo-9500hd", 15)))
+				 (!strncasecmp(vName, "cuberevo-mini", 13)) ||
+				 (!strncasecmp(vName, "cuberevo-mini2", 14)) ||
+				 (!strncasecmp(vName, "cuberevo-mini-fta", 17)) ||
+				 (!strncasecmp(vName, "cuberevo-250hd", 14)) ||
+				 (!strncasecmp(vName, "cuberevo-2000hd", 15)) ||
+				 (!strncasecmp(vName, "cuberevo-9500hd", 15)))
 			vBoxType = Cuberevo;
 		else
 			vBoxType = Unknown;

@@ -62,40 +62,38 @@ typedef struct
 
 tArgs vHArgs[] =
 {
-	{ "-e","  --setTimer           ","Args: [time date]  Format: HH:MM:SS dd-mm-YYYY" },
-	{ "","                         ","      No arg: Set the most recent timer from e2 or neutrino" },
-	{ "","                         ","      to the frontcontroller and shutdown" },
-	{ "","                         ","      Arg time date: Set frontcontroller wake-up time to" },
-	{ "","                         ","      time, shutdown, and wake up at given time" },
-	{ "-d","  --shutdown           ","Args: None or [time date]  Format: HH:MM:SS dd-mm-YYYY" },
-	{ "","                         ","      No arg: Shut down immediately" },
-	{ "","                         ","      Arg time date: Shut down at given time/date" },
-	{ "-r","  --reboot             ","Args: None" },
-	{ "","                         ","      No arg:     Reboot immediately (= -e current time+3 date today" },
-	{ "","                         ","      Arg time date: Reboot at given time/date (= -e time date)" },
-	{ "-g","  --getTime            ","Args: None        Display currently set frontprocessor time" },
-	{ "-gs"," --getTimeAndSet      ","Args: None        Set system time to current frontprocessor time" },
-	{ "","                         ","      WARNING: system date will be 01-01-1970!" },
-	{ "-gt"," --getWTime           ","Args: None        Get the current frontcontroller wake up time" },
-	{ "-s","  --setTime            ","Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
-	{ "","                         ","      Set the frontprocessor time" },
-	{ "-st"," --setWTime           ","Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
-	{ "","                         ","      Set the frontprocessor wake up time" },
-	{ "-sst","--setSystemTime      ","Args: None        Set frontprocessor time to current system time" },
-	{ "","                         ","      Set wake up time" },
-//   { "-p"," --sleep               ","Args: time date  Format: HH:MM:SS dd-mm-YYYY\n\t\tReboot receiver via fp at given time" },
-	{ "-t","  --settext            ","Arg : text        Set text to frontpanel" },
-	{ "-l","  --setLed             ","Args: LED# 0|1|2  LED#: off, on or blink" },
-	{ "-i","  --setIcon            ","Args: icon# 0|1   Set an icon off or on" },
-	{ "-b","  --setBrightness      ","Arg : 0..7        Set display brightness" },
-	{ "-w","  --getWakeupReason    ","Args: None        Get the wake up reason" },
-	{ "-L","  --setLight           ","Arg : 0/1         Set display on/off" },
-	{ "-dt"," --display_time       ","Arg : 0/1         Set display time to system time" },
-	{ "-c","  --clear              ","Args: None        Clear display, all icons and LEDs off" },
-	{ "-v","  --version            ","Args: None        Get version info from frontprocessor" },
-// { "-tm"," --time_mode          ","Arg : 0/1         Set 12/24 hour mode" },
-// { "-gms","--get_model_specific ","Arg : int         Model specific get function" },
-	{ "-ms ","--set_model_specific ","Args: long long   Model specific set function" },
+	{ "-e", "  --setTimer           ", "Args: [time date]  Format: HH:MM:SS dd-mm-YYYY" },
+	{ "", "                         ", "      No arg: Set the most recent timer from e2 or neutrino" },
+	{ "", "                         ", "      to the frontcontroller and shutdown" },
+	{ "", "                         ", "      Arg time date: Set frontcontroller wake-up time to" },
+	{ "", "                         ", "      time, shutdown, and wake up at given time" },
+	{ "-d", "  --shutdown           ", "Args: None or [time date]  Format: HH:MM:SS dd-mm-YYYY" },
+	{ "", "                         ", "      No arg: Shut down immediately" },
+	{ "", "                         ", "      Arg time date: Shut down at given time/date" },
+	{ "-r", "  --reboot             ", "Args: None" },
+	{ "", "                         ", "      No arg:     Reboot immediately (= -e current time+3 date today" },
+	{ "", "                         ", "      Arg time date: Reboot at given time/date (= -e time date)" },
+	{ "-g", "  --getTime            ", "Args: None        Display currently set frontprocessor time" },
+	{ "-gs", " --getTimeAndSet      ", "Args: None        Set system time to current frontprocessor time" },
+	{ "", "                         ", "      WARNING: system date will be 01-01-1970!" },
+	{ "-gt", " --getWTime           ", "Args: None        Get the current frontcontroller wake up time" },
+	{ "-s", "  --setTime            ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
+	{ "", "                         ", "      Set the frontprocessor time" },
+	{ "-st", " --setWTime           ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
+	{ "", "                         ", "      Set the frontprocessor wake up time" },
+	{ "-sst", "--setSystemTime      ", "Args: None        Set frontprocessor time to current system time" },
+//	{ "-p", "  --sleep              ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY\n\t\tReboot receiver via fp at given time" },
+	{ "-t", "  --settext            ", "Arg : text        Show text in front panel display" },
+	{ "-l", "  --setLed             ", "Args: LED# 0|1|2  LED#: off, on or blink" },
+	{ "-i", "  --setIcon            ", "Args: icon# 0|1   Set an icon off or on" },
+	{ "-b", "  --setBrightness      ", "Arg : 0..7        Set display brightness" },
+	{ "-w", "  --getWakeupReason    ", "Args: None        Get the wake up reason" },
+	{ "-L", "  --setLight           ", "Arg : 0|1         Set display on/off" },
+	{ "-c", "  --clear              ", "Args: None        Clear display, all icons and LEDs off" },
+	{ "-v", "  --version            ", "Args: None        Get version info from frontprocessor" },
+//	{ "-tm"," --time_mode           ", "Arg : 0|1         Set 12/24 hour mode" },
+//	{ "-gms", "--get_model_specific ", "Arg : int         Model specific get function" },
+	{ "-ms ", "--set_model_specific ", "Args: long long   Model specific set function" },
 	{ NULL, NULL, NULL }
 };
 
@@ -119,7 +117,7 @@ typedef struct
 void Spark_calcAotomTime(time_t theGMTTime, char *destString)
 {
 	/* from u-boot aotom */
-	struct	tm *now_tm;
+	struct tm *now_tm;
 	now_tm = localtime(&theGMTTime);
 	double mjd = modJulianDate(now_tm);
 	int mjd_int = mjd;
@@ -180,7 +178,7 @@ static int Spark_usage(Context_t *context, char *prg_name, char *cmd_name)
 	return 0;
 }
 
-static int Spark_setTimer(Context_t *context, time_t *theGMTTime)
+static int Spark_setTimer(Context_t *context, time_t *timerTime)
 {
 	//-e command, rewritten, tested on Spark7162
 	struct aotom_ioctl_data vData;
@@ -197,18 +195,18 @@ static int Spark_setTimer(Context_t *context, time_t *theGMTTime)
 	smonth = tss->tm_mon + 1;
 	syear = tss->tm_year + 1900;
 	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d\n", tss->tm_hour, tss->tm_min, tss->tm_sec, tss->tm_mday, tss->tm_mon + 1, tss->tm_year + 1900);
-	if (theGMTTime == NULL) // -e no argument = shutdown on next e2/neutrino timer
+	if (timerTime == NULL) // -e no argument = shutdown on next e2/neutrino timer
 	{
 		wakeupTime = read_timers_utc(curTime); //get current 1st timer
 	}
 	else
 	{
-		wakeupTime = *theGMTTime; //get specified time
+		wakeupTime = *timerTime; //get specified time
 	}
 	if ((wakeupTime == LONG_MAX) || (wakeupTime == -1)) // if no timers set
 	{
 		//if wake up time in the past
-		printf("There are no timers set!\n");
+//		printf("There are no timers set!\n");
 		return 0;
 	}
 	else
@@ -243,23 +241,28 @@ static int Spark_setTimer(Context_t *context, time_t *theGMTTime)
 		}
 		ts = gmtime(&wakeupTime);
 		printf("Wake up time: %02d:%02d:%02d", ts->tm_hour, ts->tm_min, ts->tm_sec);
-		if ((tss->tm_mday == 1) && (tss->tm_mon == 0) && (tss->tm_year == 70)) //today
+//		if (diff > 86399)
+		if ((tss->tm_mday == ts->tm_mday) && (tss->tm_mon == ts->tm_mon) && (tss->tm_year == ts->tm_year)) //today
 		{
-			printf(" (%02d-%02d-%04d)\n", sday, smonth, syear);
+			printf(" (today)\n");
 		}
-		if (tss->tm_mday > 1)
+		else
 		{
-			printf(" in %d day(s)", tss->tm_mday - 1);
+			printf("\non          : %02d-%02d-%04d\n", sday, smonth, syear);
 		}
-		if (tss->tm_mon != 0)
-		{
-			printf(", %d month(s)", tss->tm_mon);
-		}
-		if (tss->tm_year != 70)
-		{
-			printf(", %d year(s)", tss->tm_year - 70);
-		}
-		printf("\n");
+//		if (tss->tm_mday > 1)
+//		{
+//			printf(" in %d day(s)", tss->tm_mday - 1);
+//		}
+//		if (tss->tm_mon != 0)
+//		{
+//			printf(", %d month(s)", tss->tm_mon);
+//		}
+//		if (tss->tm_year != 70)
+//		{
+//			printf(", %d year(s)", tss->tm_year - 70);
+//		}
+//		printf("\n");
 		Spark_calcAotomTime(wakeupTime, vData.u.standby.time);
 		if (ioctl(context->fd, VFDSTANDBY, &wakeupTime) < 0)
 		{
@@ -304,7 +307,7 @@ static int Spark_shutdown(Context_t *context, time_t *shutdownTimeGMT)
 		time(&curTime);
 		ts = localtime(&curTime);
 		printf("Current time  : %02d:%02d:%02d %02d-%02d-%04d\r",
-			ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon+1, ts->tm_year+1900);
+			   ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
 		usleep(20000);
 	}
 	printf("\n\n");
@@ -381,7 +384,7 @@ static int Spark_getWTime(Context_t *context, time_t *theGMTTime)
 		*theGMTTime = iTime;
 		get_tm = gmtime(&iTime);
 		printf("Frontprocessor wakeup time: %02d:%02d:%02d %02d-%02d-%04d\n",
-			   get_tm->tm_hour, get_tm->tm_min, get_tm->tm_sec, get_tm->tm_mday, get_tm->tm_mon + 1, get_tm->tm_year + 1900);
+			get_tm->tm_hour, get_tm->tm_min, get_tm->tm_sec, get_tm->tm_mday, get_tm->tm_mon + 1, get_tm->tm_year + 1900);
 	}
 	else
 	{
@@ -429,24 +432,24 @@ static int Spark_setWTime(Context_t *context, time_t *theGMTTime)
 	return 0;
 }
 
-static int Spark_setDisplayTime(Context_t *context, int on)
+static int Spark_setSTime(Context_t *context, time_t *theGMTTime)
 {
-	//-dt command, tested on spark7162
-	time_t theGMTTime = time(NULL); //get system time
+	//-sst command, tested on spark7162
+	time_t systemTime = time(NULL);
 	struct tm *gmt;
-	gmt = localtime(&theGMTTime);
+	gmt = localtime(&systemTime);
 	if (gmt->tm_year == 100)
 	{
 		fprintf(stderr, "Problem: RTC time not set.\n");
 	}
 	else
 	{
-		fprintf(stderr, "Setting front panel clock to\ncurrent system time: %02d:%02d:%02d %02d-%02d-%04d\n",
-				gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon + 1, gmt->tm_year + 1900);
-		theGMTTime += gmt->tm_gmtoff;
-		if (ioctl(context->fd, VFDSETTIME2, &theGMTTime) < 0)
+		fprintf(stderr, "Setting front panel clock to\ncurrent system time: %02d:%02d:%02d (date ignored)\n",
+				gmt->tm_hour, gmt->tm_min, gmt->tm_sec);
+		systemTime += gmt->tm_gmtoff;
+		if (ioctl(context->fd, VFDSETTIME2, &systemTime) < 0)
 		{
-			perror("Settime");
+			perror("Set FP time to system time");
 			return -1;
 		}
 	}
@@ -534,6 +537,40 @@ static int Spark_setLight(Context_t *context, int on)  //! actually does not swi
 	{
 		perror("Set light");
 		return -1;
+	}
+	return 0;
+}
+
+static int Spark_setDisplayTime(Context_t *context, int on)
+{
+	// -sf command
+	time_t systemTime = time(NULL);
+	struct tm *gmt;
+
+	gmt = localtime(&systemTime); //get system time
+
+	if ((gmt->tm_year + 1900) > 2016)
+	{
+		fprintf(stderr, "Set display time to %d is not supported on this receiver.\n", on);
+		return -1;
+	}
+
+	fprintf(stderr, "Set display time to %d is deprecated in this receiver,\nplease use -sst option in future.\n", on);
+
+	if (gmt->tm_year == 100)
+	{
+		fprintf(stderr, "Problem: RTC time not set.\n");
+	}
+	else
+	{
+		fprintf(stderr, "Setting front panel clock to\ncurrent system time: %02d:%02d:%02d %02d-%02d-%04d\n",
+				gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon + 1, gmt->tm_year + 1900);
+		systemTime += gmt->tm_gmtoff;
+		if (ioctl(context->fd, VFDSETTIME2, &systemTime) < 0)
+		{
+			perror("Set FP time to system time");
+			return -1;
+		}
 	}
 	return 0;
 }
@@ -669,6 +706,7 @@ Model_t Spark_model =
 	.Clear            = Spark_clear,
 	.Usage            = Spark_usage,
 	.SetTime          = Spark_setTime,
+	.SetSTime         = Spark_setSTime,
 	.SetTimer         = Spark_setTimer,
 	.GetTime          = Spark_getTime,
 	.GetWTime         = Spark_getWTime,
