@@ -47,7 +47,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* software version of fp_control. please increase on every change */
-static const char *sw_version = "1.05NdV 20141123.1";
+static const char *sw_version = "1.05NdV 20141204.1";
 
 typedef struct
 {
@@ -700,7 +700,11 @@ int getModel()
 			vBoxType = Spark;
 		else if (!strncasecmp(vName, "spark7162", 9))
 			vBoxType = Spark;
-		else if (!strncasecmp(vName, "adb_box", 7))
+		else if ((!strncasecmp(vName, "adb_box", 7)) ||
+				 (!strncasecmp(vName, "sagemcom88", 10)) ||
+				 (!strncasecmp(vName, "esi_88", 6)) ||
+				 (!strncasecmp(vName, "esi88", 5)) ||
+				 (!strncasecmp(vName, "dsi87", 5)))
 			vBoxType = Adb_Box;
 		else if ((!strncasecmp(vName, "cuberevo", 8)) ||
 				 (!strncasecmp(vName, "cuberevo-mini", 13)) ||
