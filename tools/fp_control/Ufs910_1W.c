@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -49,12 +49,11 @@ typedef struct
 {
 	int vfd;
 
-	int    display;
-	int    display_custom;
-	char  *timeFormat;
-
+	int display;
+	int display_custom;
+	char *timeFormat;
 	time_t wakeupTime;
-	int    wakeupDecrement;
+	int wakeupDecrement;
 } tUFS910Private;
 
 typedef struct
@@ -74,7 +73,6 @@ tUFS910Leds led[] =
 	{/* cYellow,*/ "3", "C" }
 };
 
-
 /* ******************* helper/misc functions ****************** */
 
 static int setTemFlagsKathrein(int fd)
@@ -85,25 +83,19 @@ static int setTemFlagsKathrein(int fd)
 	if ((tcgetattr(fd, &old_io)) == 0)
 	{
 		new_io = old_io;
-
-		printf("setting new flags\n");
+		printf("Setting new flags\n");
 		/* c_iflags ->input flags */
 		new_io.c_iflag &= ~(IMAXBEL | BRKINT | ICRNL);
-
 		/* c_lflags ->local flags*/
 		new_io.c_lflag &= ~(ECHO | IEXTEN);
-
 		/* c_oflags ->output flags*/
 		new_io.c_oflag &= ~(ONLCR);
-
 		/* c_cflags ->constant flags*/
 		new_io.c_cflag = B19200;
-
 		tcsetattr(fd, TCSANOW, &new_io);
-
 	}
 	else
-		printf("error set raw mode.\n");
+		printf("Error setting raw mode.\n");
 
 	return 0;
 }
@@ -114,10 +106,8 @@ static int init(Context_t *context)
 {
 	int vFd;
 	tUFS910Private *private = malloc(sizeof(tUFS910Private));
-
 	((Model_t *)context->m)->private = private;
 	memset(private, 0, sizeof(tUFS910Private));
-
 	vFd = open(cTTY_DEVICE, O_RDWR);
 
 	if (vFd < 0)
@@ -127,17 +117,15 @@ static int init(Context_t *context)
 	}
 
 	setTemFlagsKathrein(vFd);
-
 	private->vfd = open(cVFD_DEVICE, O_RDWR);
 
 	if (private->vfd < 0)
 	{
-		fprintf(stderr, "cannot open %s\n", cVFD_DEVICE);
+		fprintf(stderr, "Cannot open %s\n", cVFD_DEVICE);
 		perror("");
 	}
 
 	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement);
-
 	return vFd;
 }
 
@@ -161,17 +149,15 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 
 static int setTimer(Context_t *context, time_t *theGMTTime)
 {
-	time_t                  curTime;
-	time_t                  wakeupTime;
-	struct tm               *ts;
-	unsigned long int       diffTm;
-	unsigned char           uTime0, uTime1, uTime2, uTime3;
-	char                    cTime[6];
-	tUFS910Private *private = (tUFS910Private *) ((Model_t *)context->m)->private;
-
+	time_t curTime;
+	time_t wakeupTime;
+	struct tm *ts;
+	unsigned long int diffTm;
+	unsigned char uTime0, uTime1, uTime2, uTime3;
+	char cTime[6];
+	tUFS910Private *private = (tUFS910Private *)((Model_t *)context->m)->private;
 	time(&curTime);
 	ts = localtime(&curTime);
-
 	fprintf(stderr, "Current Time: %02d:%02d:%02d %02d-%02d-%04d\n",
 			ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
 
@@ -185,35 +171,31 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 
 	if (curTime > wakeupTime)
 	{
-		printf("Wrong System Time -> Reboot\n");
+		printf("System time wrong -> Reboot\n");
 		diffTm = 5;
 	}
 	else
 		diffTm = (unsigned long int) wakeupTime - curTime;
 
-	printf("DIFFTIME: %ld\n", diffTm);
-
+	printf("Time difference: %ld\n", diffTm);
 	uTime0 = diffTm % 256;
 	uTime1 = (diffTm / 256) % 256;
 	uTime2 = ((diffTm / 256) / 256) % 256;
 	uTime3 = (((diffTm / 256) / 256) / 256) % 256;
-
 	printf("%03d %03d %03d %03d\n", uTime3, uTime2, uTime1, uTime0);
-
 	cTime[0] = 'Q';
 	cTime[1] = uTime3;
 	cTime[2] = uTime2;
 	cTime[3] = uTime1;
 	cTime[4] = uTime0;
 
-	printf("GOOD BYE\n");
+	printf("Goodbye\n");
 
 	sleep(1);
 
 	/* SWITCH ON RED LED */
 	write(context->fd, "2" , 1);
 	usleep(1000);
-
 	write(context->fd, &cTime[0], 1);
 	usleep(1000);
 	write(context->fd, &cTime[1], 1);
@@ -223,7 +205,6 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	write(context->fd, &cTime[3], 1);
 	usleep(1000);
 	write(context->fd, &cTime[4], 1);
-
 	return 0;
 }
 
@@ -235,9 +216,9 @@ static int getTimer(Context_t *context, time_t *theGMTTime)
 
 static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 {
-	time_t     curTime;
+	time_t curTime;
 
-	/* shutdown immediate */
+	/* shutdown immediately */
 	if (*shutdownTimeGMT == -1)
 		return (setTimer(context, NULL));
 
@@ -259,7 +240,7 @@ static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 
 static int reboot(Context_t *context, time_t *rebootTimeGMT)
 {
-	time_t                    curTime;
+	time_t curTime;
 
 	while (1)
 	{
@@ -278,13 +259,13 @@ static int reboot(Context_t *context, time_t *rebootTimeGMT)
 
 static int Sleep(Context_t *context, time_t *wakeUpGMT)
 {
-	time_t     curTime;
-	int        sleep = 1;
-	fd_set     rfds;
-	struct     timeval tv;
-	int        retval;
-	struct tm  *ts;
-	char       output[cMAXCharsUFS910 + 1];
+	time_t curTime;
+	int sleep = 1;
+	fd_set rfds;
+	struct timeval tv;
+	int retval;
+	struct tm *ts;
+	char output[cMAXCharsUFS910 + 1];
 	tUFS910Private *private = (tUFS910Private *)
 							  ((Model_t *)context->m)->private;
 
@@ -301,10 +282,8 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 		{
 			FD_ZERO(&rfds);
 			FD_SET(context->fd, &rfds);
-
 			tv.tv_sec = 0;
 			tv.tv_usec = 100000;
-
 			retval = select(context->fd + 1, &rfds, NULL, NULL, &tv);
 
 			if (retval > 0)
@@ -326,20 +305,16 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 static int setText(Context_t *context, char *theText)
 {
 	struct vfd_ioctl_data data;
-
 	tUFS910Private *private = (tUFS910Private *)
 							  ((Model_t *)context->m)->private;
-
 	memset(data.data, ' ', 63);
-
 	memcpy(data.data, theText, strlen(theText));
-
 	data.start = 0;
 	data.length = strlen(theText);
 
 	if (ioctl(private->vfd, VFDDISPLAYCHARS, &data) < 0)
 	{
-		perror("settext: ");
+		perror("setText: ");
 		return -1;
 	}
 
@@ -362,12 +337,9 @@ static int setLed(Context_t *context, int which, int on)
 static int setIcon(Context_t *context, int which, int on)
 {
 	struct vfd_ioctl_data data;
-
 	tUFS910Private *private = (tUFS910Private *)
 							  ((Model_t *)context->m)->private;
-
 	memset(data.data, ' ', 63);
-
 	data.start = 0;
 	data.length = 5;
 	data.data[0] = which & 0x0f;
@@ -375,7 +347,7 @@ static int setIcon(Context_t *context, int which, int on)
 
 	if (ioctl(private->vfd, VFDICONDISPLAYONOFF, &data) < 0)
 	{
-		perror("seticon: ");
+		perror("setIcon: ");
 		return -1;
 	}
 
@@ -385,7 +357,6 @@ static int setIcon(Context_t *context, int which, int on)
 static int setBrightness(Context_t *context, int brightness)
 {
 	struct vfd_ioctl_data data;
-
 	tUFS910Private *private = (tUFS910Private *)
 							  ((Model_t *)context->m)->private;
 
@@ -393,13 +364,12 @@ static int setBrightness(Context_t *context, int brightness)
 		return -1;
 
 	memset(data.data, ' ', 63);
-
 	data.start = brightness & 0x07;
 	data.length = 0;
 
 	if (ioctl(private->vfd, VFDBRIGHTNESS, &data) < 0)
 	{
-		perror("setbrightness: ");
+		perror("setBrightness: ");
 		return -1;
 	}
 
@@ -415,10 +385,7 @@ static int setPwrLed(Context_t *context, int brightness)
 static int setLight(Context_t *context, int on)
 {
 	struct vfd_ioctl_data data;
-
-	tUFS910Private *private = (tUFS910Private *)
-							  ((Model_t *)context->m)->private;
-
+	tUFS910Private *private = (tUFS910Private *)((Model_t *)context->m)->private;
 	memset(&data, 0, sizeof(struct vfd_ioctl_data));
 
 	if (on)
@@ -437,7 +404,6 @@ static int setLight(Context_t *context, int on)
 	return 0;
 }
 
-
 static int Exit(Context_t *context)
 {
 	tUFS910Private *private = (tUFS910Private *)
@@ -450,16 +416,13 @@ static int Exit(Context_t *context)
 		close(context->fd);
 
 	free(private);
-
 	exit(1);
 }
 
 static int Clear(Context_t *context)
 {
 	int i;
-
 	setText(context, "                ");
-
 	setBrightness(context, 7);
 
 	for (i = 1; i <= 3 ; i++)
@@ -473,28 +436,27 @@ static int Clear(Context_t *context)
 
 Model_t Ufs910_1W_model =
 {
-	.Name             = "Kathrein UFS910 1W frontpanel control utility",
-	.Type             = Ufs910_1W,
-	.Init             = init,
-	.Clear            = Clear,
-	.Usage            = usage,
-	.SetTime          = setTime,
-	.GetTime          = getTime,
-	.SetTimer         = setTimer,
-	.GetTimer         = getTimer,
-	.Shutdown         = shutdown,
-	.Reboot           = reboot,
-	.Sleep            = Sleep,
-	.SetText          = setText,
-	.SetLed           = setLed,
-	.SetIcon          = setIcon,
-	.SetBrightness    = setBrightness,
-	.SetPwrLed        = setPwrLed,
-	.SetLight         = setLight,
-	.Exit             = Exit,
-	.SetLedBrightness = NULL,
-	.SetRF            = NULL,
-	.SetFan           = NULL,
-	.private          = NULL,
+	.Name                      = "Kathrein UFS910 1W frontpanel control utility",
+	.Type                      = Ufs910_1W,
+	.Init                      = init,
+	.Clear                     = Clear,
+	.Usage                     = usage,
+	.SetTime                   = setTime,
+	.GetTime                   = getTime,
+	.SetTimer                  = setTimer,
+	.GetTimer                  = getTimer,
+	.Shutdown                  = shutdown,
+	.Reboot                    = reboot,
+	.Sleep                     = Sleep,
+	.SetText                   = setText,
+	.SetLed                    = setLed,
+	.SetIcon                   = setIcon,
+	.SetBrightness             = setBrightness,
+	.SetPwrLed                 = setPwrLed,
+	.SetLight                  = setLight,
+	.Exit                      = Exit,
+	.SetLedBrightness          = NULL,
+	.SetRF                     = NULL,
+	.SetFan                    = NULL,
+	.private                   = NULL
 };
-

@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -55,20 +55,19 @@ static int setLight(Context_t *context, int on);
 
 typedef struct
 {
-	int    vfd;
-	int    fd_green;
-	int    fd_red;
-	int    fd_yellow;
+	int vfd;
+	int fd_green;
+	int fd_red;
+	int fd_yellow;
 
-	int    nfs;
+	int nfs;
 
-	int    display;
-	int    display_custom;
-	char  *timeFormat;
+	int display;
+	int display_custom;
+	char *timeFormat;
 
 	time_t wakeupTime;
-	int    wakeupDecrement;
-
+	int wakeupDecrement;
 } tHS5101Private;
 
 /* ----------------------------------------------------- */
@@ -86,9 +85,7 @@ void hs5101_avs_standby(int fd_avs, unsigned int mode)
 void hs5101_hdmi_standby(int fd_hdmi, int mode)
 {
 	struct stmfbio_output_configuration outputConfig = {0};
-
 	printf("%s %d\n", __func__, mode);
-
 	outputConfig.outputid = 1;
 
 	if (ioctl(fd_hdmi, STMFBIO_GET_OUTPUT_CONFIG, &outputConfig) < 0)
@@ -97,7 +94,6 @@ void hs5101_hdmi_standby(int fd_hdmi, int mode)
 	outputConfig.caps = 0;
 	outputConfig.activate = STMFBIO_ACTIVATE_IMMEDIATE;
 	outputConfig.analogue_config = 0;
-
 	outputConfig.caps |= STMFBIO_OUTPUT_CAPS_HDMI_CONFIG;
 
 	if (!mode)
@@ -114,7 +110,6 @@ void hs5101_hdmi_standby(int fd_hdmi, int mode)
 		if (ioctl(fd_hdmi, STMFBIO_SET_OUTPUT_CONFIG, &outputConfig) < 0)
 			perror("setting output configuration failed");
 	}
-
 }
 
 /* ----------------------------------------------------- */
@@ -123,17 +118,13 @@ void hs5101_startPseudoStandby(Context_t *context, tHS5101Private *private)
 {
 	int id;
 	int fd_avs = open("/proc/stb/avs/0/standby", O_RDWR);
-	int fd_hdmi  = open("/dev/fb0",   O_RDWR);
-
+	int fd_hdmi = open("/dev/fb0", O_RDWR);
 	printf("%s\n", __func__);
-
 	setLed(context, 1, 0);
 	setLed(context, 2, 0);
 	setLed(context, 3, 0);
-
 	hs5101_avs_standby(fd_avs, 0);
 	hs5101_hdmi_standby(fd_hdmi, 0);
-
 	setText(context, "                ");
 
 	for (id = 0x10; id < 0x20; id++)
@@ -149,9 +140,8 @@ void hs5101_startPseudoStandby(Context_t *context, tHS5101Private *private)
 void hs5101_stopPseudoStandby(Context_t *context, tHS5101Private *private)
 {
 	int fd_avs = open("/proc/stb/avs/0/standby", O_RDWR);
-	int fd_hdmi  = open("/dev/fb0",   O_RDWR);
+	int fd_hdmi = open("/dev/fb0", O_RDWR);
 	int id;
-
 	printf("%s\n", __func__);
 
 	if (private->display == 0)
@@ -164,14 +154,11 @@ void hs5101_stopPseudoStandby(Context_t *context, tHS5101Private *private)
 
 	hs5101_hdmi_standby(fd_hdmi, 1);
 	hs5101_avs_standby(fd_avs, 1);
-
 	setLed(context, 1, 0);
 	setLed(context, 2, 0);
 	setLed(context, 3, 0);
-
 	close(fd_hdmi);
 	close(fd_avs);
-
 }
 
 /* ******************* driver functions ****************** */
@@ -181,21 +168,16 @@ static int init(Context_t *context)
 	char cmdLine[512];
 	int vFd;
 	tHS5101Private *private = malloc(sizeof(tHS5101Private));
-
-	printf("%s\n", __func__);
-
+//	printf("%s\n", __func__);
 	((Model_t *)context->m)->private = private;
 	memset(private, 0, sizeof(tHS5101Private));
-
 	vFd = open(cCMDLINE, O_RDWR);
-
 	private->nfs = 0;
 
 	if (read(vFd, cmdLine, 512) > 0)
 	{
 		if (strstr("nfsroot", cmdLine) != NULL)
 			private->nfs = 1;
-
 	}
 
 	close(vFd);
@@ -213,10 +195,9 @@ static int init(Context_t *context)
 		perror("");
 	}
 
-	//    private->fd_green = open("/sys/class/leds/ufs910\\:green/brightness", O_WRONLY);
-	//    private->fd_red = open("/sys/class/leds/ufs910\\:red/brightness", O_WRONLY);
-	//    private->fd_yellow = open("/sys/class/leds/ufs910\\:yellow/brightness", O_WRONLY);
-
+	// private->fd_green = open("/sys/class/leds/ufs910\\:green/brightness", O_WRONLY);
+	// private->fd_red = open("/sys/class/leds/ufs910\\:red/brightness", O_WRONLY);
+	// private->fd_yellow = open("/sys/class/leds/ufs910\\:yellow/brightness", O_WRONLY);
 	private->vfd = open(cVFD_DEVICE, O_RDWR);
 
 	if (private->vfd < 0)
@@ -226,7 +207,6 @@ static int init(Context_t *context)
 	}
 
 	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement);
-
 	return vFd;
 }
 
@@ -250,19 +230,14 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 
 static int setTimer(Context_t *context, time_t *theGMTTime)
 {
-	time_t                  curTime;
-	struct tm               *ts;
-	tHS5101Private *private = (tHS5101Private *)
-							  ((Model_t *)context->m)->private;
-
+	time_t curTime;
+	struct tm *ts;
+	tHS5101Private *private = (tHS5101Private *)((Model_t *)context->m)->private;
 	printf("%s\n", __func__);
-
 	time(&curTime);
 	ts = localtime(&curTime);
-
 	fprintf(stderr, "Current Time: %02d:%02d:%02d %02d-%02d-%04d\n",
 			ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
-
 	hs5101_startPseudoStandby(context, private);
 
 	if (theGMTTime == NULL)
@@ -271,9 +246,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		private->wakeupTime = *theGMTTime;
 
 	Sleep(context, &private->wakeupTime);
-
 	hs5101_stopPseudoStandby(context, private);
-
 	return 0;
 }
 
@@ -285,11 +258,10 @@ static int getTimer(Context_t *context, time_t *theGMTTime)
 
 static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 {
-	time_t     curTime;
-
+	time_t curTime;
 	printf("%s\n", __func__);
 
-	/* shutdown immediate */
+	/* shutdown immediately */
 	if (*shutdownTimeGMT == -1)
 		system(cmdHalt);
 
@@ -310,8 +282,7 @@ static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 
 static int reboot(Context_t *context, time_t *rebootTimeGMT)
 {
-	time_t                    curTime;
-
+	time_t curTime;
 	printf("%s\n", __func__);
 
 	while (1)
@@ -331,22 +302,18 @@ static int reboot(Context_t *context, time_t *rebootTimeGMT)
 
 static int Sleep(Context_t *context, time_t *wakeUpGMT)
 {
-	time_t     curTime;
-	int        sleep = 1;
-	int        vFd;
-	fd_set     rfds;
-	struct     timeval tv;
-	int        retval, len, i;
-	struct tm  *ts;
-	char       output[cMAXCharsHS5101 + 1];
-	struct     input_event data[64];
-	tHS5101Private *private = (tHS5101Private *)
-							  ((Model_t *)context->m)->private;
-
+	time_t curTime;
+	int sleep = 1;
+	int vFd;
+	fd_set rfds;
+	struct timeval tv;
+	int retval, len, i;
+	struct tm *ts;
+	char output[cMAXCharsHS5101 + 1];
+	struct input_event data[64];
+	tHS5101Private *private = (tHS5101Private *)((Model_t *)context->m)->private;
 	printf("%s\n", __func__);
-
 	output[cMAXCharsHS5101] = '\0';
-
 	vFd = open("/dev/input/event0", O_RDONLY);
 
 	if (vFd < 0)
@@ -366,13 +333,10 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 		}
 		else
 		{
-
 			FD_ZERO(&rfds);
 			FD_SET(vFd, &rfds);
-
 			tv.tv_sec = 0;
 			tv.tv_usec = 100000;
-
 			retval = select(vFd + 1, &rfds, NULL, NULL, &tv);
 
 			if (retval > 0)
@@ -385,8 +349,7 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 					{
 						/* noop */
 					}
-					else if (data[i].type == EV_MSC &&
-							 (data[i].code == MSC_RAW || data[i].code == MSC_SCAN))
+					else if (data[i].type == EV_MSC && (data[i].code == MSC_RAW || data[i].code == MSC_SCAN))
 					{
 						/* noop */
 					}
@@ -412,16 +375,14 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 static int setText(Context_t *context, char *theText)
 {
 	struct vfd_ioctl_data vData;
-
 	printf("%s\n", __func__);
-
 	strncpy((char *) vData.data, theText, cMAXCharsHS5101);
 	vData.data[cMAXCharsHS5101] = '\0';
 	vData.length = strlen((char *) vData.data);
 
 	if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
 	{
-		perror("standby: ");
+		perror("setText: ");
 		return -1;
 	}
 
@@ -430,11 +391,8 @@ static int setText(Context_t *context, char *theText)
 
 static int setLed(Context_t *context, int which, int on)
 {
-	tHS5101Private *private = (tHS5101Private *)
-							  ((Model_t *)context->m)->private;
-
+	tHS5101Private *private = (tHS5101Private *)((Model_t *)context->m)->private;
 	printf("%s\n", __func__);
-
 	return 0;
 
 	if (which == 1)
@@ -452,14 +410,9 @@ static int setLed(Context_t *context, int which, int on)
 static int setIcon(Context_t *context, int which, int on)
 {
 	struct vfd_ioctl_data data;
-
-	tHS5101Private *private = (tHS5101Private *)
-							  ((Model_t *)context->m)->private;
-
+	tHS5101Private *private = (tHS5101Private *)((Model_t *)context->m)->private;
 	printf("%s\n", __func__);
-
 	memset(data.data, ' ', 63);
-
 	data.start = 0;
 	data.length = 5;
 	data.data[0] = which & 0x0f;
@@ -467,7 +420,7 @@ static int setIcon(Context_t *context, int which, int on)
 
 	if (ioctl(private->vfd, VFDICONDISPLAYONOFF, &data) < 0)
 	{
-		perror("seticon: ");
+		perror("setIcon: ");
 		return -1;
 	}
 
@@ -477,17 +430,13 @@ static int setIcon(Context_t *context, int which, int on)
 static int setBrightness(Context_t *context, int brightness)
 {
 	struct vfd_ioctl_data data;
-
-	tHS5101Private *private = (tHS5101Private *)
-							  ((Model_t *)context->m)->private;
-
+	tHS5101Private *private = (tHS5101Private *)((Model_t *)context->m)->private;
 	printf("%s\n", __func__);
 
 	if (brightness < 0 || brightness > 7)
 		return -1;
 
 	memset(data.data, ' ', 63);
-
 	data.start = brightness & 0x07;
 	data.length = 0;
 
@@ -503,12 +452,8 @@ static int setBrightness(Context_t *context, int brightness)
 static int setLight(Context_t *context, int on)
 {
 	struct vfd_ioctl_data data;
-
-	tHS5101Private *private = (tHS5101Private *)
-							  ((Model_t *)context->m)->private;
-
+	tHS5101Private *private = (tHS5101Private *)((Model_t *)context->m)->private;
 	printf("%s\n", __func__);
-
 	memset(&data, 0, sizeof(struct vfd_ioctl_data));
 
 	if (on)
@@ -529,9 +474,7 @@ static int setLight(Context_t *context, int on)
 
 static int Exit(Context_t *context)
 {
-	tHS5101Private *private = (tHS5101Private *)
-							  ((Model_t *)context->m)->private;
-
+	tHS5101Private *private = (tHS5101Private *)((Model_t *)context->m)->private;
 	printf("%s\n", __func__);
 
 	if (context->fd > 0)
@@ -540,21 +483,17 @@ static int Exit(Context_t *context)
 	if (private->vfd > 0)
 		close(private->vfd);
 
-	//    close(private->fd_green);
-	//    close(private->fd_red);
-	//    close(private->fd_yellow);
-
+	// close(private->fd_green);
+	// close(private->fd_red);
+	// close(private->fd_yellow);
 	free(private);
-
 	exit(1);
 }
 
 static int Clear(Context_t *context)
 {
 	int i;
-
 	setText(context, "                ");
-
 	setBrightness(context, 7);
 
 	for (i = 1; i <= 3 ; i++)
@@ -568,29 +507,28 @@ static int Clear(Context_t *context)
 
 Model_t Hs5101_model =
 {
-	.Name             = "Homecast 5101 frontpanel control utility",
-	.Type             = Hs5101,
-	.Init             = init,
-	.Clear            = Clear,
-	.Usage            = usage,
-	.SetTime          = setTime,
-	.GetTime          = getTime,
-	.SetTimer         = setTimer,
-	.GetTimer         = getTimer,
-	.Shutdown         = shutdown,
-	.Reboot           = reboot,
-	.Sleep            = Sleep,
-	.SetText          = setText,
-	.SetLed           = setLed,
-	.SetIcon          = setIcon,
-	.SetBrightness    = setBrightness,
-	.SetPwrLed        = NULL,
-	.SetLight         = setLight,
-	.Exit             = Exit,
-	.SetLedBrightness = NULL,
-	.GetVersion       = NULL,
-	.SetRF            = NULL,
-	.SetFan           = NULL,
-	.private          = NULL,
+	.Name                      = "Homecast 5101 frontpanel control utility",
+	.Type                      = Hs5101,
+	.Init                      = init,
+	.Clear                     = Clear,
+	.Usage                     = usage,
+	.SetTime                   = setTime,
+	.GetTime                   = getTime,
+	.SetTimer                  = setTimer,
+	.GetTimer                  = getTimer,
+	.Shutdown                  = shutdown,
+	.Reboot                    = reboot,
+	.Sleep                     = Sleep,
+	.SetText                   = setText,
+	.SetLed                    = setLed,
+	.SetIcon                   = setIcon,
+	.SetBrightness             = setBrightness,
+	.SetPwrLed                 = NULL,
+	.SetLight                  = setLight,
+	.Exit                      = Exit,
+	.SetLedBrightness          = NULL,
+	.GetVersion                = NULL,
+	.SetRF                     = NULL,
+	.SetFan                    = NULL,
+	.private                   = NULL
 };
-

@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -44,17 +44,17 @@ static int setText(Context_t *context, char *theText);
 
 typedef struct
 {
-	int    display;
-	int    display_custom;
-	char  *timeFormat;
+	int display;
+	int display_custom;
+	char *timeFormat;
 
 	time_t wakeupTime;
-	int    wakeupDecrement;
+	int wakeupDecrement;
 } tHL101Private;
 
 /* ******************* helper/misc functions ****************** */
 
-/* calculate the time value which we can pass to
+/* Calculate the time value which we can pass to
  * the proton fp. its a mjd time (mjd=modified
  * julian date). mjd is relativ to gmt so theGMTTime
  * must be in GMT/UTC.
@@ -64,13 +64,10 @@ void setProtonTime(time_t theGMTTime, char *destString)
 	/* from u-boot proton */
 	struct tm *now_tm;
 	now_tm = gmtime(&theGMTTime);
-
 	printf("Set Time (UTC): %02d:%02d:%02d %02d-%02d-%04d\n",
 		   now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec, now_tm->tm_mday, now_tm->tm_mon + 1, now_tm->tm_year + 1900);
-
 	double mjd = modJulianDate(now_tm);
 	int mjd_int = mjd;
-
 	destString[0] = (mjd_int >> 8);
 	destString[1] = (mjd_int & 0xff);
 	destString[2] = now_tm->tm_hour;
@@ -80,18 +77,14 @@ void setProtonTime(time_t theGMTTime, char *destString)
 
 unsigned long getProtonTime(char *protonTimeString)
 {
-	unsigned int 	mjd 	= ((protonTimeString[1] & 0xFF) * 256) + (protonTimeString[2] & 0xFF);
-	unsigned long 	epoch 	= ((mjd - 40587) * 86400);
-
-	unsigned int 	hour 	= protonTimeString[3] & 0xFF;
-	unsigned int 	min 	= protonTimeString[4] & 0xFF;
-	unsigned int 	sec 	= protonTimeString[5] & 0xFF;
-
+	unsigned int mjd = ((protonTimeString[1] & 0xFF) * 256) + (protonTimeString[2] & 0xFF);
+	unsigned long epoch = ((mjd - 40587) * 86400);
+	unsigned int hour = protonTimeString[3] & 0xFF;
+	unsigned int min = protonTimeString[4] & 0xFF;
+	unsigned int sec = protonTimeString[5] & 0xFF;
 	epoch += (hour * 3600 + min * 60 + sec);
-
 	printf("MJD = %d epoch = %ld, time = %02d:%02d:%02d\n", mjd,
 		   epoch, hour, min, sec);
-
 	return epoch;
 }
 
@@ -101,9 +94,7 @@ static int init(Context_t *context)
 {
 	tHL101Private *private = malloc(sizeof(tHL101Private));
 	int vFd;
-
-	printf("%s\n", __func__);
-
+//	printf("%s\n", __func__);
 	vFd = open(cVFD_DEVICE, O_RDWR);
 
 	if (vFd < 0)
@@ -114,9 +105,7 @@ static int init(Context_t *context)
 
 	((Model_t *)context->m)->private = private;
 	memset(private, 0, sizeof(tHL101Private));
-
 	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement);
-
 	return vFd;
 }
 
@@ -129,9 +118,7 @@ static int usage(Context_t *context, char *prg_name)
 static int setTime(Context_t *context, time_t *theGMTTime)
 {
 	struct proton_ioctl_data vData;
-
-	printf("%s\n", __func__);
-
+//	printf("%s\n", __func__);
 	setProtonTime(*theGMTTime, vData.u.time.time);
 
 	if (ioctl(context->fd, VFDSETTIME, &vData) < 0)
@@ -146,8 +133,7 @@ static int setTime(Context_t *context, time_t *theGMTTime)
 static int getTime(Context_t *context, time_t *theGMTTime)
 {
 	char fp_time[8];
-
-	fprintf(stderr, "waiting on current time from fp ...\n");
+	fprintf(stderr, "Waiting for current time from fp...\n");
 
 	/* front controller time */
 	if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
@@ -159,14 +145,13 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 	/* if we get the fp time */
 	if (fp_time[0] != '\0')
 	{
-		fprintf(stderr, "success reading time from fp\n");
-
+//		fprintf(stderr, "Success reading time from fp\n");
 		/* current front controller time */
 		*theGMTTime = (time_t) getProtonTime(fp_time);
 	}
 	else
 	{
-		fprintf(stderr, "error reading time from fp\n");
+		fprintf(stderr, "Error reading time from fp\n");
 		*theGMTTime = 0;
 	}
 
@@ -176,14 +161,12 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 static int setTimer(Context_t *context, time_t *theGMTTime)
 {
 	struct proton_ioctl_data vData;
-	time_t                  curTime;
-	time_t                  wakeupTime;
-	struct tm               *ts;
-	tHL101Private *private = (tHL101Private *) ((Model_t *)context->m)->private;
-
+	time_t curTime;
+	time_t wakeupTime;
+	struct tm *ts;
+//	tHL101Private *private = (tHL101Private *)((Model_t *)context->m)->private;
 	time(&curTime);
 	ts = localtime(&curTime);
-
 	fprintf(stderr, "Current Time: %02d:%02d:%02d %02d-%02d-%04d\n",
 			ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
 
@@ -195,8 +178,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	if ((wakeupTime <= 0) || (wakeupTime == LONG_MAX))
 	{
 		/* nothing to do for e2 */
-		fprintf(stderr, "no e2 timer found clearing fp wakeup time ... good bye ...\n");
-
+		fprintf(stderr, "no e2 timer found clearing fp wakeup time. Goodbye...\n");
 		vData.u.standby.time[0] = '\0';
 
 		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
@@ -204,14 +186,12 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 			perror("standby: ");
 			return -1;
 		}
-
 	}
 	else
 	{
 		unsigned long diff;
-		char   	    fp_time[8];
-
-		fprintf(stderr, "waiting on current time from fp ...\n");
+		char fp_time[8];
+		fprintf(stderr, "Waiting for current time from fp...\n");
 
 		/* front controller time */
 		if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
@@ -226,19 +206,17 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		/* if we get the fp time */
 		if (fp_time[0] != '\0')
 		{
-			fprintf(stderr, "success reading time from fp\n");
-
+			fprintf(stderr, "Success reading time from fp\n");
 			/* current front controller time */
 			curTime = (time_t) getProtonTime(fp_time);
 		}
 		else
 		{
-			fprintf(stderr, "error reading time ... assuming localtime\n");
+			fprintf(stderr, "Error reading time, assuming localtime.\n");
 			/* noop current time already set */
 		}
 
 		wakeupTime = curTime + diff;
-
 		setProtonTime(wakeupTime, vData.u.standby.time);
 
 		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
@@ -259,9 +237,9 @@ static int getTimer(Context_t *context, time_t *theGMTTime)
 
 static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 {
-	time_t     curTime;
+	time_t curTime;
 
-	/* shutdown immediate */
+	/* shutdown immediately */
 	if (*shutdownTimeGMT == -1)
 		return (setTimer(context, NULL));
 
@@ -285,7 +263,7 @@ static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 
 static int reboot(Context_t *context, time_t *rebootTimeGMT)
 {
-	time_t                  curTime;
+	time_t curTime;
 	struct proton_ioctl_data vData;
 
 	while (1)
@@ -309,19 +287,17 @@ static int reboot(Context_t *context, time_t *rebootTimeGMT)
 
 static int Sleep(Context_t *context, time_t *wakeUpGMT)
 {
-	time_t     curTime;
-	int        sleep = 1;
-	int        vFd;
-	fd_set     rfds;
-	struct     timeval tv;
-	int        retval;
-	struct tm  *ts;
-	char       output[cMAXCharsHL101 + 1];
-	tHL101Private *private = (tHL101Private *)
-							 ((Model_t *)context->m)->private;
+	time_t curTime;
+	int sleep = 1;
+	int vFd;
+	fd_set rfds;
+	struct timeval tv;
+	int retval;
+	struct tm *ts;
+	char output[cMAXCharsHL101 + 1];
+	tHL101Private *private = (tHL101Private *)((Model_t *)context->m)->private;
 #if 0
 	printf("%s\n", __func__);
-
 	vFd = open(cRC_DEVICE, O_RDWR);
 
 	if (vFd < 0)
@@ -346,10 +322,8 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 		{
 			FD_ZERO(&rfds);
 			FD_SET(vFd, &rfds);
-
 			tv.tv_sec = 0;
 			tv.tv_usec = 100000;
-
 			retval = select(vFd + 1, &rfds, NULL, NULL, &tv);
 
 			if (retval > 0)
@@ -366,34 +340,28 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 	}
 
 #endif
-
 	return 0;
 }
 
 static int setText(Context_t *context, char *theText)
 {
 	char vHelp[128];
-
 	strncpy(vHelp, theText, cMAXCharsHL101);
 	vHelp[cMAXCharsHL101] = '\0';
-
 	/* printf("%s, %d\n", vHelp, strlen(vHelp));*/
-
 	write(context->fd, vHelp, strlen(vHelp));
-
 	return 0;
 }
 
 static int setLed(Context_t *context, int which, int on)
 {
 	struct proton_ioctl_data vData;
-
 	vData.u.led.led_nr = which;
 	vData.u.led.on = on;
 
 	if (ioctl(context->fd, VFDSETLED, &vData) < 0)
 	{
-		perror("setled: ");
+		perror("setLed: ");
 		return -1;
 	}
 
@@ -403,13 +371,12 @@ static int setLed(Context_t *context, int which, int on)
 static int setIcon(Context_t *context, int which, int on)
 {
 	struct proton_ioctl_data vData;
-
 	vData.u.icon.icon_nr = which;
 	vData.u.icon.on = on;
 
 	if (ioctl(context->fd, VFDICONDISPLAYONOFF, &vData) < 0)
 	{
-		perror("seticon: ");
+		perror("setIcon: ");
 		return -1;
 	}
 
@@ -424,12 +391,11 @@ static int setBrightness(Context_t *context, int brightness)
 		return -1;
 
 	vData.u.brightness.level = brightness;
-
 	printf("%d\n", context->fd);
 
 	if (ioctl(context->fd, VFDBRIGHTNESS, &vData) < 0)
 	{
-		perror("setbrightness: ");
+		perror("setBrightness: ");
 		return -1;
 	}
 
@@ -445,7 +411,6 @@ static int setPwrLed(Context_t *context, int brightness)
 
 static int setLight(Context_t *context, int on)
 {
-
 	if (on)
 		setBrightness(context, 7);
 	else
@@ -456,14 +421,12 @@ static int setLight(Context_t *context, int on)
 
 static int Exit(Context_t *context)
 {
-	tHL101Private *private = (tHL101Private *)
-							 ((Model_t *)context->m)->private;
+	tHL101Private *private = (tHL101Private *)((Model_t *)context->m)->private;
 
 	if (context->fd > 0)
 		close(context->fd);
 
 	free(private);
-
 	exit(1);
 }
 
@@ -482,29 +445,28 @@ static int Clear(Context_t *context)
 
 Model_t HL101_model =
 {
-	.Name             = "Spider HL101 frontpanel control utility",
-	.Type             = Hl101,
-	.Init             = init,
-	.Clear            = Clear,
-	.Usage            = usage,
-	.SetTime          = setTime,
-	.GetTime          = getTime,
-	.SetTimer         = setTimer,
-	.GetTimer         = getTimer,
-	.Shutdown         = shutdown,
-	.Reboot           = reboot,
-	.Sleep            = Sleep,
-	.SetText          = setText,
-	.SetLed           = setLed,
-	.SetIcon          = setIcon,
-	.SetBrightness    = setBrightness,
-	.SetPwrLed        = setPwrLed,
-	.SetLight         = setLight,
-	.Exit             = Exit,
-	.SetLedBrightness = NULL,
-	.GetVersion       = NULL,
-	.SetRF            = NULL,
-	.SetFan           = NULL,
-	.private          = NULL,
+	.Name                      = "Spider HL101 frontpanel control utility",
+	.Type                      = Hl101,
+	.Init                      = init,
+	.Clear                     = Clear,
+	.Usage                     = usage,
+	.SetTime                   = setTime,
+	.GetTime                   = getTime,
+	.SetTimer                  = setTimer,
+	.GetTimer                  = getTimer,
+	.Shutdown                  = shutdown,
+	.Reboot                    = reboot,
+	.Sleep                     = Sleep,
+	.SetText                   = setText,
+	.SetLed                    = setLed,
+	.SetIcon                   = setIcon,
+	.SetBrightness              = setBrightness,
+	.SetPwrLed                 = setPwrLed,
+	.SetLight                  = setLight,
+	.Exit                      = Exit,
+	.SetLedBrightness          = NULL,
+	.GetVersion                = NULL,
+	.SetRF                     = NULL,
+	.SetFan                    = NULL,
+	.private                   = NULL
 };
-

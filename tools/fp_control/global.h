@@ -7,26 +7,26 @@
 #define false 0
 #endif
 
-#define VFDGETTIME		0xc0425afa
-#define VFDSETTIME		0xc0425afb
-#define VFDSTANDBY		0xc0425afc
-#define VFDREBOOT		0xc0425afd
-#define VFDSETLED		0xc0425afe
-#define VFDICONDISPLAYONOFF	0xc0425a0a
-#define	VFDDISPLAYCHARS 	0xc0425a00
-#define VFDBRIGHTNESS		0xc0425a03
-#define VFDPWRLED		0xc0425a04 /* added by zeroone, also used in nuvoton.h; set PowerLed Brightness on HDBOX*/
-#define VFDDISPLAYWRITEONOFF	0xc0425a05
-#define VFDDISPLAYCLR		0xc0425b00
+#define VFDGETTIME           0xc0425afa
+#define VFDSETTIME           0xc0425afb
+#define VFDSTANDBY           0xc0425afc
+#define VFDREBOOT            0xc0425afd
+#define VFDSETLED            0xc0425afe
+#define VFDICONDISPLAYONOFF  0xc0425a0a
+#define VFDDISPLAYCHARS      0xc0425a00
+#define VFDBRIGHTNESS        0xc0425a03
+#define VFDPWRLED            0xc0425a04
+#define VFDDISPLAYWRITEONOFF 0xc0425a05
+#define VFDDISPLAYCLR        0xc0425b00
 /* ufs912, 922, hdbox ->unset compat mode */
-#define VFDSETMODE		0xc0425aff
+#define VFDSETMODE           0xc0425aff
 /*spark*/
-#define VFDGETSTARTUPSTATE	0xc0425af8
+#define VFDGETSTARTUPSTATE   0xc0425af8
 
 /* ufs912 */
-#define VFDGETVERSION	        0xc0425af7
-#define VFDLEDBRIGHTNESS	0xc0425af8
-#define VFDGETWAKEUPMODE	0xc0425af9
+#define VFDGETVERSION        0xc0425af7
+#define VFDLEDBRIGHTNESS     0xc0425af8
+#define VFDGETWAKEUPMODE     0xc0425af9
 
 struct vfd_ioctl_data
 {
@@ -41,14 +41,15 @@ typedef enum {Unknown, Ufs910_1W, Ufs910_14W, Ufs922, Ufc960, Tf7700, Hl101, Vip
 
 typedef struct Context_s
 {
-	void * /* Model_t */  *m; /* instance data */
-	int                  fd; /* filedescriptor of fd */
+	/* Model_t */
+	void *m; /* instance data */
+	int fd; /* filedescriptor of fd */
 
 } Context_t;
 
 typedef struct Model_s
 {
-		char    *Name;
+		char *Name;
 		eBoxType Type;
 		int (* Init)(Context_t *context);
 		int (* Clear)(Context_t *context);
@@ -64,7 +65,7 @@ typedef struct Model_s
 		int (* SetLed)(Context_t *context, int which, int on);
 		int (* SetIcon)(Context_t *context, int which, int on);
 		int (* SetBrightness)(Context_t *context, int brightness);
-		int (* SetPwrLed)(Context_t *context, int pwrled);             /* added by zeroone; set PowerLed Brightness on HDBOX*/
+		int (* SetPwrLed)(Context_t *context, int pwrled);
 		int (* GetWakeupReason)(Context_t *context, eWakeupReason *reason);
 		int (* SetLight)(Context_t *context, int on);
 		int (* Exit)(Context_t *context);
@@ -92,28 +93,10 @@ extern Model_t Adb_Box_model;
 extern Model_t Cuberevo_model;
 extern Model_t CNBOX_model;
 
-static Model_t *AvailableModels[] =
-{
-	&Ufs910_1W_model,
-	&Ufs910_14W_model,
-	&UFS922_model,
-	&Fortis_model,
-	&HL101_model,
-	&VIP2_model,
-	&Hs5101_model,
-	&UFS912_model,
-	&UFC960_model,
-	&Spark_model,
-	&Adb_Box_model,
-	&Cuberevo_model,
-	&CNBOX_model,
-	NULL
-};
-
 double modJulianDate(struct tm *theTime);
 time_t read_timers_utc(time_t curTime);
 time_t read_fake_timer_utc(time_t curTime);
-int searchModel(Context_t  *context, eBoxType type);
+int searchModel(Context_t *context, eBoxType type);
 int checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeup);
 
 int getWakeupReasonPseudo(eWakeupReason *reason);

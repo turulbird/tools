@@ -1,5 +1,5 @@
-#ifndef __Fortis__
-#define __Fortis__
+#ifndef __fortis__
+#define __fortis__
 
 #define VFDGETVERSION    0xc0425af7
 #define VFDGETWAKEUPTIME 0xc0425b03
