@@ -47,7 +47,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* software version of fp_control. please increase on every change */
-static const char *sw_version = "1.05NdV 20141204.1";
+static const char *sw_version = "1.04";
 
 typedef struct
 {
@@ -61,7 +61,7 @@ char vName[129] = "Unknown";
 int Vdisplay = 0;
 int Vdisplay_custom = 0;
 char *VtimeFormat = "Unknown";
-int Vwakeup = 5 * 60; //default wakeup decrement in minutes
+int Vwakeup = 5;
 const char *wakeupreason[4] = { "Unknown", "Power on", "From deep standby", "Timer" };
 
 tArgs vArgs[] =
@@ -73,7 +73,7 @@ tArgs vArgs[] =
 	{ "-d", "  --shutDown           ", "Args: [time date] Format: HH:MM:SS dd-mm-YYYY\n\tMimics shutdown command. Shutdown receiver via fc at given time." },
 	{ "-g", "  --getTime            ", "Args: No arguments\n\tReturn current set frontcontroller time" },
 	{ "-gs", " --getTimeAndSet      ", "Args: No arguments\n\tSet system time to current frontcontroller time" },
-	{ "-gw", " --getWakeupTime      ", "Args: No arguments\n\tReturn current wakeup time" },
+//	{ "-gw", " --getWakeupTime      ","Args: No arguments\n\tReturn current wakeup time" },
 	{ "-s", "  --setTime            ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller time" },
 	{ "-sst", "--setWakeTime        ", "Args: No arguments\n\tSet the frontcontroller time equal to system time" },
 	{ "-gt", " --getWakeTime        ", "Args: No arguments\n\tGet the frontcontroller wake up time" },
@@ -245,22 +245,22 @@ void processCommand(Context_t *context, int argc, char *argv[])
 					}
 				}
 			}
-			else if ((strcmp(argv[i], "-gw") == 0) || (strcmp(argv[i], "--getWakeupTime") == 0))
-			{
-				time_t theGMTTime;
-
-				/* get the frontcontroller wakeup time */
-				if (((Model_t*)context->m)->GetWakeupTime)
-				{
-					if (((Model_t*)context->m)->GetWakeupTime(context, &theGMTTime) == 0)
-					{
-						struct tm *gmt = gmtime(&theGMTTime);
-
-						fprintf(stderr, "Wakeup Time: %02d:%02d:%02d %02d-%02d-%04d\n",
-							gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon+1, gmt->tm_year+1900);
-					}
-				}
-			}
+//			else if ((strcmp(argv[i], "-gw") == 0) || (strcmp(argv[i], "--getWakeupTime") == 0))
+//			{
+//				time_t theGMTTime;
+//
+//				/* get the frontcontroller wakeup time */
+//				if (((Model_t*)context->m)->GetWakeupTime)
+//				{
+//					if (((Model_t*)context->m)->GetWakeupTime(context, &theGMTTime) == 0)
+//					{
+//						struct tm *gmt = gmtime(&theGMTTime);
+//
+//						fprintf(stderr, "Wakeup Time: %02d:%02d:%02d %02d-%02d-%04d\n",
+//							gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon+1, gmt->tm_year+1900);
+//					}
+//				}
+//			}
 			else if ((strcmp(argv[i], "-s") == 0) || (strcmp(argv[i], "--setTime") == 0))
 			{
 				time_t theGMTTime;
@@ -493,7 +493,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				printf("fp_control version %s\n", sw_version);
 				printf("\nConfiguration of receiver:\n");
 				printf("Display: %d        Time format: %s", Vdisplay, VtimeFormat);
-				printf("Displaycustom: %d  Wakeupdecrement: %d seconds\n", Vdisplay_custom, Vwakeup);
+				printf("Displaycustom: %d  Wakeupdecrement: %d mins\n", Vdisplay_custom, Vwakeup);
 				/* get FP version info */
 				if (((Model_t *)context->m)->GetVersion)
 				{

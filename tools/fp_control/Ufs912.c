@@ -210,8 +210,8 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 				tsWakeupTime->tm_hour, tsWakeupTime->tm_min, tsWakeupTime->tm_sec, tsWakeupTime->tm_mday, tsWakeupTime->tm_mon + 1, tsWakeupTime->tm_year + 1900);
 		setMicomTime(wakeupTime, vData.u.standby.time);
 		fprintf(stderr, "Setting Planned Fp Wakeup Time to = %02X%02X %d %d %d (mtime)\n",
-			vData.u.standby.time[0], vData.u.standby.time[1], vData.u.standby.time[2],
-			vData.u.standby.time[3], vData.u.standby.time[4]);
+				vData.u.standby.time[0], vData.u.standby.time[1], vData.u.standby.time[2],
+				vData.u.standby.time[3], vData.u.standby.time[4]);
 	}
 	fprintf(stderr, "Entering DeepStandby. ... good bye ...\n");
 	fflush(stdout);

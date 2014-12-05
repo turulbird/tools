@@ -42,7 +42,7 @@ char *sDisplayStd = "%a %d %H:%M:%S";
 #define WAS_TIMER_WAKEUP "/proc/stb/fp/was_timer_wakeup"
 
 #define E2_WAKEUP_TIME_PROC
-int disp = 1;
+disp = 1;
 
 static Model_t *AvailableModels[] =
 {
@@ -115,21 +115,11 @@ static time_t read_e2_timers(time_t curTime)
 			printf(" (none set)");
 			recordTime = -1;
 		}
-		else
-		{
-//			int wakeupDecrement = 5 * 60;
-//			int platzhalter;
-//			char *platzhalters;
-//			checkConfig(&platzhalter, &platzhalter, &platzhalters, &wakeupDecrement, disp);
-			recordTime -= Vwakeup;
-		}
 		printf(" - Done\n");
 		fclose(fd);
 	}
 	else
-	{
 		printf(" - Error reading %s\n", E2TIMERSXML);
-	}
 	return recordTime;
 }
 #endif
@@ -319,16 +309,11 @@ int checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeu
 	*timeFormat = "Unknown";
 	*wakeup = 5 * 60;
 	FILE *fd_config = fopen(CONFIG, "r");  //read box /etc/vdstandby.cfg
-	if (fd_config == NULL)
+	if ((fd_config == NULL) && (verbose))
 	{
-		Vwakeup = 5 * 60; //default wakeupdecrement is 5 minutes
-
-		if (verbose)
-		{
-			printf("Config file (%s) not found,\nusing standard config:", CONFIG);
-			printf("Config:\nDisplay: %d              Time format: %d\n", *display, *display_custom);
-			printf("Displaycustom: %s  Wakeupdecrement: %d minutes %d seconds\n", *timeFormat, Vwakeup/60, Vwakeup%60);
-		}
+		printf("Config file (%s) not found,\nusing standard config:", CONFIG);
+		printf("Config:\nDisplay: %d              Time format: %d\n", *display, *display_custom);
+		printf("Displaycustom: %s  Wakeupdecrement: %d mins\n", *timeFormat, *wakeup / 60);
 		return -1;
 	}
 	while (fgets(buffer, MAX, fd_config))
@@ -336,7 +321,7 @@ int checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeu
 		if (!strncmp("DISPLAY=", buffer, 8))
 		{
 			char *option = &buffer[8];
-			if (!strncmp("TRUE", option, 4))
+			if (!strncmp("TRUE", option, 2))
 			{
 				*display = 1;
 			}
@@ -349,6 +334,7 @@ int checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeu
 		{
 			char *option = &buffer[14];  //get buffer from character 14 on
 			*display_custom = 1;
+//			display_customstr = "TRUE ";
 			*timeFormat = strdup(option);
 		}
 		else if (!strncmp("WAKEUPDECREMENT=", buffer, 16))
@@ -365,15 +351,7 @@ int checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeu
 	{
 		printf("Configuration of receiver:\n");
 		printf("Display: %d        Time format: %s", *display, *timeFormat);
-		printf("Displaycustom: %d  Wakeupdecrement: %d minute(s)", *display_custom, *wakeup / 60);
-		if (*wakeup % 60 != 0)
-		{
-			printf(" %d second(s)\n\n", *wakeup % 60);
-		}
-		else
-		{
-			printf("\n\n");
-		}
+		printf("Displaycustom: %d  Wakeupdecrement: %d mins\n\n", *display_custom, *wakeup / 60);
 	}
 	Vdisplay = *display;
 	VtimeFormat = *timeFormat;

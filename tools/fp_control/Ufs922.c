@@ -101,7 +101,7 @@ unsigned long getMicomTime(char *micomTimeString)
 	unsigned int    sec     = micomTimeString[5] & 0xFF;
 	epoch += (hour * 3600 + min * 60 + sec);
 	printf("MJD = %d epoch = %ld, time = %02d:%02d:%02d\n", mjd,
-		epoch, hour, min, sec);
+		   epoch, hour, min, sec);
 	return epoch;
 }
 
@@ -210,12 +210,12 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		// Print wakeup time
 		tsWakeupTime = gmtime(&wakeupTime);
 		fprintf(stderr, "Planned Wakeup Time: %02d:%02d:%02d %02d-%02d-%04d (UTC)\n",
-			tsWakeupTime->tm_hour, tsWakeupTime->tm_min, tsWakeupTime->tm_sec,
-			tsWakeupTime->tm_mday, tsWakeupTime->tm_mon + 1, tsWakeupTime->tm_year + 1900);
+				tsWakeupTime->tm_hour, tsWakeupTime->tm_min, tsWakeupTime->tm_sec,
+				tsWakeupTime->tm_mday, tsWakeupTime->tm_mon + 1, tsWakeupTime->tm_year + 1900);
 		setMicomTime(wakeupTime, vData.u.standby.time);
 		fprintf(stderr, "Setting Planned Fp Wakeup Time to = %02X%02X %d %d %d (mtime)\n",
-			vData.u.standby.time[0], vData.u.standby.time[1], vData.u.standby.time[2],
-			vData.u.standby.time[3], vData.u.standby.time[4]);
+				vData.u.standby.time[0], vData.u.standby.time[1], vData.u.standby.time[2],
+				vData.u.standby.time[3], vData.u.standby.time[4]);
 	}
 	fprintf(stderr, "Entering DeepStandby. Goodbye...\n");
 	fflush(stdout);
