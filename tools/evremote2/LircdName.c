@@ -40,8 +40,8 @@
 #include "map.h"
 #include "remotes.h"
 
-#define REPEATDELAY 75 // ms
-#define REPEATFREQ 75 // ms
+#define REPEATDELAY 130 // ms
+#define REPEATFREQ 20 // ms
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
@@ -234,6 +234,7 @@ static char LastKeyName[30];
 static long long LastKeyPressedTime;
 static int LircdBtnDelay = REPEATDELAY;
 static int KeyPowerCounter = 0;
+static int BlinkingIcon = -1;
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
@@ -243,6 +244,14 @@ static int pInit(Context_t *context, int argc, char *argv[])
 
 	if (argc >= 4)
 		LircdBtnDelay = (atoi(argv[3]) == 0) ? REPEATDELAY : atoi(argv[3]);
+	if (argc >= 5)
+	{
+		BlinkingIcon = (atoi(argv[4]) == 0) ? 0 : atoi(argv[4]);
+		printf("[LircdName RCU] init delay %d ms, blinking ICON %i\n", LircdBtnDelay, BlinkingIcon);
+	}
+	else
+		printf("[LircdName RCU] init delay %d ms\n", LircdBtnDelay);
+  
 	// in new lircd its moved to /var/run/lirc/lircd by default and need use key to run as old version
 	if (access("/var/run/lirc/lircd", F_OK) == 0)
 		strcpy(vAddr.sun_path, "/var/run/lirc/lircd");
@@ -265,8 +274,6 @@ static int pInit(Context_t *context, int argc, char *argv[])
 		return -1;
 	}
 
-	printf("[LircdName RCU] init delay %d ms\n", LircdBtnDelay);
-	
 	return vHandle;
 }
 
@@ -372,8 +379,34 @@ static int pRead(Context_t *context)
 
 static int pNotification(Context_t *context, const int cOn)
 {
-	/* noop: is handled from fp itself */
-	return 0;
+	if ((BlinkingIcon == -1)) // && (cOn == 1))
+	{
+		printf("[LircdName RCU] << end\n");
+		return 0;
+	}
+	  
+	//printf("[LircdName RCU] ICON %i %i\n", BlinkingIcon, cOn);
+
+	int file_vfd = -1;
+	char icon = BlinkingIcon;
+
+	struct {
+		unsigned char start;
+		unsigned char data[64];
+		unsigned char length;
+	} data;
+
+	data.start = 0x00;
+	data.data[0] = icon;
+	data.data[4] = cOn;
+	data.length = 5;
+	if ( (file_vfd = open ( "/dev/vfd", O_RDWR )) == -1 )
+		printf ( "[LircdName]: could not open vfd-device!\n" );
+	else {
+		ioctl(file_vfd, 0xc0425a0a, &data); //0xc0425a0a = VFDICONDISPLAYONOFF
+		close ( file_vfd );
+	}
+
 }
 
 RemoteControl_t LircdName_RC =

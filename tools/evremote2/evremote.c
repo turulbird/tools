@@ -484,12 +484,13 @@ int main(int argc, char *argv[])
 	if (argc >= 2 && (!strncmp(argv[1], "-h", 2) || !strncmp(argv[1], "--help", 6)))
 	{
 		printf("USAGE:\n");
-		printf("evremote2 [useLircdName [<period>] <delay>]\n");
+		printf("evremote2 [[[useLircdName] <period>] <delay>] <IconNumber>]\n");
 		printf("Parameters description:\n");
 		printf("useLircdName - using key names defined in lircd.conf.\n              Can work with multiple RCs simultaneously.\n");
 		printf("<period> - time of pressing a key.\n");
 		printf("<delay> - delay between pressing keys. Increase if RC is too sensitive\n");
-		printf("No parameters - autoselection of RC driver.\n\n");
+		printf("<IconNumber> - Number of blinking Icon\n");
+		printf("No parameters - autoselection of RC driver with standard features.\n\n");
 		return 0;
 	}
 	if (argc >= 2 && !strncmp(argv[1], "useLircdName", 12))
