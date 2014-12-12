@@ -370,16 +370,31 @@ static int setLed(Context_t *context, int which, int on)
 
 static int setIcon(Context_t *context, int which, int on)
 {
+	char icon = which;
+
+	struct {
+		unsigned char start;
+		unsigned char data[64];
+		unsigned char length;
+	} data;
+
+	data.start = 0x00;
+	data.data[0] = icon;
+	data.data[4] = on;
+	data.length = 5;
+
+	if (ioctl(context->fd, VFDICONDISPLAYONOFF, &data) < 0)
+#if 0
 	struct adb_box_ioctl_data vData;
 	vData.u.icon.icon_nr = which;
 	vData.u.icon.on = on;
 
 	if (ioctl(context->fd, VFDICONDISPLAYONOFF, &vData) < 0)
+#endif
 	{
 		perror("setIcon: ");
 		return -1;
 	}
-
 	return 0;
 }
 
@@ -444,7 +459,7 @@ static int Clear(Context_t *context)
 
 Model_t Adb_Box_model =
 {
-	.Name                      = "B4Team ADB_BOX frontpanel control utility",
+	.Name                      = "B4Team mod j00zek nBOX and sagemcom8X frontpanel control utility",
 	.Type                      = Adb_Box,
 	.Init                      = init,
 	.Clear                     = Clear,
