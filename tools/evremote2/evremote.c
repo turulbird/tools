@@ -216,18 +216,15 @@ int processComplex(Context_t *context, int argc, char *argv[])
 	if (((RemoteControl_t *)context->r)->LongKeyPressSupport != NULL)
 	{
 		tLongKeyPressSupport lkps = *((RemoteControl_t *)context->r)->LongKeyPressSupport;
-		if (cmdBtnPeriod)
-		  gBtnPeriod = cmdBtnPeriod;
-		else
-		  gBtnPeriod = lkps.period;
-		if (cmdBtnDelay)
-			gBtnDelay = cmdBtnDelay;
-		else
-			gBtnDelay = lkps.delay;
+		gBtnPeriod = (cmdBtnPeriod) ? cmdBtnPeriod : lkps.period;
+		gBtnDelay = (cmdBtnDelay) ? cmdBtnDelay : lkps.delay;
 		printf("Using period=%d delay=%d\n", gBtnPeriod, gBtnDelay);
 	}
 
-	setInputEventRepeatRate(500, 200);
+	if (cmdBtnPeriod  && cmdBtnDelay && (cmdBtnPeriod + cmdBtnDelay) < 200)
+		setInputEventRepeatRate(500, cmdBtnPeriod + cmdBtnDelay);
+	else
+		setInputEventRepeatRate(500, 200);
 
 	sem_init(&keydown_sem, 0, 0);
 	pthread_create(&keydown_thread, NULL, detectKeyUpTask, context);
@@ -409,13 +406,9 @@ int getModel()
 			vBoxType = Fortis;
 		else if (!strncasecmp(vName, "octagon1008", 11))
 			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "hs7110", 6))
-			vBoxType = Fortis;
 		else if (!strncasecmp(vName, "hs7810a", 7))
 			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "hs7119", 6))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "hs7819", 6))
+		else if (!strncasecmp(vName, "hs7110", 6))
 			vBoxType = Fortis;
 		else if (!strncasecmp(vName, "atemio520", 9))
 			vBoxType = CNBox;
@@ -484,13 +477,25 @@ int main(int argc, char *argv[])
 	 */
 	ignoreSIGPIPE();
 
+	if (argc >= 2 && (!strncmp(argv[1], "-h", 2) || !strncmp(argv[1], "--help", 6)))
+	{
+		printf("USAGE:\n");
+		printf("evremote2 [[[useLircdName] <period>] <delay>] <IconNumber>]\n");
+		printf("Parameters description:\n");
+		printf("useLircdName - using key names defined in lircd.conf.\n              Can work with multiple RCs simultaneously.\n");
+		printf("<period> - time of pressing a key.\n");
+		printf("<delay> - delay between pressing keys. Increase if RC is too sensitive\n");
+		printf("<IconNumber> - Number of blinking Icon\n");
+		printf("No parameters - autoselection of RC driver with standard features.\n\n");
+		return 0;
+	}
 	if (argc >= 2 && !strncmp(argv[1], "useLircdName", 12))
 	{
 		vBoxType = LircdName;
 		if (argc >= 3)
-		  cmdBtnPeriod = atoi(argv[2]);
+			cmdBtnPeriod = atoi(argv[2]);
 		if (argc >= 4)
-		  cmdBtnDelay = atoi(argv[3]);
+			cmdBtnDelay = atoi(argv[3]);
 	}
 	else
 		vBoxType = getModel();

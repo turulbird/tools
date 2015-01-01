@@ -45,6 +45,7 @@ Makefile
 aio-grab/Makefile
 devinit/Makefile
 evremote2/Makefile
+wait4button/Makefile
 libeplayer3/Makefile
 fp_control/Makefile
 fbshot/Makefile

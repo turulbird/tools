@@ -40,58 +40,6 @@
 #include "map.h"
 #include "remotes.h"
 
-#define REPEATDELAY 130 // ms
-#define REPEATFREQ 20 // ms
-
-static tLongKeyPressSupport cLongKeyPressSupport =
-{
-	REPEATDELAY, REPEATFREQ /*delay, period*/
-};
-
-static long long GetNow(void)
-{
-#define MIN_RESOLUTION 1 // ms
-	static bool initialized = false;
-	static bool monotonic = false;
-	struct timespec tp;
-
-	if (!initialized)
-	{
-		// check if monotonic timer is available and provides enough accurate resolution:
-		if (clock_getres(CLOCK_MONOTONIC, &tp) == 0)
-		{
-			//long Resolution = tp.tv_nsec;
-			// require a minimum resolution:
-			if (tp.tv_sec == 0 && tp.tv_nsec <= MIN_RESOLUTION * 1000000)
-			{
-				if (clock_gettime(CLOCK_MONOTONIC, &tp) == 0)
-				{
-					monotonic = true;
-				}
-			}
-		}
-
-		initialized = true;
-	}
-
-	if (monotonic)
-	{
-		if (clock_gettime(CLOCK_MONOTONIC, &tp) == 0)
-			return (long long)(tp.tv_sec) * 1000 + tp.tv_nsec / 1000000;
-
-		monotonic = false;
-		// fall back to gettimeofday()
-	}
-
-	struct timeval t;
-
-	if (gettimeofday(&t, NULL) == 0)
-		return (long long)(t.tv_sec) * 1000 + t.tv_usec / 1000;
-
-	return 0;
-}
-
-
 /* Key is recognized by name of it in lircd.conf */
 static tButton cButtons_LircdName[] =
 {
@@ -231,10 +179,6 @@ static struct sockaddr_un  vAddr;
 
 static int LastKeyCode = -1;
 static char LastKeyName[30];
-static long long LastKeyPressedTime;
-static int LircdBtnDelay = REPEATDELAY;
-static int KeyPowerCounter = 0;
-static int BlinkingIcon = -1;
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
@@ -242,16 +186,6 @@ static int pInit(Context_t *context, int argc, char *argv[])
 
 	vAddr.sun_family = AF_UNIX;
 
-	if (argc >= 4)
-		LircdBtnDelay = (atoi(argv[3]) == 0) ? REPEATDELAY : atoi(argv[3]);
-	if (argc >= 5)
-	{
-		BlinkingIcon = (atoi(argv[4]) == 0) ? 0 : atoi(argv[4]);
-		printf("[LircdName RCU] init delay %d ms, blinking ICON %i\n", LircdBtnDelay, BlinkingIcon);
-	}
-	else
-		printf("[LircdName RCU] init delay %d ms\n", LircdBtnDelay);
-  
 	// in new lircd its moved to /var/run/lirc/lircd by default and need use key to run as old version
 	if (access("/var/run/lirc/lircd", F_OK) == 0)
 		strcpy(vAddr.sun_path, "/var/run/lirc/lircd");
@@ -290,7 +224,7 @@ static int pRead(Context_t *context)
 	char vBuffer[128];
 	char vData[3];
 	const int cSize = 128;
-	int vCurrentCode = -1;
+	int vCurrentCode = 0;
 	char *buffer;
 	char KeyName[30]; 	//For flexibility we use Lircd keys names
 	int LastKeyNameChar;	//for long detection on RCU sending different codes for short/long
@@ -307,7 +241,7 @@ static int pRead(Context_t *context)
 	if (sscanf(vBuffer, "%*x %x %29s", &count, KeyName) != 2)  // '29' in '%29s' is LIRC_KEY_BUF-1!
 	{
 		printf("[LircdName RCU] Warning: unparseable lirc command: %s\n", vBuffer);
-		return -1;
+		return 0;
 	}
 
 	//some RCUs send different codes for single click and long push. This breakes e2 LONG detection, because lircd counter starts from beginning
@@ -322,90 +256,8 @@ static int pRead(Context_t *context)
 	
 	vCurrentCode = getInternalCodeLircKeyName(cButtons, KeyName);
 
-	if (vCurrentCode != 0)
-	{
-		static int nextflag = 0;
-		if (count == 0)
-		{
-		//Emergency reboot after 5xPOWER, we count only presses within 2 seconds, not lONGs
-		if (!strncasecmp(LastKeyName, "KEY_POWER", 9) && !strncasecmp(KeyName, "KEY_POWER", 9)  && (GetNow() - LastKeyPressedTime < 2000))
-		{
-			KeyPowerCounter += 1;
-			printf("[LircdName RCU] KEY_POWER pressed %d time(s)\n", KeyPowerCounter);
-			if (KeyPowerCounter >= 5)
-			{
-				printf("[LircdName RCU] EMERGENCY REBOOT !!!\n");
-				fflush(stdout);
-				reboot(LINUX_REBOOT_CMD_RESTART);
-				return -1;
-			}
-		}
-		else
-			KeyPowerCounter = 0;
-		//time checking
-			if ((LastKeyCode == vCurrentCode) && (GetNow() - LastKeyPressedTime < LircdBtnDelay))   // (diffMilli(LastKeyPressedTime, CurrKeyPressedTime) <= REPEATDELAY) )
-			{
-				printf("[LircdName RCU] skiping next press of same key coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
-				return -1;
-			}
-			else if (GetNow() - LastKeyPressedTime < LircdBtnDelay)
-			{
-				printf("[LircdName RCU] skiping different keys coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
-				return -1;
-			}
-			else
-			{
-				printf("[RCU LircdName] new KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
-			}
-                nextflag++;
-			
-		}
-		else
-			printf("[RCU LircdName] same KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
-
-		LastKeyCode = vCurrentCode;
-		LastKeyPressedTime = GetNow();
-		strcpy(LastKeyName, KeyName);
-
-		vCurrentCode += (nextflag << 16);
-	}
-	else
-		printf("[RCU LircdName] unknown key -> %s\n", &vBuffer[0]);
-
 	return vCurrentCode;
 
-
-}
-
-static int pNotification(Context_t *context, const int cOn)
-{
-	if ((BlinkingIcon == -1)) // && (cOn == 1))
-	{
-		printf("[LircdName RCU] << end\n");
-		return 0;
-	}
-	  
-	//printf("[LircdName RCU] ICON %i %i\n", BlinkingIcon, cOn);
-
-	int file_vfd = -1;
-	char icon = BlinkingIcon;
-
-	struct {
-		unsigned char start;
-		unsigned char data[64];
-		unsigned char length;
-	} data;
-
-	data.start = 0x00;
-	data.data[0] = icon;
-	data.data[4] = cOn;
-	data.length = 5;
-	if ( (file_vfd = open ( "/dev/vfd", O_RDWR )) == -1 )
-		printf ( "[LircdName]: could not open vfd-device!\n" );
-	else {
-		ioctl(file_vfd, 0xc0425a0a, &data); //0xc0425a0a = VFDICONDISPLAYONOFF
-		close ( file_vfd );
-	}
 
 }
 
@@ -416,10 +268,10 @@ RemoteControl_t LircdName_RC =
 	&pInit,
 	&pShutdown,
 	&pRead,
-	&pNotification,
+	NULL,
 	cButtons_LircdName,
 	NULL,
 	NULL,
 	1,
-	&cLongKeyPressSupport,
+	NULL,
 };

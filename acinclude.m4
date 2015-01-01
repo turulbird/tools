@@ -323,7 +323,10 @@ AC_SUBST(CATALOGS)
 
 AC_DEFUN([TUXBOX_BOXTYPE],[
 AC_ARG_WITH(boxtype,
-	[  --with-boxtype     valid values: ufs910,ufs912,ufs913,ufs922,ufc960,ipbox55,ipbox99,ipbox9900,cuberevo,cuberevo_mini,cuberevo_mini2,cuberevo_mini_fta,cuberevo_250hd,cuberevo_2000hd,cuberevo_9500hd,tf7700,fortis_hdbox,octagon1008,atevio7500,spark,spark7162,hl101,hs7110,hs7810a,hs7119,hs7819,adb_box,whitebox,vip,homecast5101,vitamin_hd5000,sagemcom88,arivalink200,fortis_dp7000],
+	[  --with-boxtype    valid values: ufs910, ufs912, ufs913, ufs922, ufc960
+                             valid values: ipbox55, ipbox99, ipbox9900, cuberevo, cuberevo_mini, cuberevo_mini2, cuberevo_mini_fta, cuberevo_250hd, cuberevo_2000hd, cuberevo_9500hd
+                             valid values: tf7700, fortis_hdbox, octagon1008, atevio7500, spark, spark7162, hl101, hs7110, hs7810a, hs7119, hs7819, adb_box, atemio520, atemio530, vip, homecast5101
+                             valid values: vitamin_hd5000, sagemcom88, arivalink200, fortis_dp7000],
 	[case "${withval}" in
 		ufs910|ufs912|ufs913|ufs922|ufc960|ipbox55|ipbox99|ipbox9900|cuberevo|cuberevo_mini|cuberevo_mini2|cuberevo_mini_fta|cuberevo_250hd|cuberevo_2000hd|cuberevo_9500hd|tf7700|fortis_hdbox|octagon1008|atevio7500|spark|spark7162|hl101|hs7110|hs7810a|hs7119|hs7819|adb_box|atemio520|atemio530|vip|homecast5101|vitamin_hd5000|sagemcom88|arivalink200|fortis_dp7000)
 			BOXTYPE="$withval"
@@ -369,6 +372,79 @@ AM_CONDITIONAL(BOXTYPE_VITAMIN_HD5000, test "$BOXTYPE" = "vitamin_hd5000")
 AM_CONDITIONAL(BOXTYPE_SAGEMCOM88, test "$BOXTYPE" = "sagemcom88")
 AM_CONDITIONAL(BOXTYPE_ARIVALINK200, test "$BOXTYPE" = "arivalink200")
 AM_CONDITIONAL(BOXTYPE_FORTIS_DP7000, test "$BOXTYPE" = "fortis_dp7000")
+
+if test "$BOXTYPE" = "ufs910"; then
+	AC_DEFINE(HAVE_UFS910_HARDWARE, 1, [building for a ufs910])
+elif test "$BOXTYPE" = "ufs912"; then
+	AC_DEFINE(HAVE_UFS912_HARDWARE, 1, [building for a ufs912])
+elif test "$BOXTYPE" = "ufs913"; then
+	AC_DEFINE(HAVE_UFS913_HARDWARE, 1, [building for a ufs913])
+elif test "$BOXTYPE" = "ufs922"; then
+	AC_DEFINE(HAVE_UFS922_HARDWARE, 1, [building for an ufs922])
+elif test "$BOXTYPE" = "ufc960"; then
+	AC_DEFINE(HAVE_UFC960_HARDWARE, 1, [building for an ufc960])
+elif test "$BOXTYPE" = "ipbox55"; then
+	AC_DEFINE(HAVE_IPBOX55_HARDWARE, 1, [building for a ipbox55])
+elif test "$BOXTYPE" = "ipbox99"; then
+	AC_DEFINE(HAVE_IPBOX99_HARDWARE, 1, [building for a ipbox99])
+elif test "$BOXTYPE" = "ipbox9900"; then
+	AC_DEFINE(HAVE_IPBOX9900_HARDWARE, 1, [building for a ipbox9900])
+elif test "$BOXTYPE" = "cuberevo"; then
+	AC_DEFINE(HAVE_CUBEREVO_HARDWARE, 1, [building for a cuberevo])
+elif test "$BOXTYPE" = "cuberevo_mini"; then
+	AC_DEFINE(HAVE_CUBEREVO_MINI_HARDWARE, 1, [building for an cuberevo_mini])
+elif test "$BOXTYPE" = "cuberevo_mini2"; then
+	AC_DEFINE(HAVE_CUBEREVO_MINI2_HARDWARE, 1, [building for a cuberevo_mini2])
+elif test "$BOXTYPE" = "cuberevo_mini_fta"; then
+	AC_DEFINE(HAVE_CUBEREVO_MINI_FTA_HARDWARE, 1, [building for a cuberevo_mini_fta])
+elif test "$BOXTYPE" = "cuberevo_250hd"; then
+	AC_DEFINE(HAVE_CUBEREVO_250HD_HARDWARE, 1, [building for a cuberevo_250hd])
+elif test "$BOXTYPE" = "cuberevo_2000hd"; then
+	AC_DEFINE(HAVE_CUBEREVO_2000HD_HARDWARE, 1, [building for a cuberevo_2000hd])
+elif test "$BOXTYPE" = "cuberevo_9500hd"; then
+	AC_DEFINE(HAVE_CUBEREVO_9500HD_HARDWARE, 1, [building for an cuberevo_9500hd])
+elif test "$BOXTYPE" = "tf7700"; then
+	AC_DEFINE(HAVE_TF7700_HARDWARE, 1, [building for a tf7700])
+elif test "$BOXTYPE" = "fortis_hdbox"; then
+	AC_DEFINE(HAVE_FORTIS_HDBOX_HARDWARE, 1, [building for a fortis_hdbox])
+elif test "$BOXTYPE" = "octagon1008"; then
+	AC_DEFINE(HAVE_OCTAGON1008_HARDWARE, 1, [building for a octagon1008])
+elif test "$BOXTYPE" = "atevio7500"; then
+	AC_DEFINE(HAVE_ATEVIO7500_HARDWARE, 1, [building for a atevio7500])
+elif test "$BOXTYPE" = "spark"; then
+	AC_DEFINE(HAVE_SPARK_HARDWARE, 1, [building for an spark])
+elif test "$BOXTYPE" = "spark7162"; then
+	AC_DEFINE(HAVE_SPARK7162_HARDWARE, 1, [building for a spark7162])
+elif test "$BOXTYPE" = "hl101"; then
+	AC_DEFINE(HAVE_HL101_HARDWARE, 1, [building for a hl101])
+elif test "$BOXTYPE" = "hs7110"; then
+	AC_DEFINE(HAVE_HS7110_HARDWARE, 1, [building for a hs7110])
+elif test "$BOXTYPE" = "hs7810a"; then
+	AC_DEFINE(HAVE_HS7810A_HARDWARE, 1, [building for a hs7810a])
+elif test "$BOXTYPE" = "hs7119"; then
+	AC_DEFINE(HAVE_HS7119_HARDWARE, 1, [building for a hs7119])
+elif test "$BOXTYPE" = "hs7819"; then
+	AC_DEFINE(HAVE_HS7819_HARDWARE, 1, [building for a hs7819])
+elif test "$BOXTYPE" = "adb_box"; then
+	AC_DEFINE(HAVE_ADB_BOX_HARDWARE, 1, [building for a adb_box])
+elif test "$BOXTYPE" = "atemio520"; then
+	AC_DEFINE(HAVE_ATEMIO520_HARDWARE, 1, [building for a atemio520])
+elif test "$BOXTYPE" = "atemio530"; then
+	AC_DEFINE(HAVE_ATEMIO530_HARDWARE, 1, [building for a atemio530])
+elif test "$BOXTYPE" = "vip"; then
+	AC_DEFINE(HAVE_VIP_HARDWARE, 1, [building for an vip])
+elif test "$BOXTYPE" = "homecast5101"; then
+	AC_DEFINE(HAVE_HOMECAST5101_HARDWARE, 1, [building for a homecast5101])
+elif test "$BOXTYPE" = "vitamin_hd5000"; then
+	AC_DEFINE(HAVE_VITAMIN_HD5000_HARDWARE, 1, [building for a vitamin_hd5000])
+elif test "$BOXTYPE" = "sagemcom88"; then
+	AC_DEFINE(HAVE_SAGEMCOM88_HARDWARE, 1, [building for a sagemcom88])
+elif test "$BOXTYPE" = "arivalink200"; then
+	AC_DEFINE(HAVE_ARIVALINK200_HARDWARE, 1, [building for a arivalink200])
+elif test "$BOXTYPE" = "fortis_dp7000"; then
+	AC_DEFINE(HAVE_FORTIS_DP7000_HARDWARE, 1, [building for a fortis_dp7000])
+fi
+
 ])
 
 dnl backward compatiblity
