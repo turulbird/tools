@@ -221,7 +221,7 @@ static int pRead(Context_t *context)
 
 	vCurrentCode = getInternalCode((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData);
 
-	if (vCurrentCode & 0x80 == 0) // new key
+	if ((vCurrentCode & 0x80) == 0) // new key
 	{
 		gNextKey++;
 		gNextKey %= 20;
