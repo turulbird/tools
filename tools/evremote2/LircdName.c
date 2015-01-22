@@ -390,20 +390,32 @@ static int pNotification(Context_t *context, const int cOn)
 	int file_vfd = -1;
 	char icon = BlinkingIcon;
 
+	
 	struct {
 		unsigned char start;
 		unsigned char data[64];
 		unsigned char length;
 	} data;
 
+	struct
+	{
+		int icon_nr;
+		int on;
+	} vfd_icon;
+
 	data.start = 0x00;
 	data.data[0] = icon;
 	data.data[4] = cOn;
 	data.length = 5;
+
+	vfd_icon.icon_nr = icon;
+	vfd_icon.on = cOn;
+
 	if ( (file_vfd = open ( "/dev/vfd", O_RDWR )) == -1 )
 		printf ( "[LircdName]: could not open vfd-device!\n" );
 	else {
 		ioctl(file_vfd, 0xc0425a0a, &data); //0xc0425a0a = VFDICONDISPLAYONOFF
+		ioctl(file_vfd, 0xc0425a0a, &vfd_icon); //0xc0425a0a = VFDICONDISPLAYONOFF
 		close ( file_vfd );
 	}
 
