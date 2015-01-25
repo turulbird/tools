@@ -1,5 +1,6 @@
 AC_INIT([tuxbox-tools], [0.0.1])
 AM_INIT_AUTOMAKE
+AM_SILENT_RULES([yes])
 
 TUXBOX_BOXTYPE
 

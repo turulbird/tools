@@ -53,5 +53,5 @@ tools/stfbcontrol/stfbcontrol
 tools/streamproxy/streamproxy
 tools/ustslave/ustslave
 tools/vfdctl/vfdctl
-
+tools/wait4button/wait4button
 
