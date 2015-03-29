@@ -1,8 +1,9 @@
 #ifndef __Spark__
 #define __Spark__
 
-#define VFDGETVERSION    0xc0425af7
-#define VFDGETWAKEUPTIME 0xc0425b03
+#define VFDGETVERSION     0xc0425af7
+#define VFDGETWAKEUPTIME  0xc0425b03
+#define VFDSETDISPLAYTIME 0xc0425b04 // added by Audioniek (Cuberevo uses 0xc0425b02)
 
 /* this setups the mode temporarily (for one ioctl)
  * to the desired mode. currently the "normal" mode
@@ -33,6 +34,11 @@ struct set_led_s
 struct set_light_s
 {
 	int onoff;
+};
+
+struct set_display_time_s
+{
+	int on;
 };
 
 /* time must be given as follows:
@@ -86,6 +92,7 @@ struct aotom_ioctl_data
 		struct set_led_s led;
 		struct set_light_s light;
 		struct set_brightness_s brightness;
+		struct set_display_time_s display_time;
 		struct set_mode_s mode;
 		struct set_standby_s standby;
 		struct set_time_s time;

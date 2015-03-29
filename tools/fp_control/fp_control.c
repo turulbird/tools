@@ -47,7 +47,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* software version of fp_control. please increase on every change */
-static const char *sw_version = "1.05NdV 20141123.1";
+static const char *sw_version = "1.05NdV 20150329.1";
 
 typedef struct
 {
@@ -75,7 +75,7 @@ tArgs vArgs[] =
 	{ "-gs", " --getTimeAndSet      ", "Args: No arguments\n\tSet system time to current frontcontroller time" },
 	{ "-gw", " --getWakeupTime      ", "Args: No arguments\n\tReturn current wakeup time" },
 	{ "-s", "  --setTime            ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller time" },
-	{ "-sst", "--setWakeTime        ", "Args: No arguments\n\tSet the frontcontroller time equal to system time" },
+	{ "-sst", "--setSystemTime      ", "Args: No arguments\n\tSet the frontcontroller time equal to system time" },
 	{ "-gt", " --getWakeTime        ", "Args: No arguments\n\tGet the frontcontroller wake up time" },
 	{ "-st", " --setWakeTime        ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller wake up time" },
 	{ "-r", "  --reboot             ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tReboot receiver via fc at given time" },

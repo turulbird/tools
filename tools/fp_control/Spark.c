@@ -50,8 +50,8 @@ int res;
 /* ******************* constants ************************ */
 
 #define cVFD_DEVICE "/dev/vfd"
-/* FIXME: Valid for Spark7162 only */
-#define cMAXCharsSpark 8
+/* FIXME: Valid for Spark7162 DVFD only */
+#define cMAXCharsSpark 10
 
 typedef struct
 {
@@ -88,10 +88,11 @@ tArgs vHArgs[] =
 	{ "-i", "  --setIcon            ", "Args: icon# 0|1   Set an icon off or on" },
 	{ "-b", "  --setBrightness      ", "Arg : 0..7        Set display brightness" },
 	{ "-w", "  --getWakeupReason    ", "Args: None        Get the wake up reason" },
+	{ "-tm", " --time_mode          ", "Args: 0|1         Display time mode off|on" },
 	{ "-L", "  --setLight           ", "Arg : 0|1         Set display on/off" },
 	{ "-c", "  --clear              ", "Args: None        Clear display, all icons and LEDs off" },
 	{ "-v", "  --version            ", "Args: None        Get version info from frontprocessor" },
-//	{ "-tm"," --time_mode           ", "Arg : 0|1         Set 12/24 hour mode" },
+//	{ "-tm","  --time_mode          ", "Arg : 0|1         Set 12/24 hour mode" },
 //	{ "-gms", "--get_model_specific ", "Arg : int         Model specific get function" },
 	{ "-ms ", "--set_model_specific ", "Args: long long   Model specific set function" },
 	{ NULL, NULL, NULL }
@@ -490,9 +491,9 @@ static int Spark_setIcon(Context_t *context, int which, int on)
 {
 	//-i command, tested on spark7162
 	struct aotom_ioctl_data vData;
-	if (which < 1 || which > 47)
+	if (which < 1 || which > 63)
 	{
-		printf("Illegal icon number %d (valid is 1..47)\n", which);
+		printf("Illegal icon number %d (valid is 1..63)\n", which);
 		return 0;
 	}
 	vData.u.icon.icon_nr = which;
@@ -543,7 +544,7 @@ static int Spark_setLight(Context_t *context, int on)  //! actually does not swi
 
 static int Spark_setDisplayTime(Context_t *context, int on)
 {
-	// -sf command
+	// -dt command
 	time_t systemTime = time(NULL);
 	struct tm *gmt;
 
@@ -680,11 +681,22 @@ static int Spark_getVersion(Context_t *context, int *version)
 	return 0;
 }
 
-static int Spark_setTimeMode(Context_t *context, int timemode)
+static int Spark_setTimeMode(Context_t *context, int on)
 {
 	// -tm command, to be built, aotom/FP permitting
-	fprintf(stderr, "%s: not implemented (yet?)\n", __func__);
-	return -1;
+	struct aotom_ioctl_data vData;
+	if (on != 0)
+	{
+		on = 1;
+	}
+	vData.u.display_time.on = on;
+	if (ioctl(context->fd, VFDSETDISPLAYTIME, &vData) < 0)
+	{
+		perror("Set time mode");
+		return -1;
+	}
+//	fprintf(stderr, "%s: not implemented (yet?)\n", __func__);
+	return 0;
 }
 
 static int Spark_exit(Context_t *context)
