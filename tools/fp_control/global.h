@@ -25,27 +25,27 @@
 #define VFDTESTFIFTEEN          0xc0425a0f
 
 #define VFDTEST                 0xc0425af0
-#define VFDGETBLUEKEY           0xc0425af1 /* spark specific */
-#define VFDSETBLUEKEY           0xc0425af2 /* spark specific */
-#define VFDGETSTBYKEY           0xc0425af3 /* spark specific */
-#define VFDSETSTBYKEY           0xc0425af4 /* spark specific */
-#define VFDPOWEROFF             0xc0425af5 /* spark specific */
-#define VFDSETPOWERONTIME       0xc0425af6 /* spark specific */
-#define VFDGETSTARTUPSTATE      0xc0425af8 /* spark specific */
+#define VFDGETBLUEKEY           0xc0425af1 /* Spark specific */
+#define VFDSETBLUEKEY           0xc0425af2 /* Spark specific */
+#define VFDGETSTBYKEY           0xc0425af3 /* Spark specific */
+#define VFDSETSTBYKEY           0xc0425af4 /* Spark specific */
+#define VFDPOWEROFF             0xc0425af5 /* Spark specific */
+#define VFDSETPOWERONTIME       0xc0425af6 /* Spark specific */
+#define VFDGETSTARTUPSTATE      0xc0425af8 /* Spark specific */
 #define VFDLEDBRIGHTNESS        0xc0425af8 /* ufs912 */
 #define VFDGETWAKEUPMODE        0xc0425af9 /* Fortis, does the same as spark VFDGETSTARTUPSTATE */
 #define VFDGETTIME              0xc0425afa
 #define VFDSETTIME              0xc0425afb
 #define VFDSTANDBY              0xc0425afc
 #define VFDREBOOT               0xc0425afd /* ufs912, fortis */
-#define VFDSETTIME2             0xc0425afd /* spark specific */
+#define VFDSETTIME2             0xc0425afd /* Spark specific */
 #define VFDSETLED               0xc0425afe
 #define VFDSETMODE              0xc0425aff /* ufs912, 922, Fortis ->unset compat mode */
 #define VFDDISPLAYCLR           0xc0425b00
-#define VFDGETLOOPSTATE         0xc0425b01 /* spark specific */
-#define VFDSETLOOPSTATE         0xc0425b02 /* spark specific */
+#define VFDGETLOOPSTATE         0xc0425b01 /* Spark specific */
+#define VFDSETLOOPSTATE         0xc0425b02 /* Spark specific */
 #define VFDSETTIMEFORMAT        0xc0425b04 /* Fortis specific */
-
+#define VFDGETTIMEFORMAT        0xc0425b05 /* Fortis specific */
 struct vfd_ioctl_data
 {
 	unsigned char start;
@@ -117,7 +117,7 @@ double	modJulianDate(struct tm *theTime);
 time_t	read_timers_utc(time_t curTime);
 time_t	read_fake_timer_utc(time_t curTime);
 int 	searchModel(Context_t *context, eBoxType type);
-int 	checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeup, int verbose);
+int 	checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeup);
 
 int	getWakeupReasonPseudo(int *reason);
 int	syncWasTimerWakeup(eWakeupReason reason);

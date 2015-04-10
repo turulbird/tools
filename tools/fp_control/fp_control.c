@@ -29,6 +29,8 @@
  * added:
  * model specific commands -ms and -gms,
  * setLEDbrightness replaces powerLed
+ * Verbose mode
+ * DVFD FP detection
  * by audioniek
  */
 #include <fcntl.h>
@@ -47,7 +49,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* software version of fp_control. please increase on every change */
-static const char *sw_version = "1.05NdV 20150329.1";
+static const char *sw_version = "1.06NdV 20150410.3";
 
 typedef struct
 {
@@ -93,8 +95,7 @@ tArgs vArgs[] =
 	{ "-sr", " --setRF              ", "Arg : 0/1\n\tSet rf modulator on/off" },
 	{ "-dt", " --display_time       ", "Arg : 0/1\n\tSet time display on/off" },
 	{ "-tm", " --time_mode          ", "Arg : 0/1\n\tSet 12 or 24 hour time mode" },
-//	{ "-v0", " --verboseoff         ","Args: No arguments\n\tSwitches screen output off (default)" },
-//	{ "-v1", " --verboseon          ","Args: No arguments\n\tSwitches screen output on" },
+	{ "-V", "  --verbose            ", "Args: None\n\tVerbose operation" },
 	{ "-ms", " --set_model_specific ", "Args: int\n\tModel specific set function" },
 	{ NULL, NULL, NULL }
 };
@@ -153,6 +154,7 @@ void getTimeFromArg(char *timeStr, char *dateStr, time_t *theGMTTime)
 void processCommand(Context_t *context, int argc, char *argv[])
 {
 	int i;
+
 	if (((Model_t *)context->m)->Init)
 	{
 		context->fd = ((Model_t *)context->m)->Init(context);
@@ -162,7 +164,12 @@ void processCommand(Context_t *context, int argc, char *argv[])
 		i = 1;
 		while (i < argc)
 		{
-			if ((strcmp(argv[i], "-e") == 0) || (strcmp(argv[i], "--setTimer") == 0))
+			if ((strcmp(argv[i], "-V") == 0) || (strcmp(argv[i], "--verbose") == 0))
+			{
+				/* switch verbose on */
+				disp = 1;
+			}
+			else if ((strcmp(argv[i], "-e") == 0) || (strcmp(argv[i], "--setTimer") == 0))
 			{
 				if (argc == 4)
 				{
@@ -180,20 +187,6 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				else
 					usage(context, argv[0], argv[1]);
 			}
-#if 0
-			else if ((strcmp(argv[i], "-v0") == 0) || (strcmp(argv[i], "--verboseoff") == 0))
-			{
-				/* switch verbose off */
-				disp = 0;
-				printf("Verbose is off.\n");
-			}
-			else if ((strcmp(argv[i], "-v1") == 0) || (strcmp(argv[i], "--verboseon") == 0))
-			{
-				/* switch verbose on */
-				disp = 1;
-				printf("Verbose is on.\n");
-			}
-#endif
 			else if ((strcmp(argv[i], "-g") == 0) || (strcmp(argv[i], "--getTime") == 0))
 			{
 				time_t theGMTTime;  //TODO: print time according to receiver mask
@@ -218,11 +211,6 @@ void processCommand(Context_t *context, int argc, char *argv[])
 					if (((Model_t *)context->m)->GetTime(context, &theGMTTime) == 0)
 					{
 						struct tm *gmt = gmtime(&theGMTTime);
-						struct timeval tv;
-						time_t allsec;
-						allsec = mktime(gmt);
-						tv.tv_sec = allsec;
-//						settimeofday(&tv, 0);   // only works on spark, so we make a system-call later
 						fprintf(stderr, "Setting RTC to current frontpanel time: %02d:%02d:%02d %02d-%02d-%04d\n",
 								gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon + 1, gmt->tm_year + 1900);
 						char cmd[50];
@@ -387,6 +375,10 @@ void processCommand(Context_t *context, int argc, char *argv[])
 						((Model_t *)context->m)->SetText(context, argv[i + 1]);
 					}
 				}
+				else
+				{
+					usage(context, argv[0], argv[1]);
+				}
 				i += 1;
 			}
 			else if ((strcmp(argv[i], "-l") == 0) || (strcmp(argv[i], "--setLed") == 0))
@@ -401,6 +393,10 @@ void processCommand(Context_t *context, int argc, char *argv[])
 					{
 						((Model_t *)context->m)->SetLed(context, which, on);
 					}
+				}
+				else
+				{
+					usage(context, argv[0], argv[1]);
 				}
 				i += 2;
 			}
@@ -489,11 +485,23 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-v") == 0) || (strcmp(argv[i], "--version") == 0))
 			{
 				int version = -1;
-				printf("\nProgram version info:\n");
-				printf("fp_control version %s\n", sw_version);
-				printf("\nConfiguration of receiver:\n");
-				printf("Display: %d        Time format: %s", Vdisplay, VtimeFormat);
-				printf("Displaycustom: %d  Wakeupdecrement: %d seconds\n", Vdisplay_custom, Vwakeup);
+
+				if (!disp)
+				{
+					printf("\nProgram version info:\n");
+					printf("fp_control version %s\n", sw_version);
+					printf("\nConfiguration of receiver:\n");
+					printf("Display      : %d  Time format: %s", Vdisplay, VtimeFormat);
+					printf("Displaycustom: %d  Wakeupdecrement: %d minute(s)", Vdisplay_custom, Vwakeup / 60);
+					if (Vwakeup % 60 != 0)
+					{
+						printf(" %d second(s)\n\n", Vwakeup % 60);
+					}
+					else
+					{
+						printf("\n\n");
+					}
+				}
 				/* get FP version info */
 				if (((Model_t *)context->m)->GetVersion)
 				{
@@ -714,7 +722,7 @@ int getModel()
 			vBoxType = Unknown;
 		if (disp)
 		{
-			printf("Receiver: %s\n", vName);
+			printf("Receiver: %s\n\n", vName);
 		}
 	}
 	return vBoxType;
@@ -724,9 +732,25 @@ int main(int argc, char *argv[])
 {
 	eBoxType vBoxType = Unknown;
 	Context_t context;
+	int i;
+
+	if (argc > 1)
+	{
+		i = 1;
+		while (i < argc)
+		{
+			if ((strcmp(argv[i], "-V") == 0) || (strcmp(argv[i], "--verbose") == 0))
+			{
+				/* switch verbose on */
+				disp = 1;
+			}
+			i++;
+		}
+	}
+	
 	if (disp)
 	{
-		printf("\n%s Version %s\n", argv[0], sw_version);
+		printf("%s Version %s\n", argv[0], sw_version);
 	}
 	vBoxType = getModel();
 	if (searchModel(&context, vBoxType) != 0)

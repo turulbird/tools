@@ -121,7 +121,7 @@ static int init(Context_t *context)
 		fprintf(stderr, "Cannot open %s\n", cVFD_DEVICE);
 		perror("");
 	}
-	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement, disp);
+	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement);
 	return vFd;
 }
 

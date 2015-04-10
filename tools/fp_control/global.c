@@ -42,7 +42,7 @@ char *sDisplayStd = "%a %d %H:%M:%S";
 #define WAS_TIMER_WAKEUP "/proc/stb/fp/was_timer_wakeup"
 
 #define E2_WAKEUP_TIME_PROC
-int disp = 1;
+int verbose = 0; //verbose is off by default
 
 static Model_t *AvailableModels[] =
 {
@@ -120,7 +120,7 @@ static time_t read_e2_timers(time_t curTime)
 //			int wakeupDecrement = 5 * 60;
 //			int platzhalter;
 //			char *platzhalters;
-//			checkConfig(&platzhalter, &platzhalter, &platzhalters, &wakeupDecrement, disp);
+//			checkConfig(&platzhalter, &platzhalter, &platzhalters, &wakeupDecrement);
 			recordTime -= Vwakeup;
 		}
 		printf(" - Done\n");
@@ -165,16 +165,17 @@ static time_t read_neutrino_timers(time_t curTime)
 		printf(" - Error reading %s\n", NEUTRINO_TIMERS);
 	if (recordTime != LONG_MAX)
 	{
-		int wakeupDecrement = 5 * 60;
+		int wakeupDecrement = Vwakeup;
 		int platzhalter;
 		char *platzhalters;
-		checkConfig(&platzhalter, &platzhalter, &platzhalters, &wakeupDecrement, disp);
+		checkConfig(&platzhalter, &platzhalter, &platzhalters, &wakeupDecrement);
 		recordTime -= wakeupDecrement;
 	}
 	return recordTime;
 }
 
-// Write the wakeup time to a file to allow detection of wakeup cause if fp does not support
+// Write the wakeup time to a file to allow detection of wakeup cause
+// in case fp does not support wakeup cause
 static void write_wakeup_file(time_t wakeupTime)
 {
 	FILE *wakeupFile;
@@ -310,7 +311,7 @@ int searchModel(Context_t *context, eBoxType type)
 	return -1;
 }
 
-int checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeup, int verbose)
+int checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeup)
 {
 	const int MAX = 100;
 	char buffer[MAX];
@@ -319,16 +320,14 @@ int checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeu
 	*timeFormat = "Unknown";
 	*wakeup = 5 * 60;
 	FILE *fd_config = fopen(CONFIG, "r");  //read box /etc/vdstandby.cfg
+
 	if (fd_config == NULL)
 	{
 		Vwakeup = 5 * 60; //default wakeupdecrement is 5 minutes
 
-		if (verbose)
-		{
-			printf("Config file (%s) not found,\nusing standard config:", CONFIG);
-			printf("Config:\nDisplay: %d              Time format: %d\n", *display, *display_custom);
-			printf("Displaycustom: %s  Wakeupdecrement: %d minutes %d seconds\n", *timeFormat, Vwakeup/60, Vwakeup%60);
-		}
+		printf("Config file (%s) not found,\nusing standard config:", CONFIG);
+		printf("Config:\nDisplay: %d              Time format: %d\n", *display, *display_custom);
+		printf("Displaycustom: %s  Wakeupdecrement: %d minutes %d seconds\n", *timeFormat, *wakeup/60, *wakeup%60);
 		return -1;
 	}
 	while (fgets(buffer, MAX, fd_config))
@@ -361,18 +360,18 @@ int checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeu
 	{
 		*timeFormat = "?";
 	}
-	if (verbose)
+	if (disp)
 	{
 		printf("Configuration of receiver:\n");
-		printf("Display: %d        Time format: %s", *display, *timeFormat);
+		printf("Display      : %d  Time format: %s", *display, *timeFormat);
 		printf("Displaycustom: %d  Wakeupdecrement: %d minute(s)", *display_custom, *wakeup / 60);
 		if (*wakeup % 60 != 0)
 		{
-			printf(" %d second(s)\n\n", *wakeup % 60);
+			printf(" %d second(s)\n", *wakeup % 60);
 		}
 		else
 		{
-			printf("\n\n");
+			printf("\n");
 		}
 	}
 	Vdisplay = *display;

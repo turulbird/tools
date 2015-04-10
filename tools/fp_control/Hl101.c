@@ -103,7 +103,7 @@ static int init(Context_t *context)
 	}
 	((Model_t *)context->m)->private = private;
 	memset(private, 0, sizeof(tHL101Private));
-	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement, disp);
+	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement);
 	return vFd;
 }
 

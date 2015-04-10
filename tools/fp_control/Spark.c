@@ -23,10 +23,13 @@
  *
  * Date     By              Description
  * --------------------------------------------------------------------------
- * 20130909 Audioniek       Get wake up reason made functional
- * 20130910 Audioniek       Set timer polished
- * 20130911 Audioniek       Shutdown polished
- * 20130911 Audioniek       Reboot built
+ * 20130909 Audioniek       Get wake up reason made functional.
+ * 20130910 Audioniek       Set timer polished.
+ * 20130911 Audioniek       Shutdown polished.
+ * 20130911 Audioniek       Reboot built.
+ * 20150404 Audioniek       -tm added for DVFD models.
+ * 20150410 Audioniek       Awareness of VFD or DVFD front panel versions
+ *                          added, including time mode on DVFD.
  *
  ****************************************************************************/
 
@@ -47,11 +50,13 @@
 
 static int Spark_setText(Context_t *context, char *theText);
 int res;
+unsigned int fp_type;
+unsigned int time_mode;
+
 /* ******************* constants ************************ */
 
 #define cVFD_DEVICE "/dev/vfd"
-/* FIXME: Valid for Spark7162 DVFD only */
-#define cMAXCharsSpark 10
+#define cMAXCharsSpark 16
 
 typedef struct
 {
@@ -67,11 +72,11 @@ tArgs vHArgs[] =
 	{ "", "                         ", "      to the frontcontroller and shutdown" },
 	{ "", "                         ", "      Arg time date: Set frontcontroller wake-up time to" },
 	{ "", "                         ", "      time, shutdown, and wake up at given time" },
-	{ "-d", "  --shutdown           ", "Args: None or [time date]  Format: HH:MM:SS dd-mm-YYYY" },
+	{ "-d", "  --shutdown           ", "Args: None or time date (format: HH:MM:SS dd-mm-YYYY)" },
 	{ "", "                         ", "      No arg: Shut down immediately" },
 	{ "", "                         ", "      Arg time date: Shut down at given time/date" },
-	{ "-r", "  --reboot             ", "Args: None" },
-	{ "", "                         ", "      No arg:     Reboot immediately (= -e current time+3 date today" },
+	{ "-r", "  --reboot             ", "Args: [time date]  Format: HH:MM:SS dd-mm-YYYY" },
+	{ "", "                         ", "      No arg:     Reboot immediately (= -e current time+5 date today" },
 	{ "", "                         ", "      Arg time date: Reboot at given time/date (= -e time date)" },
 	{ "-g", "  --getTime            ", "Args: None        Display currently set frontprocessor time" },
 	{ "-gs", " --getTimeAndSet      ", "Args: None        Set system time to current frontprocessor time" },
@@ -88,11 +93,11 @@ tArgs vHArgs[] =
 	{ "-i", "  --setIcon            ", "Args: icon# 0|1   Set an icon off or on" },
 	{ "-b", "  --setBrightness      ", "Arg : 0..7        Set display brightness" },
 	{ "-w", "  --getWakeupReason    ", "Args: None        Get the wake up reason" },
-	{ "-tm", " --time_mode          ", "Args: 0|1         Display time mode off|on" },
-	{ "-L", "  --setLight           ", "Arg : 0|1         Set display on/off" },
+	{ "-tm", " --time_mode          ", "Arg : 0|1         Clock display off|on" },
+	{ "-L", "  --setLight           ", "Arg : 0|1         Set display off|on" },
 	{ "-c", "  --clear              ", "Args: None        Clear display, all icons and LEDs off" },
 	{ "-v", "  --version            ", "Args: None        Get version info from frontprocessor" },
-//	{ "-tm","  --time_mode          ", "Arg : 0|1         Set 12/24 hour mode" },
+	{ "-V", "  --verbose            ", "Args: None        Verbose operation" },
 //	{ "-gms", "--get_model_specific ", "Arg : int         Model specific get function" },
 	{ "-ms ", "--set_model_specific ", "Args: long long   Model specific set function" },
 	{ NULL, NULL, NULL }
@@ -111,7 +116,7 @@ typedef struct
 /* ******************* helper/misc functions ****************** */
 
 /* Calculate the time value which we can pass to
-    * the aotom fp. its a mjd time (mjd=modified
+    * the aotom fp. it is a mjd time (mjd=modified
     * julian date). mjd is relative to gmt so theGMTTime
     * must be in GMT/UTC.
     */
@@ -147,16 +152,60 @@ static int Spark_init(Context_t *context)
 {
 	tSparkPrivate *private = malloc(sizeof(tSparkPrivate));
 	int vFd;
+	int t_mode;
+
+	unsigned char strVersion[20];
+	const char *dp_type[9] = { "Unknown", "VFD", "LCD", "DVFD", "LED", "?", "?", "?", "LBD" };
+	const char *tm_type[2] = { "off", "on" };
+
 //	printf("%s\n", __func__);
+
 	vFd = open(cVFD_DEVICE, O_RDWR);
 	if (vFd < 0)
 	{
 		fprintf(stderr, "Cannot open %s\n", cVFD_DEVICE);
 		perror("");
 	}
+
 	((Model_t *)context->m)->private = private;
 	memset(private, 0, sizeof(tSparkPrivate));
-	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement, disp);
+	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement);
+
+	if (ioctl(vFd, VFDGETVERSION, &strVersion) < 0) // get version info (1x u32 4x u8)
+	{
+		perror("Get version info");
+		return -1;
+	}
+	if (strVersion[0] != '\0')  /* if the version info is OK */
+	{
+		fp_type = strVersion[4];
+	}
+	else
+	{
+		fprintf(stderr, "Error reading version from fp\n");
+	}
+
+	if (ioctl(vFd, VFDGETDISPLAYTIME, &t_mode) < 0)
+	{
+		time_mode = 1; //if no support from aotom, assume clock on
+	}
+	else
+	{
+		time_mode = t_mode;
+	}
+	if (disp)
+	{
+		printf("FP type is   : %s", dp_type[fp_type]);
+		if (fp_type == 3)
+		{
+			printf(", time mode %s\n\n", tm_type[time_mode]);
+		}
+		else
+		{
+			printf("\n\n");
+		}
+
+	}
 	return vFd;
 }
 
@@ -188,8 +237,9 @@ static int Spark_setTimer(Context_t *context, time_t *timerTime)
 	time_t wakeupTime;
 	struct tm *ts;
 	struct tm *tss;
-	unsigned long   diff;
+	unsigned long diff;
 	int sday, smonth, syear;
+
 	time(&curTime);  //get system time (UTC)
 	tss = localtime(&curTime); //save it for the date
 	sday = tss->tm_mday;
@@ -276,7 +326,7 @@ static int Spark_setTimer(Context_t *context, time_t *timerTime)
 
 static int Spark_shutdown(Context_t *context, time_t *shutdownTimeGMT)
 {
-	//-d command, partially rewritten, tested on Spark7162
+	//-d command, partially rewritten
 	struct aotom_ioctl_data vData;
 	time_t curTime;
 	time_t wakeupTime;
@@ -323,7 +373,7 @@ static int Spark_shutdown(Context_t *context, time_t *shutdownTimeGMT)
 
 static int Spark_reboot(Context_t *context, time_t *rebootTimeGMT)
 {
-	//-r command, partially rewritten, tested on Spark7162
+	//-r command, partially rewritten
 	// Note: aotom does not have a particular reboot command
 	time_t curTime;
 	/* reboot at a given time */
@@ -333,13 +383,13 @@ static int Spark_reboot(Context_t *context, time_t *rebootTimeGMT)
 	}
 	/* reboot immediately */
 	time(&curTime);
-	*rebootTimeGMT = curTime + 3;
+	*rebootTimeGMT = curTime + 5;
 	return (Spark_setTimer(context, rebootTimeGMT));
 }
 
 static int Spark_getTime(Context_t *context, time_t *theGMTTime)
 {
-	// -g command, adapted for spark, tested on spark7162
+	// -g command, adapted for spark
 	struct tm *get_tm;
 	time_t iTime;
 	/* get front controller time */
@@ -369,7 +419,7 @@ static int Spark_getTime(Context_t *context, time_t *theGMTTime)
 
 static int Spark_getWTime(Context_t *context, time_t *theGMTTime)
 {
-	//-gt command: VFDGETWAKEUPTIME not supported by older aotoms
+	//-gt command, note: VFDGETWAKEUPTIME not supported by older aotoms
 	struct tm *get_tm;
 	time_t iTime;
 	/* front controller wake up time */
@@ -398,12 +448,14 @@ static int Spark_getWTime(Context_t *context, time_t *theGMTTime)
 
 static int Spark_setTime(Context_t *context, time_t *theGMTTime)
 {
-	//-s command, tested on spark7162
+	//-s command
 	//FIXME: sets time to 00:59:59 if time string invalid, and date to 01-01-1970 if date string invalid
 	struct aotom_ioctl_data vData;
 	struct tm *set_tm;
 	time_t iTime;
+
 	Spark_calcAotomTime(*theGMTTime, vData.u.time.time);
+
 	if (ioctl(context->fd, VFDSETTIME, &vData) < 0)
 	{
 		perror("Set time");
@@ -417,7 +469,7 @@ static int Spark_setTime(Context_t *context, time_t *theGMTTime)
 
 static int Spark_setWTime(Context_t *context, time_t *theGMTTime)
 {
-	//-st command, tested on spark7162
+	//-st command
 	struct tm *setwtm;
 	time_t iTime;
 	iTime = *theGMTTime;
@@ -435,7 +487,7 @@ static int Spark_setWTime(Context_t *context, time_t *theGMTTime)
 
 static int Spark_setSTime(Context_t *context, time_t *theGMTTime)
 {
-	//-sst command, tested on spark7162
+	//-sst command
 	time_t systemTime = time(NULL);
 	struct tm *gmt;
 	gmt = localtime(&systemTime);
@@ -459,21 +511,41 @@ static int Spark_setSTime(Context_t *context, time_t *theGMTTime)
 
 static int Spark_setText(Context_t *context, char *theText)
 {
-	//-t command, tested on spark7162
+	//-t command
 	char text[cMAXCharsSpark + 1];
-	strncpy(text, theText, cMAXCharsSpark);
-	text[cMAXCharsSpark] = ' ';
+	int disp_size;
+
+	switch (fp_type)
+	{
+		case 3: //DVFD
+		{
+			disp_size = (time_mode ? 10 : 16);
+			break;
+		}
+		case 4: //LED
+		{
+			disp_size = 4;
+			break;
+		}
+		default: //VFD and others
+		{
+			disp_size = 8;
+			break;
+		}
+	}
+	strncpy(text, theText, disp_size);
+	text[disp_size] = 0;
 	write(context->fd, text, strlen(text));
 	return 0;
 }
 
 static int Spark_setLed(Context_t *context, int which, int on)
 {
-	//-l command, tested on spark7162
+	//-l command
 	struct aotom_ioctl_data vData;
-	if (on < 0 || on > 2)
+	if (on < 0 || on > 255)
 	{
-		printf("Illegal LED action %d (valid is 0..2)\n", on);
+		printf("Illegal LED action %d (valid is 0..255)\n", on);
 		return 0;
 	}
 	vData.u.led.led_nr = which;
@@ -489,11 +561,24 @@ static int Spark_setLed(Context_t *context, int which, int on)
 
 static int Spark_setIcon(Context_t *context, int which, int on)
 {
-	//-i command, tested on spark7162
+	//-i command
+	int first, last;
 	struct aotom_ioctl_data vData;
-	if (which < 1 || which > 63)
+
+	if (fp_type == 3)
 	{
-		printf("Illegal icon number %d (valid is 1..63)\n", which);
+		first = 48;
+		last = 63;
+	}
+	else
+	{
+		first = 1;
+		last = 47;
+	}
+	if ((which < first || which > last) 
+	&& which != 46 && which != 8 && which != 10 && which != 11 && which != 12 && which != 13 && which != 14 && which != 26)
+	{
+//		printf("Illegal icon number %d (valid is %d..%d)\n", which, first, last);
 		return 0;
 	}
 	vData.u.icon.icon_nr = which;
@@ -508,7 +593,7 @@ static int Spark_setIcon(Context_t *context, int which, int on)
 
 static int Spark_setBrightness(Context_t *context, int brightness)
 {
-	//-b command, tested on spark7162
+	//-b command
 	struct aotom_ioctl_data vData;
 	if (brightness < 0 || brightness > 7)
 	{
@@ -524,9 +609,9 @@ static int Spark_setBrightness(Context_t *context, int brightness)
 	return 0;
 }
 
-static int Spark_setLight(Context_t *context, int on)  //! actually does not switch display off, but sets brightness to zero!
+static int Spark_setLight(Context_t *context, int on)
 {
-	//-L command, tested on spark7162
+	//-L command
 	struct aotom_ioctl_data vData;
 	if (on < 0 || on > 1)
 	{
@@ -599,7 +684,7 @@ static int Spark_setLEDb(Context_t *context, int brightness)
 
 static int Spark_clear(Context_t *context)
 {
-	//-c command, tested on spark7162
+	//-c command
 	struct aotom_ioctl_data vData;
 	if (ioctl(context->fd, VFDDISPLAYCLR, &vData) < 0)
 	{
@@ -621,20 +706,23 @@ static int Spark_clear(Context_t *context)
 		perror("Setled (red)");
 		return -1;
 	}
-	vData.u.led.led_nr = 1;
-	vData.u.led.on = 0;
-	res = (ioctl(context->fd, VFDSETLED, &vData));
-	if (res < 0)
+	if (fp_type != 1)
 	{
-		perror("Setled (green)");
-		return -1;
+		vData.u.led.led_nr = 1;
+		vData.u.led.on = 0;
+		res = (ioctl(context->fd, VFDSETLED, &vData));
+		if (res < 0)
+		{
+			perror("Setled (green)");
+			return -1;
+		}
 	}
 	return 0;
 }
 
 static int Spark_getWakeupReason(Context_t *context, int *reason)
 {
-	//-w command, tested on spark7162
+	//-w command
 	char mode[8];
 	if (ioctl(context->fd, VFDGETSTARTUPSTATE, mode) < 0)
 	{
@@ -655,7 +743,7 @@ static int Spark_getWakeupReason(Context_t *context, int *reason)
 
 static int Spark_getVersion(Context_t *context, int *version)
 {
-	//-v command, tested on spark7162
+	//-v command
 	unsigned char strVersion[20];
 	const char *CPU_type[3] = { "Unknown", "ATTING48", "ATTING88" };
 	const char *Display_type[9] = { "Unknown", "VFD", "LCD", "DVFD", "LED", "?", "?", "?", "LBD" };
@@ -666,11 +754,15 @@ static int Spark_getVersion(Context_t *context, int *version)
 	}
 	if (strVersion[0] != '\0')  /* if the version info is OK */
 	{
-		printf("\nFront processor version info:\n");
+		printf("Front processor version info:\n");
 		printf("FP CPU type is   : %d (%s)\n", strVersion[0], CPU_type[strVersion[0]]);
 		printf("Display type is  : %d (%s)\n", strVersion[4], Display_type[strVersion[4]]);
 		printf("# of keys        : %d\n", strVersion[5]);
 		printf("FP SW version is : %d.%d\n", strVersion[6], strVersion[7]);
+//		if (strVersion[4] == 3 && (strVersion[8] == 0 || strVersion[8] == 1))
+//		{
+//			printf("Time mode is     : %s (%d)\n", timeMode_type[strVersion[8]], strVersion[8]);
+//		}
 		*version = strVersion[4];
 	}
 	else
@@ -683,19 +775,32 @@ static int Spark_getVersion(Context_t *context, int *version)
 
 static int Spark_setTimeMode(Context_t *context, int on)
 {
-	// -tm command, to be built, aotom/FP permitting
+	// -tm command
+	const char *timeMode_type[2] = { "off", "on" };
 	struct aotom_ioctl_data vData;
-	if (on != 0)
+
+	if (fp_type == 3)
 	{
-		on = 1;
+		if (on != 0)
+		{
+			on = 1;
+		}
+		vData.u.display_time.on = on;
+		if (ioctl(context->fd, VFDSETDISPLAYTIME, &vData) < 0)
+		{
+			perror("Set time mode");
+			return -1;
+		}
+		time_mode = on;
+		if (disp)
+		{
+			printf("FP time mode is now %s.\n", timeMode_type[time_mode]);
+		}
 	}
-	vData.u.display_time.on = on;
-	if (ioctl(context->fd, VFDSETDISPLAYTIME, &vData) < 0)
+	else
 	{
-		perror("Set time mode");
-		return -1;
+		printf("Set time mode is only supported on DVFD displays.\n");
 	}
-//	fprintf(stderr, "%s: not implemented (yet?)\n", __func__);
 	return 0;
 }
 

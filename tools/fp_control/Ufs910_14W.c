@@ -285,7 +285,7 @@ static int init(Context_t *context)
 	private->fd_red = open("/sys/class/leds/ufs910:red/brightness", O_WRONLY);
 	private->fd_yellow = open("/sys/class/leds/ufs910:orange/brightness", O_WRONLY);
 	private->vfd = vFd;
-	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement, disp);
+	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement);
 	return vFd;
 }
 
