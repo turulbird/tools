@@ -34,9 +34,6 @@ missing
 depcomp
 .deps/
 .libs/
-libstb-hal*
-neutrino-*
-enigma2*
 libs/libstgles/libltdl/
 tools/acinclude.m4
 tools/aio-grab/grab
