@@ -97,7 +97,7 @@ static tButton cButtonsTopfield7700HDPVR[] =
 	{"SAT"            , "5E", KEY_SAT},
 	{"STEPBACK"       , "50", KEY_PREVIOUS},
 	{"STEPFORWARD"    , "52", KEY_NEXT},
-	{"MARK"           , "4C", KEY_EPG},
+	{"MARK"           , "4C", KEY_OPTION},
 	{"TV/RADIO"       , "04", KEY_TV2}, //WE USE TV2 AS TV/RADIO SWITCH BUTTON
 	{"USB"            , "40", KEY_ARCHIVE},
 	{"TIMER"          , "44", KEY_TIME},

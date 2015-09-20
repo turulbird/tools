@@ -1,12 +1,12 @@
 #ifndef FRONTPANEL_H
 #define FRONTPANEL_H
 /*
-  This device driver uses the following device entries:
+	This device driver uses the following device entries:
 
-  /dev/fpc      c 62 0      # FP control (read/write, for clock- and timer operations, shutdown etc.)
-  /dev/rc       c 62 1      # Remote Control (read-only)
-  /dev/fplarge  c 62 2      # Direct access to the 8 character display (write-only)
-  /dev/fpsmall  c 62 3      # Direct access to the 4 character display (write-only)
+	/dev/fpc      c 62 0      # FP control (read/write, for clock- and timer operations, shutdown etc.)
+	/dev/rc       c 62 1      # Remote Control (read-only)
+	/dev/fplarge  c 62 2      # Direct access to the 8 character display (write-only)
+	/dev/fpsmall  c 62 3      # Direct access to the 4 character display (write-only)
  */
 
 #include "tftypes.h"
@@ -18,11 +18,11 @@
 #define FRONTPANEL_MINOR_FPSMALL        3
 
 /* RWSS SSSS SSSS SSSS KKKK KKKK NNNN NNNN
-   R = read
-   W = write
-   S = parameter size
-   K = ioctl magic = 0x3a
-   N = command number
+	 R = read
+	 W = write
+	 S = parameter size
+	 K = ioctl magic = 0x3a
+	 N = command number
 */
 
 #define FRONTPANELGETTIME               0x40003a00 | (sizeof(frontpanel_ioctl_time) << 16)
@@ -106,68 +106,66 @@
 #define FPICON_HDD8                     0x00400000
 #define FPICON_HDDFULL                  0x00800000
 
-
-
 typedef struct
 {
-  word    year;
-  word    month;
-  word    day;
-  word    dow;
-  char    sdow[4];
-  word    hour;
-  word    min;
-  word    sec;
-  dword   now;
+	word  year;
+	word  month;
+	word  day;
+	word  dow;
+	char  sdow[4];
+	word  hour;
+	word  min;
+	word  sec;
+	dword now;
 } frontpanel_ioctl_time;
 
 typedef struct
 {
-  byte    bright;
+	byte bright;
 } frontpanel_ioctl_brightness;
 
 typedef struct
 {
-  byte    reason;
+	byte reason;
 } frontpanel_ioctl_bootreason;
 
 typedef struct
 {
-  byte    onoff;
+	byte onoff;
 } frontpanel_ioctl_irfilter;
 
 typedef struct
 {
-  dword   Icons1;
-  dword   Icons2;
-  byte    BlinkMode;
+	dword Icons1;
+	dword Icons2;
+	byte  BlinkMode;
 } frontpanel_ioctl_icons;
 
 typedef struct
 {
-  byte    TypematicDelay;
+	byte TypematicDelay;
 } frontpanel_ioctl_typematicdelay;
 
 typedef struct
 {
-  byte    TypematicRate;
+	byte TypematicRate;
 } frontpanel_ioctl_typematicrate;
 
 typedef struct
 {
-  byte    KeyEmulation;
+	byte KeyEmulation;
 } frontpanel_ioctl_keyemulation;
 
 typedef struct
 {
-  byte    AllCaps;
+	byte AllCaps;
 } frontpanel_ioctl_allcaps;
 
 typedef struct
 {
-  byte    ScrollMode;
-  byte    ScrollPause;
-  byte    ScrollDelay;
+	byte ScrollMode;
+	byte ScrollPause;
+	byte ScrollDelay;
 } frontpanel_ioctl_scrollmode;
 
 
