@@ -45,6 +45,7 @@ tools/fp_control/fp_control
 tools/gitVCInfo/gitVCInfo
 tools/hd-idle/hd-idle
 tools/hotplug/hotplug
+tools/libeplayer3/eplayer3
 tools/libeplayer3/container
 tools/libeplayer3/container/.dirstamp
 tools/libeplayer3/manager/.dirstamp
