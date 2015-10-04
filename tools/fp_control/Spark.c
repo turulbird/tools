@@ -91,9 +91,9 @@ tArgs vHArgs[] =
 	{ "-t", "  --settext            ", "Arg : text        Show text in front panel display" },
 	{ "-l", "  --setLed             ", "Args: LED# 0|1|2  LED#: off, on or blink" },
 	{ "-i", "  --setIcon            ", "Args: icon# 0|1   Set an icon off or on" },
-	{ "-b", "  --setBrightness      ", "Arg : 0..7        Set display brightness" },
+	{ "-b", "  --setBrightness      ", "Arg : 0..7        Set display brightness (VFD/DVFD only)" },
 	{ "-w", "  --getWakeupReason    ", "Args: None        Get the wake up reason" },
-	{ "-tm", " --time_mode          ", "Arg : 0|1         Clock display off|on" },
+	{ "-tm", " --time_mode          ", "Arg : 0|1         Clock display off|on (DVFD only)" },
 	{ "-L", "  --setLight           ", "Arg : 0|1         Set display off|on" },
 	{ "-c", "  --clear              ", "Args: None        Clear display, all icons and LEDs off" },
 	{ "-v", "  --version            ", "Args: None        Get version info from frontprocessor" },
@@ -524,7 +524,15 @@ static int Spark_setText(Context_t *context, char *theText)
 		}
 		case 4: //LED
 		{
-			disp_size = 4;
+//			strncpy(text, theText, 5);
+			if (strlen(theText) > 2 && (theText[2] == 0x2e || theText[2] == 0x2c || theText[2] == 0x3a))
+			{
+				disp_size = 5;
+			}
+			else
+			{
+				disp_size = 4;
+			}
 			break;
 		}
 		default: //VFD and others
@@ -691,12 +699,15 @@ static int Spark_clear(Context_t *context)
 		perror("Clear");
 		return -1;
 	}
-	vData.u.icon.icon_nr = 46;
-	vData.u.icon.on = 0;
-	if (ioctl(context->fd, VFDICONDISPLAYONOFF, &vData) < 0)
+	if (fp_type == 1 || fp_type == 3)
 	{
-		perror("Set icon");
-		return -1;
+		vData.u.icon.icon_nr = 46;
+		vData.u.icon.on = 0;
+		if (ioctl(context->fd, VFDICONDISPLAYONOFF, &vData) < 0)
+		{
+			perror("Set icon");
+			return -1;
+		}
 	}
 	vData.u.led.led_nr = 0;
 	vData.u.led.on = 0;

@@ -49,7 +49,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* software version of fp_control. please increase on every change */
-static const char *sw_version = "1.06NdV 20150410.3";
+static const char *sw_version = "1.06NdV 20151004.3";
 
 typedef struct
 {
