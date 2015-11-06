@@ -22,9 +22,10 @@
 /*                  tffpctl now saves some settings into a file.          */
 /*                  --restoresettings                                     */
 /* 2011-07-23 V4.2  Added lonkeypress option to keyemulation mode         */
+/* 2015-11-06 V4.3  Added spinner control                                 */
 /**************************************************************************/
 
-#define VERSION "V4.2"
+#define VERSION "V4.3"
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -67,6 +68,7 @@
 #define _FRONTPANELSCROLLPAUSE          0x18
 #define _FRONTPANELSCROLLDELAY          0x19
 #define _FRONTPANELRESTORSETTINGS       0x1a
+#define _FRONTPANELSPINNER              0x1b
 
 
 #define SETTINGSFILE                    "/etc/tffpctl.conf"
@@ -87,6 +89,7 @@ typedef struct
 	unsigned char ScrollMode;
 	unsigned char ScrollPause;
 	unsigned char ScrollDelay;
+	unsigned char Spinner;
 	//--------------- for future enhancements: settings version 1 ends here
 }tSettings;
 
@@ -116,6 +119,7 @@ void Help (void)
 	printf ("--resend                     sends the whole display buffer to the VFD\n");
 	printf ("--allcaps <0|1>              show all chars of the big display in CAPS letters\n");
 	printf ("--icon <xxxxxxxx_xxxxxxxx_m> defines which icons to be displayed\n");
+	printf ("--spinner <0|1>              switches spinner on or off\n");
 
 	printf ("--typematicdelay <0 to 255>  delay between the first and the repeated keys\n");
 	printf ("--typematicrate <0 to 255>   delay between the repeated key codes\n");
@@ -242,6 +246,8 @@ int main(int argc, char** argv)
 			{"scrolldelay",     required_argument, 0, 0},
 
 			{"restoresettings", no_argument      , 0, 0},
+
+			{"spinner",         required_argument, 0, 0}, //0x1b
 
 			{NULL,      0, 0, 0}
 		};
@@ -430,6 +436,20 @@ int main(int argc, char** argv)
 						{
 							printf ("Invalid icon parameter\n");
 						}
+						break;
+					}
+					case _FRONTPANELSPINNER:
+					{
+						frontpanel_ioctl_spinner fpdata;
+
+						fpdata.Spinner = atoi(optarg);
+						if (fpdata.Spinner != 0)
+						{
+							fpdata.Spinner = 1;
+						}
+						Settings.Spinner = fpdata.Spinner;
+						SaveSettings();
+						ioctl(file_fp, FRONTPANELSPINNER, &fpdata);
 						break;
 					}
 					case _FRONTPANELTYPEMATICDELAY:

@@ -48,6 +48,7 @@
 #define FRONTPANELALLCAPS               0x40003a14 | (sizeof(frontpanel_ioctl_allcaps) << 16)
 #define FRONTPANELSCROLLMODE            0x40003a15 | (sizeof(frontpanel_ioctl_scrollmode) << 16)
 #define FRONTPANELICON                  0x40003a20 | (sizeof(frontpanel_ioctl_icons) << 16)
+#define FRONTPANELSPINNER               0x40003a21 | (sizeof(frontpanel_ioctl_spinner) << 16)
 
 //The following icons belong to block 1
 #define FPICON_IRDOT                    0x00000001
@@ -160,6 +161,11 @@ typedef struct
 {
 	byte AllCaps;
 } frontpanel_ioctl_allcaps;
+
+typedef struct
+{
+	byte Spinner;
+} frontpanel_ioctl_spinner;
 
 typedef struct
 {
