@@ -442,7 +442,8 @@ int getModel()
 				 (!strncasecmp(vName, "cuberevo-mini-fta", 17)) ||
 				 (!strncasecmp(vName, "cuberevo-250hd", 14)) ||
 				 (!strncasecmp(vName, "cuberevo-2000hd", 15)) ||
-				 (!strncasecmp(vName, "cuberevo-9500hd", 15)))
+				 (!strncasecmp(vName, "cuberevo-9500hd", 15)) ||
+				 (!strncasecmp(vName, "cuberevo-3000hd", 14)))
 		{
 			vBoxType = Cuberevo;
 		}
