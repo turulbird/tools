@@ -408,9 +408,13 @@ int getModel()
 			vBoxType = Fortis;
 		else if (!strncasecmp(vName, "hs7110", 6))
 			vBoxType = Fortis;
+		else if (!strncasecmp(vName, "hs7420", 6))
+			vBoxType = Fortis;
 		else if (!strncasecmp(vName, "hs7810a", 7))
 			vBoxType = Fortis;
 		else if (!strncasecmp(vName, "hs7119", 6))
+			vBoxType = Fortis;
+		else if (!strncasecmp(vName, "hs7429", 6))
 			vBoxType = Fortis;
 		else if (!strncasecmp(vName, "hs7819", 6))
 			vBoxType = Fortis;

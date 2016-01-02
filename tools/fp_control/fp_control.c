@@ -49,7 +49,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* software version of fp_control. please increase on every change */
-static const char *sw_version = "1.06NdV 20151004.3";
+static const char *sw_version = "1.06NdV 20160101.1";
 
 typedef struct
 {
@@ -656,14 +656,19 @@ int getModel()
 			switch (getKathreinUfs910BoxType())
 			{
 				case 0:
+				{
 					vBoxType = Ufs910_1W;
 					break;
-				case 1:
+				}case 1:
+				{
 					vBoxType = Ufs910_14W;
 					break;
+				}
 				default:
+				{
 					vBoxType = Unknown;
 					break;
+				}
 			}
 		}
 		else if (!strncasecmp(vName, "ufs922", 6))
@@ -686,9 +691,13 @@ int getModel()
 			vBoxType = Fortis;
 		else if (!strncasecmp(vName, "hs7110", 6))
 			vBoxType = Fortis;
+		else if (!strncasecmp(vName, "hs7420", 6))
+			vBoxType = Fortis;
 		else if (!strncasecmp(vName, "hs7810a", 7))
 			vBoxType = Fortis;
 		else if (!strncasecmp(vName, "hs7119", 6))
+			vBoxType = Fortis;
+		else if (!strncasecmp(vName, "hs7429", 6))
 			vBoxType = Fortis;
 		else if (!strncasecmp(vName, "hs7819", 6))
 			vBoxType = Fortis;
@@ -710,17 +719,19 @@ int getModel()
 			vBoxType = Spark;
 		else if (!strncasecmp(vName, "adb_box", 7))
 			vBoxType = Adb_Box;
-		else if ((!strncasecmp(vName, "cuberevo", 8)) ||
-				 (!strncasecmp(vName, "cuberevo-mini", 13)) ||
-				 (!strncasecmp(vName, "cuberevo-mini2", 14)) ||
-				 (!strncasecmp(vName, "cuberevo-mini-fta", 17)) ||
-				 (!strncasecmp(vName, "cuberevo-250hd", 14)) ||
-				 (!strncasecmp(vName, "cuberevo-2000hd", 15)) ||
-				 (!strncasecmp(vName, "cuberevo-9500hd", 15)) ||
-				 (!strncasecmp(vName, "cuberevo-3000hd", 14)))
+		else if ((!strncasecmp(vName, "cuberevo", 8))
+		     || (!strncasecmp(vName, "cuberevo-mini", 13))
+		     || (!strncasecmp(vName, "cuberevo-mini2", 14))
+		     || (!strncasecmp(vName, "cuberevo-mini-fta", 17))
+		     || (!strncasecmp(vName, "cuberevo-250hd", 14))
+		     || (!strncasecmp(vName, "cuberevo-2000hd", 15))
+		     || (!strncasecmp(vName, "cuberevo-9500hd", 15))
+		     || (!strncasecmp(vName, "cuberevo-3000hd", 14)))
 			vBoxType = Cuberevo;
 		else
+		{
 			vBoxType = Unknown;
+		}
 		if (disp)
 		{
 			printf("Receiver: %s\n\n", vName);

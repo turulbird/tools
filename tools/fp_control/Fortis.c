@@ -53,7 +53,6 @@ static int setIcon(Context_t *context, int which, int on);
 #define cVFD_DEVICE "/dev/vfd"
 #define cEVENT_DEVICE "/dev/input/event0"
 
-//FIXME: not true for most Fortis boxes!
 #define cMAXCharsFortis 12
 #define VFDGETWAKEUPTIME        0xc0425b03 // added by audioniek
 
