@@ -326,14 +326,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	}
 	return 0;
 }
-#if 0
-static int getWTime(Context_t *context, time_t *theGMTTime)
-{
-	// -gt command to check
-	fprintf(stderr, "%s: not implemented\n", __func__);
-	return -1;
-}
-#else
+
 static int getWTime(Context_t *context, time_t *theGMTTime)
 {
 	//-gt command: VFDGETWAKEUPTIME not supported by older nuvotons
@@ -361,7 +354,6 @@ static int getWTime(Context_t *context, time_t *theGMTTime)
 	}
 	return 1;
 }
-#endif
 
 static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 {
@@ -490,18 +482,37 @@ static int setLed(Context_t *context, int which, int level)
 {
 	// -l command, OK
 	struct nuvoton_ioctl_data vData;
-	if (which < 0 || which > 7)
-	{
-		printf("Illegal LED number %d (valid is 0..7)\n", which);
-		return 0;
-	}
 
 	if (level < 0 || level > 31)
 	{
 		printf("Illegal brightness level %d (valid is 0..31)\n", level);
 		return 0;
 	}
-	vData.u.led.led_nr = 1 << which; //LED# is bitwise in Fortis
+
+	if (which < 8)
+	{
+		if (which < 0)
+		{
+			printf("Illegal LED number %d (valid is 0..7)\n", which);
+			return 0;
+		}
+		else
+		{
+			vData.u.led.led_nr = 1 << which; //LED# is bitwise in Fortis
+		}
+	}
+	else // allow more than one led to be set at once
+	{
+		vData.u.led.led_nr = which;
+	}
+
+//	if (which < 0 || which > 7)
+//	{
+//		printf("Illegal LED number %d (valid is 0..7)\n", which);
+//		return 0;
+//	}
+
+//	vData.u.led.led_nr = 1 << which; //LED# is bitwise in Fortis
 	vData.u.led.on = level;
 	setMode(context->fd);
 	if (ioctl(context->fd, VFDSETLED, &vData) < 0)
@@ -509,6 +520,7 @@ static int setLed(Context_t *context, int which, int level)
 		perror("SetLED");
 		return -1;
 	}
+	usleep(100000); //allow frontprocessor to keep up
 	return 0;
 }
 
