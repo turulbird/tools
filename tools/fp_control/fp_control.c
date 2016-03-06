@@ -49,7 +49,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* software version of fp_control. please increase on every change */
-static const char *sw_version = "1.06NdV 20160116.1";
+static const char *sw_version = "1.07NdV 20160306.1";
 
 typedef struct
 {
@@ -133,6 +133,7 @@ int usage(Context_t *context, char *prg, char *cmd)
 void getTimeFromArg(char *timeStr, char *dateStr, time_t *theGMTTime)
 {
 	struct tm  theTime;
+
 //	printf("%s\n", __func__);
 	sscanf(timeStr, "%d:%d:%d", &theTime.tm_hour, &theTime.tm_min, &theTime.tm_sec);
 	sscanf(dateStr, "%d-%d-%d", &theTime.tm_mday, &theTime.tm_mon, &theTime.tm_year);
@@ -645,9 +646,11 @@ int getModel()
 	char        vName[129]      = "Unknown";
 	int         vLen            = -1;
 	eBoxType    vBoxType        = Unknown;
+
 	vFd = open("/proc/stb/info/model", O_RDONLY);
 	vLen = read(vFd, vName, cSize);
 	close(vFd);
+
 	if (vLen > 0)
 	{
 		vName[vLen - 1] = '\0';

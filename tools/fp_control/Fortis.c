@@ -117,6 +117,7 @@ typedef struct
 static void setMode(int fd)
 {
 	struct nuvoton_ioctl_data nuvoton;
+
 	nuvoton.u.mode.compat = 1;
 	if (ioctl(fd, VFDSETMODE, &nuvoton) < 0)
 	{
@@ -131,6 +132,7 @@ unsigned long calcGetNuvotonTime(char *nuvotonTimeString)
 	unsigned int    hour    = nuvotonTimeString[2] & 0xFF;
 	unsigned int    min     = nuvotonTimeString[3] & 0xFF;
 	unsigned int    sec     = nuvotonTimeString[4] & 0xFF;
+
 	epoch += (hour * 3600 + min * 60 + sec);
 //	printf("MJD = %d epoch = %ld, time = %02d:%02d:%02d\n", mjd, epoch, hour, min, sec);
 	return epoch;
@@ -144,6 +146,7 @@ unsigned long calcGetNuvotonTime(char *nuvotonTimeString)
 void calcSetNuvotonTime(time_t theTime, char *destString)
 {
 	struct tm *now_tm;
+
 	now_tm = gmtime(&theTime);
 //	printf("Input time to set: %02d:%02d:%02d %02d-%02d-%04d\n", now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec, now_tm->tm_mday, now_tm->tm_mon+1, now_tm->tm_year+1900);
 	double mjd = modJulianDate(now_tm);
@@ -177,6 +180,7 @@ static int init(Context_t *context)
 static int usage(Context_t *context, char *prg_name, char *cmd_name)
 {
 	int i;
+
 	fprintf(stderr, "Usage:\n\n");
 	fprintf(stderr, "%s argument [optarg1] [optarg2]\n", prg_name);
 	for (i = 0; ; i++)
@@ -197,6 +201,7 @@ static int setTime(Context_t *context, time_t *theGMTTime)
 {
 	// -s command, OK
 	struct nuvoton_ioctl_data vData;
+
 	calcSetNuvotonTime(*theGMTTime, vData.u.time.time);
 	if (ioctl(context->fd, VFDSETTIME, &vData) < 0)
 	{
@@ -213,10 +218,14 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 	char fp_time[8];
 	time_t curTimeFP;
 	struct tm *ts;
+	struct nuvoton_ioctl_data vData;
+
 	time(&curTime);  //get system time (UTC)
 	ts = localtime(&curTime);  // get local time
 	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
 	setTime(context, &curTime);
+
+	/* Read fp time back */
 	if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
 	{
 		perror("Gettime");
@@ -232,6 +241,7 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 {
 	// -g command, OK
 	char fp_time[8];
+
 	if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
 	{
 		perror("Get time");
@@ -259,6 +269,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	time_t wakeupTime;
 	struct tm *ts;
 	struct tm *tsw;
+
 	time(&curTime);
 	ts = localtime(&curTime);
 	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
@@ -303,11 +314,11 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 			if (((curTimeFP - curTime) > 3600) || ((curTime - curTimeFP) > 3600))
 			{
 				printf("Time difference between fp and system: %d seconds\n", (int)(curTimeFP - curTime));
-//				setTime(context, &curTime);
-//				curTimeFP = curTime;
+				setTime(context, &curTime);
+				curTimeFP = curTime;
 			}
-//			tsw = localtime (&curTimeFP);
-//			printf("Front panel time correction, set to: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min, tsw->tm_sec, tsw->tm_mday, tsw->tm_mon+1, tsw->tm_year+1900);
+			tsw = localtime(&curTimeFP);
+			printf("Front panel time correction, set to: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min, tsw->tm_sec, tsw->tm_mday, tsw->tm_mon+1, tsw->tm_year+1900);
 		}
 		else
 		{
@@ -332,6 +343,7 @@ static int getWTime(Context_t *context, time_t *theGMTTime)
 	//-gt command: VFDGETWAKEUPTIME not supported by older nuvotons
 	struct tm *get_tm;
 	time_t iTime;
+
 	/* front controller wake up time */
 	if (ioctl(context->fd, VFDGETWAKEUPTIME, &iTime) < 0)
 	{
@@ -359,6 +371,7 @@ static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 {
 	// -d command to check
 	time_t curTime;
+
 	/* shutdown immediate */
 	if (*shutdownTimeGMT == -1)
 	{
@@ -382,6 +395,7 @@ static int reboot(Context_t *context, time_t *rebootTimeGMT)
 	//-r command to check
 	time_t curTime;
 	struct nuvoton_ioctl_data vData;
+
 	while (1)
 	{
 		time(&curTime);
@@ -410,6 +424,7 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 	struct tm *ts;
 	char output[cMAXCharsFortis + 1];
 	struct input_event ev[64];
+
 	tFortisPrivate *private = (tFortisPrivate *)((Model_t *)context->m)->private;
 	vFd = open(cEVENT_DEVICE, O_RDWR);
 	if (vFd < 0)
@@ -471,6 +486,7 @@ static int setText(Context_t *context, char *theText)
 {
 	// -t command to check
 	char vHelp[128];
+
 	strncpy(vHelp, theText, cMAXCharsFortis);
 	vHelp[cMAXCharsFortis] = '\0';
 	write(context->fd, vHelp, strlen(vHelp));
@@ -528,6 +544,7 @@ static int setIcon(Context_t *context, int which, int on)
 {
 	// -i command, OK
 	struct nuvoton_ioctl_data vData;
+
 	vData.u.icon.icon_nr = which;
 	vData.u.icon.on = on;
 	setMode(context->fd);
@@ -543,6 +560,7 @@ static int setBrightness(Context_t *context, int brightness)
 {
 	//-b command, OK
 	struct nuvoton_ioctl_data vData;
+
 	if (brightness < 0 || brightness > 7)
 	{
 		printf("Illegal brightness level %d (valid is 0..7)\n", brightness);
@@ -563,6 +581,7 @@ static int Clear(Context_t *context)
 	// -c command, OK
 	int i;
 	int led_nr;
+
 	setText(context, "            ");  //show no text
 	led_nr = 1;
 	for (i = 0; i <= 7; i++)
@@ -580,6 +599,7 @@ static int setLight(Context_t *context, int on)
 {
 	// -L command, OK
 	struct nuvoton_ioctl_data vData;
+
 	vData.u.light.onoff = on;
 //	setMode(context->fd);
 	if (ioctl(context->fd, VFDDISPLAYWRITEONOFF, &vData) < 0)
@@ -594,6 +614,7 @@ static int setTimeMode(Context_t *context, int timemode)
 {
 	// -tm command, OK
 	struct nuvoton_ioctl_data vData;
+
 	vData.u.timemode.timemode = timemode;
 //	setMode(context->fd);
 	if (ioctl(context->fd, VFDSETTIMEFORMAT, &vData) < 0)
@@ -608,6 +629,7 @@ static int getWakeupReason(Context_t *context, int *reason)
 {
 	//-w command, OK
 	int mode = 0;
+
 	if (ioctl(context->fd, VFDGETWAKEUPMODE, mode) < 0)
 	{
 		perror("Get wakeup reason");
@@ -630,6 +652,7 @@ static int modelSpecific(Context_t *context, int len, int *testdata)
 	//-ms command
 	int i, res;
 	int vData[18];
+
 	vData[1] = len;
 	printf("nuvoton ioctl: VFDTEST (0x%08x) SOP, CMD=", VFDTEST);
 	for (i = 1; i <= len; i++)
