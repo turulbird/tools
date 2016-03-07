@@ -292,7 +292,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		wakeupTime == LONG_MAX; //Set wake up time to max. in the future
 		printf("Setting wake up Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min, tsw->tm_sec,
 			tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
-		setNuvotonTime(wakeupTime, vData.u.standby.time);
+		calcSetNuvotonTime(wakeupTime, vData.u.standby.time);
 		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
 		{
 			perror("Shut down");
