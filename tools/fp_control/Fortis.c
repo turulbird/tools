@@ -272,8 +272,9 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 
 	time(&curTime);
 	ts = localtime(&curTime);
-	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
-	if (theGMTTime == NULL) // -e no argument = shutdown on next e2/neutrino timer
+	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts->tm_hour, ts->tm_min, ts->tm_sec,
+		ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
+	if (theGMTTime == NULL) // -e no argument = shutdown until next e2/neutrino timer
 	{
 		wakeupTime = read_timers_utc(curTime); //get current 1st timer
 	}
@@ -281,16 +282,20 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	{
 		wakeupTime = *theGMTTime; //get specified time
 	}
-	//check --> wakeupTime is set and larger than curTime and no larger than a year in the future (gost)
+	//check --> wakeupTime is set and larger than curTime and no larger than 300 days in the future (gost)
 	//check --> there is no timer set
 	if ((wakeupTime <= 0) || ((wakeupTime == LONG_MAX)) || (curTime > wakeupTime) || (curTime < (wakeupTime - 25920000)))
 	{
 		/* shut down immedately */
-		fprintf(stderr, "There are no timers set or\nwake up time in the past;\nshutting down now.\n");
-		vData.u.standby.time[0] = '\0';
+		fprintf(stderr, "No timers set, wake up time in the past, or more than 300 days ahead.\n");
+//		vData.u.standby.time[0] = '\0'; //Set wake up time in the past
+		wakeupTime == LONG_MAX; //Set wake up time to max. in the future
+		printf("Setting wake up Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min, tsw->tm_sec,
+			tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
+		setNuvotonTime(wakeupTime, vData.u.standby.time);
 		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
 		{
-			perror("Standby");
+			perror("Shut down");
 			return -1;
 		}
 	}
@@ -299,13 +304,14 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		unsigned long diff;
 		char fp_time[8];
 		tsw = localtime(&wakeupTime);
-		printf("Wakeup Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min, tsw->tm_sec, tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
+		printf("Wake up Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min, tsw->tm_sec,
+			tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
 		if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
 		{
 			perror("Gettime");
 			return -1;
 		}
-		/* difference from now (local system time) to wake up */
+		/* difference between system time and wake up time */
 		diff = (unsigned long int) wakeupTime - curTime;
 		if (fp_time[0] != '\0')
 		{
@@ -314,11 +320,12 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 			if (((curTimeFP - curTime) > 3600) || ((curTime - curTimeFP) > 3600))
 			{
 				printf("Time difference between fp and system: %d seconds\n", (int)(curTimeFP - curTime));
-				setTime(context, &curTime);
+				setTime(context, &curTime); //sync fp clock
 				curTimeFP = curTime;
+				tsw = localtime(&curTimeFP);
+				printf("Front panel time corrected, set to: %02d:%02d:%02d %02d-%02d-%04d (local)\n",
+					tsw->tm_hour, tsw->tm_min, tsw->tm_sec, tsw->tm_mday, tsw->tm_mon+1, tsw->tm_year + 1900);
 			}
-			tsw = localtime(&curTimeFP);
-			printf("Front panel time correction, set to: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min, tsw->tm_sec, tsw->tm_mday, tsw->tm_mon+1, tsw->tm_year+1900);
 		}
 		else
 		{
@@ -327,7 +334,8 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		}
 		wakeupTime = curTimeFP + diff;
 		tsw = localtime(&wakeupTime);
-		printf("Calculated wakeup Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min, tsw->tm_sec, tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
+		printf("Calculated wake up Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min,
+			tsw->tm_sec, tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
 		calcSetNuvotonTime(wakeupTime, vData.u.standby.time);
 		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
 		{
