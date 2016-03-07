@@ -218,7 +218,7 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 	char fp_time[8];
 	time_t curTimeFP;
 	struct tm *ts;
-	struct nuvoton_ioctl_data vData;
+//	struct nuvoton_ioctl_data vData;
 
 	time(&curTime);  //get system time (UTC)
 	ts = localtime(&curTime);  // get local time
@@ -289,15 +289,16 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		/* shut down immedately */
 		fprintf(stderr, "No timers set, wake up time in the past, or more than 300 days ahead.\n");
 //		vData.u.standby.time[0] = '\0'; //Set wake up time in the past
-		wakeupTime == LONG_MAX; //Set wake up time to max. in the future
+		wakeupTime = LONG_MAX; //Set wake up time to max. in the future
+		tsw = localtime(&wakeupTime);
 		printf("Setting wake up Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min, tsw->tm_sec,
 			tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
-		calcSetNuvotonTime(wakeupTime, vData.u.standby.time);
-		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
-		{
-			perror("Shut down");
-			return -1;
-		}
+//		calcSetNuvotonTime(wakeupTime, vData.u.standby.time);
+//		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
+//		{
+//			perror("Shut down");
+//			return -1;
+//		}
 	}
 	else //wake up time valid and in the future
 	{
@@ -336,12 +337,12 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		tsw = localtime(&wakeupTime);
 		printf("Calculated wake up Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min,
 			tsw->tm_sec, tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
-		calcSetNuvotonTime(wakeupTime, vData.u.standby.time);
-		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
-		{
-			perror("Shut down until wake up time");
-			return -1;
-		}
+	}
+	calcSetNuvotonTime(wakeupTime, vData.u.standby.time);
+	if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
+	{
+		perror("Shut down until wake up time");
+		return -1;
 	}
 	return 0;
 }
@@ -364,7 +365,8 @@ static int getWTime(Context_t *context, time_t *theGMTTime)
 		/* current frontcontroller wake up time */
 		*theGMTTime = iTime;
 		get_tm = gmtime(&iTime);
-		printf("Frontprocessor wakeup time: %02d:%02d:%02d %02d-%02d-%04d\n", get_tm->tm_hour, get_tm->tm_min, get_tm->tm_sec, get_tm->tm_mday, get_tm->tm_mon + 1, get_tm->tm_year + 1900);
+		printf("Frontprocessor wakeup time: %02d:%02d:%02d %02d-%02d-%04d\n", get_tm->tm_hour, get_tm->tm_min,
+			get_tm->tm_sec, get_tm->tm_mday, get_tm->tm_mon + 1, get_tm->tm_year + 1900);
 	}
 	else
 	{
