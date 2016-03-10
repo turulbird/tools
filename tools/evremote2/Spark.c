@@ -344,6 +344,7 @@ static tButton cButtonsSparkDefault[] =
 	{"F1"             , "95", KEY_F1},
 	{"F2"             , "15", KEY_F2},
 	{"F3"             , "D7", KEY_F3},
+	{"PORTAL"         , "25", KEY_OPEN},
 	{""               , ""  , KEY_NULL},
 };
 
