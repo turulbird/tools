@@ -148,7 +148,8 @@ void calcSetNuvotonTime(time_t theTime, char *destString)
 	struct tm *now_tm;
 
 	now_tm = gmtime(&theTime);
-//	printf("Input time to set: %02d:%02d:%02d %02d-%02d-%04d\n", now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec, now_tm->tm_mday, now_tm->tm_mon+1, now_tm->tm_year+1900);
+//	printf("Input time to set: %02d:%02d:%02d %02d-%02d-%04d\n", now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec,
+//		 now_tm->tm_mday, now_tm->tm_mon+1, now_tm->tm_year+1900);
 	double mjd = modJulianDate(now_tm);
 	int mjd_int = mjd;
 	destString[0] = (mjd_int >> 8);
@@ -222,7 +223,8 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 
 	time(&curTime);  //get system time (UTC)
 	ts = localtime(&curTime);  // get local time
-	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
+	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts->tm_hour, ts->tm_min, ts->tm_sec,
+		ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
 	setTime(context, &curTime);
 
 	/* Read fp time back */
@@ -233,7 +235,8 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 	}
 	curTimeFP = (time_t) calcGetNuvotonTime(fp_time);
 	ts = localtime(&curTimeFP);
-	printf("Front panel time set to: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
+	printf("Front panel time set to: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts->tm_hour, ts->tm_min, ts->tm_sec,
+		ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
 	return 0;
 }
 
@@ -287,40 +290,35 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	if ((wakeupTime <= 0) || ((wakeupTime == LONG_MAX)) || (curTime > wakeupTime) || (curTime < (wakeupTime - 25920000)))
 	{
 		/* shut down immedately */
-		fprintf(stderr, "No timers set, wake up time in the past, or more than 300 days ahead.\n");
+		fprintf(stderr, "No timers set or timer more than 300 days ahead, or wake up time in the past.\n");
 //		vData.u.standby.time[0] = '\0'; //Set wake up time in the past
 		wakeupTime = LONG_MAX; //Set wake up time to max. in the future
-		tsw = localtime(&wakeupTime);
-		printf("Setting wake up Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min, tsw->tm_sec,
-			tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
-//		calcSetNuvotonTime(wakeupTime, vData.u.standby.time);
-//		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
-//		{
-//			perror("Shut down");
-//			return -1;
-//		}
 	}
-	else //wake up time valid and in the future
+	else //wake up time valid and in the coming 300 days
 	{
 		unsigned long diff;
 		char fp_time[8];
-		tsw = localtime(&wakeupTime);
-		printf("Wake up Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min, tsw->tm_sec,
-			tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
+
+//		tsw = localtime(&wakeupTime);
+//		printf("Wake up Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min, tsw->tm_sec,
+//			tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
+
+		/* Determine difference between system time and wake up time */
+		diff = (unsigned long int) wakeupTime - curTime;
+
+		/* Check if front panel clock is set prpoperly */
 		if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
 		{
 			perror("Gettime");
 			return -1;
 		}
-		/* difference between system time and wake up time */
-		diff = (unsigned long int) wakeupTime - curTime;
 		if (fp_time[0] != '\0')
 		{
 			curTimeFP = (time_t) calcGetNuvotonTime(fp_time);
-			/* set FP-Time if curTime > or < 1h (gost)*/
+			/* set FP-Time if system time of more than 1 hour off */
 			if (((curTimeFP - curTime) > 3600) || ((curTime - curTimeFP) > 3600))
 			{
-				printf("Time difference between fp and system: %d seconds\n", (int)(curTimeFP - curTime));
+				printf("Time difference between fp and system: %d seconds.\n", (int)(curTimeFP - curTime));
 				setTime(context, &curTime); //sync fp clock
 				curTimeFP = curTime;
 				tsw = localtime(&curTimeFP);
@@ -330,18 +328,18 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		}
 		else
 		{
-			fprintf(stderr, "Error reading front panel time; ...assuming system time\n");
-			/* noop system time already set */
+			fprintf(stderr, "Error reading front panel time; ...assuming system time.\n");
+			curTimeFP = curTime;
 		}
 		wakeupTime = curTimeFP + diff;
-		tsw = localtime(&wakeupTime);
-		printf("Calculated wake up Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min,
-			tsw->tm_sec, tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
 	}
+	tsw = localtime(&wakeupTime);
+	printf("Wake up Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min,
+		tsw->tm_sec, tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
 	calcSetNuvotonTime(wakeupTime, vData.u.standby.time);
 	if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
 	{
-		perror("Shut down until wake up time");
+		perror("Shut down");
 		return -1;
 	}
 	return 0;
@@ -532,13 +530,6 @@ static int setLed(Context_t *context, int which, int level)
 		vData.u.led.led_nr = which;
 	}
 
-//	if (which < 0 || which > 7)
-//	{
-//		printf("Illegal LED number %d (valid is 0..7)\n", which);
-//		return 0;
-//	}
-
-//	vData.u.led.led_nr = 1 << which; //LED# is bitwise in Fortis
 	vData.u.led.on = level;
 	setMode(context->fd);
 	if (ioctl(context->fd, VFDSETLED, &vData) < 0)

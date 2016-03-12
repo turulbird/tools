@@ -287,7 +287,7 @@ static tButton cButtonsSparkRc12[] =
 	{""               , ""  , KEY_NULL},
 };
 
-/* spark Default */
+/* spark Default (HOF-12D with portal key) */
 static tButton cButtonsSparkDefault[] =
 {
 	{"POWER"          , "87", KEY_POWER},
@@ -348,7 +348,6 @@ static tButton cButtonsSparkDefault[] =
 	{""               , ""  , KEY_NULL},
 };
 
-/* spark Default */
 static tButton cButtonsSparkRc04[] =
 {
 	{"POWER"          , "45", KEY_POWER},
@@ -464,7 +463,6 @@ static tButton cButtonsGalaxy[] =
 	{""               , ""  , KEY_NULL},
 };
 
-/* spark Default */
 static tButton cButtonsSparkEdv[] =
 {
 	{"POWER"          , "87", KEY_POWER},
@@ -536,7 +534,7 @@ static struct sockaddr_un  vAddr;
 static tButton *pSparkGetButton(char *pData)
 
 {
-	tButton	*pButtons = cButtonsEdisionSpark;
+	tButton	*pButtons = cButtonsSparkDefault;
 
 	if (!strncasecmp(pData, SPARK_RC05_PREDATA, sizeof(SPARK_RC05_PREDATA)))
 	{
@@ -718,7 +716,8 @@ RemoteControl_t Spark_RC =
 	&pShutdown,
 	&pRead,
 	&pNotification,
-	cButtonsEdisionSpark,
+//	cButtonsEdisionSpark,
+	cButtonsSparkDefault,
 	NULL,
 	NULL,
 	1,

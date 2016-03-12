@@ -49,7 +49,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* software version of fp_control. please increase on every change */
-static const char *sw_version = "1.07NdV 20160307.1";
+static const char *sw_version = "1.07NdV 20160311.1";
 
 typedef struct
 {
@@ -611,6 +611,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			}
 			else
 			{
+				printf("\nUnknown option [ %s ]\n", argv[i]);
 				usage(context, argv[0], NULL);
 			}
 			i++;

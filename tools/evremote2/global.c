@@ -109,7 +109,7 @@ int getInternalCodeLircKeyName(tButton *cButtons, const char cCode[30])
 }
 
 int printKeyMap(tButton *cButtons)
-{
+{ //TODO: always prints the first keymap found
 	int vLoop = 0;
 
 	for (vLoop = 0; cButtons[vLoop].KeyCode != KEY_NULL; vLoop++)

@@ -223,6 +223,7 @@ static tButton cButtons_LircdName[] =
 	{"KEY_PLAYPAUSE"    , "=>"  , KEY_PLAYPAUSE},
 	{"KEY_EXIT"         , "=>", KEY_EXIT},
 	{"KEY_SLEEP"        , "=>", KEY_SLEEP},
+	{"KEY_OPEN"         , "=>", KEY_OPEN},
 	{""                 , ""  , KEY_NULL},
 };
 /* fixme: move this to a structure and
