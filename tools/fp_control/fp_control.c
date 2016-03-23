@@ -49,7 +49,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* software version of fp_control. please increase on every change */
-static const char *sw_version = "1.07NdV 20160311.1";
+static const char *sw_version = "1.07NdV 20160323.1";
 
 typedef struct
 {
@@ -104,7 +104,8 @@ tArgs vArgs[] =
 int usage(Context_t *context, char *prg, char *cmd)
 {
 	/* let the model print out what it can handle in reality */
-	if ((((Model_t *)context->m)->Usage == NULL) || (((Model_t *)context->m)->Usage(context, prg, cmd) < 0))
+	if ((((Model_t *)context->m)->Usage == NULL)
+	|| (((Model_t *)context->m)->Usage(context, prg, cmd) < 0))
 	{
 		int i;
 		/* or printout a default usage */
@@ -113,9 +114,13 @@ int usage(Context_t *context, char *prg, char *cmd)
 		for (i = 0; ; i++)
 		{
 			if (vArgs[i].arg == NULL)
+			{
 				break;
+			}
 			if ((cmd == NULL) || (strcmp(cmd, vArgs[i].arg) == 0) || (strstr(vArgs[i].arg_long, cmd) != NULL))
+			{
 				fprintf(stderr, "%s   %s   %s\n", vArgs[i].arg, vArgs[i].arg_long, vArgs[i].arg_description);
+			}
 		}
 	}
 	if (((Model_t *)context->m)->Exit)
@@ -128,25 +133,18 @@ int usage(Context_t *context, char *prg, char *cmd)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/* FIXME: check if this function is correct and delivers gmt time */
-/* Audioniek: it is correct but delivers the time put in, not UTC or GMT */
 void getTimeFromArg(char *timeStr, char *dateStr, time_t *theGMTTime)
 {
-	struct tm  theTime;
+	struct tm theTime;
 
-//	printf("%s\n", __func__);
 	sscanf(timeStr, "%d:%d:%d", &theTime.tm_hour, &theTime.tm_min, &theTime.tm_sec);
 	sscanf(dateStr, "%d-%d-%d", &theTime.tm_mday, &theTime.tm_mon, &theTime.tm_year);
 	theTime.tm_year -= 1900;
 	theTime.tm_mon   = theTime.tm_mon - 1;
 	theTime.tm_isdst = -1; /* say mktime that we do not know */
 	/* FIXME: hmm this is not a gmt or, isn't it? */
-	/* Audioniek: why does this need fixing? The user will probably
-	   supply localtime anyway. On a spark7162 local time is used
-	   internally. */
 	*theGMTTime = mktime(&theTime);
 	/* new_time = localtime(&dummy);*/
-//	printf("%s <\n", __func__);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,11 +184,14 @@ void processCommand(Context_t *context, int argc, char *argv[])
 					if (((Model_t *)context->m)->SetTimer)((Model_t *)context->m)->SetTimer(context, NULL);
 				}
 				else
+				{
 					usage(context, argv[0], argv[1]);
+				}
 			}
 			else if ((strcmp(argv[i], "-g") == 0) || (strcmp(argv[i], "--getTime") == 0))
 			{
 				time_t theGMTTime;  //TODO: print time according to receiver mask
+
 				/* get the frontcontroller time */
 				if (((Model_t *)context->m)->GetTime)
 				{
@@ -206,13 +207,14 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-gs") == 0) || (strcmp(argv[i], "--getTimeAndSet") == 0))
 			{
 				time_t theGMTTime;
+
 				/* get the frontcontroller time */
 				if (((Model_t *)context->m)->GetTime)
 				{
 					if (((Model_t *)context->m)->GetTime(context, &theGMTTime) == 0)
 					{
 						struct tm *gmt = gmtime(&theGMTTime);
-						fprintf(stderr, "Setting RTC to current frontpanel time: %02d:%02d:%02d %02d-%02d-%04d\n",
+						printf("Setting system time to current frontpanel time: %02d:%02d:%02d %02d-%02d-%04d\n",
 								gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon + 1, gmt->tm_year + 1900);
 						char cmd[50];
 						sprintf(cmd, "date -s %04d.%02d.%02d-%02d:%02d:%02d\n", gmt->tm_year + 1900, gmt->tm_mon + 1, gmt->tm_mday, gmt->tm_hour, gmt->tm_min, gmt->tm_sec);
@@ -223,6 +225,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-gt") == 0) || (strcmp(argv[i], "--getWakeTime") == 0))
 			{
 				time_t theGMTTime;
+
 				/* get the current wake up time from frontcontroller */
 				if (((Model_t *)context->m)->GetWTime)
 				{
@@ -252,14 +255,15 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			}
 			else if ((strcmp(argv[i], "-s") == 0) || (strcmp(argv[i], "--setTime") == 0))
 			{
-				time_t theGMTTime;
+				time_t theLocalTime;
+
 				if (argc == 4)
 				{
-					getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
+					getTimeFromArg(argv[i + 1], argv[i + 2], &theLocalTime);
 					/* set the frontcontroller time */
 					if (((Model_t *)context->m)->SetTime)
 					{
-						((Model_t *)context->m)->SetTime(context, &theGMTTime);
+						((Model_t *)context->m)->SetTime(context, &theLocalTime);
 					}
 					else
 					{
@@ -271,6 +275,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-sst") == 0) || (strcmp(argv[i], "--setSystemTime") == 0))
 			{
 				time_t theGMTTime;
+
 				/* set the frontcontroller time to system time */
 				if (((Model_t *)context->m)->SetSTime)
 				{
@@ -279,14 +284,15 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			}
 			else if ((strcmp(argv[i], "-st") == 0) || (strcmp(argv[i], "--setWakeTime") == 0))
 			{
-				time_t theGMTTime;
+				time_t theLocalTime;
+
 				if (argc == 4)
 				{
-					getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
+					getTimeFromArg(argv[i + 1], argv[i + 2], &theLocalTime);
 					/* set the frontcontroller wake up time */
 					if (((Model_t *)context->m)->SetWTime)
 					{
-						((Model_t *)context->m)->SetWTime(context, &theGMTTime);
+						((Model_t *)context->m)->SetWTime(context, &theLocalTime);
 					}
 					else
 					{
@@ -298,6 +304,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-d") == 0) || (strcmp(argv[i], "--shutDown") == 0))
 			{
 				time_t theGMTTime;
+
 				if (argc == 4)
 				{
 					getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
@@ -325,6 +332,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-r") == 0) || (strcmp(argv[i], "--reboot") == 0))
 			{
 				time_t theGMTTime;
+
 				if (argc == 4)
 				{
 					getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
@@ -353,6 +361,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-p") == 0) || (strcmp(argv[i], "--sleep") == 0))
 			{
 				time_t theGMTTime;
+
 				if (argc == 4)
 				{
 					getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
@@ -387,6 +396,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				if (i + 2 <= argc)
 				{
 					int which, on;
+
 					which = atoi(argv[i + 1]);
 					on = atoi(argv[i + 2]);
 					/* set display led */
@@ -406,6 +416,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				if (i + 2 <= argc)
 				{
 					int which, on;
+
 					which = atoi(argv[i + 1]);
 					on = atoi(argv[i + 2]);
 					/* set display icon */
@@ -421,6 +432,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				if (i + 1 <= argc)
 				{
 					int brightness;
+
 					brightness = atoi(argv[i + 1]);
 					/* set display brightness */
 					if (((Model_t *)context->m)->SetBrightness)
@@ -434,6 +446,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			{
 				int ret = -1;
 				int reason;
+
 				if (((Model_t *)context->m)->GetWakeupReason)
 				{
 					ret = ((Model_t *)context->m)->GetWakeupReason(context, &reason);
@@ -454,6 +467,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				{
 					int on = 1; // default is on
 					on = atoi(argv[i + 1]);
+
 					if (((Model_t *)context->m)->SetLight)
 					{
 						((Model_t *)context->m)->SetLight(context, on);
@@ -475,6 +489,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				{
 					/* set LED brightness */
 					int brightness;
+
 					brightness = atoi(argv[i + 1]);
 					if (((Model_t *)context->m)->SetLedBrightness)
 					{
@@ -519,6 +534,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				{
 					int on;
 					on = atoi(argv[i + 1]);
+
 					/* set fan on/off */
 					if (((Model_t *)context->m)->SetFan)
 					{
@@ -533,6 +549,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				{
 					int on;
 					on = atoi(argv[i + 1]);
+
 					/* set rf on/off */
 					if (((Model_t *)context->m)->SetRF)
 					{
@@ -547,7 +564,8 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				{
 					int on;
 					on = atoi(argv[i + 1]);
-					/* set display time */
+
+					/* set time display */
 					if (((Model_t *)context->m)->SetDisplayTime)
 					{
 						((Model_t *)context->m)->SetDisplayTime(context, on);
@@ -561,6 +579,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				{
 					int twentyFour;
 					twentyFour = atoi(argv[i + 1]);
+
 					/* set 12/24 hour mode */
 					if (((Model_t *)context->m)->SetTimeMode)
 					{
@@ -574,6 +593,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				int len, j;
 				int testdata[17];
 //				int return_size;
+
 				len = argc - 2;
 				if ((len > 0) && (len <= 16))
 				{
@@ -663,7 +683,8 @@ int getModel()
 				{
 					vBoxType = Ufs910_1W;
 					break;
-				}case 1:
+				}
+				case 1:
 				{
 					vBoxType = Ufs910_14W;
 					break;
@@ -679,6 +700,10 @@ int getModel()
 			vBoxType = Ufs922;
 		else if (!strncasecmp(vName, "ufc960", 6))
 			vBoxType = Ufc960;
+		else if (!strncasecmp(vName, "ufs912", 6))
+			vBoxType = Ufs912;
+		else if (!strncasecmp(vName, "ufs913", 6))
+			vBoxType = Ufs912;
 		else if (!strncasecmp(vName, "tf7700hdpvr", 11))
 			vBoxType = Tf7700;
 		else if (!strncasecmp(vName, "hl101", 5))
@@ -687,51 +712,47 @@ int getModel()
 			vBoxType = Vip2;
 		else if (!strncasecmp(vName, "vip2-v1", 7))
 			vBoxType = Vip2;
-		else if (!strncasecmp(vName, "hdbox", 5))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "octagon1008", 11))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "atevio7500", 10))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "hs7110", 6))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "hs7420", 6))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "hs7810a", 7))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "hs7119", 6))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "hs7429", 6))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "hs7819", 6))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "atemio520", 9))
-			vBoxType = CNBox;
-		else if (!strncasecmp(vName, "atemio530", 9))
-			vBoxType = CNBox;
+		else
+			if ((!strncasecmp(vName, "hdbox", 5))
+			|| (!strncasecmp(vName, "octagon1008", 11))
+			|| (!strncasecmp(vName, "atevio7500", 10))
+			|| (!strncasecmp(vName, "hs7110", 6))
+			|| (!strncasecmp(vName, "hs7420", 6))
+			|| (!strncasecmp(vName, "hs7810a", 7))
+			|| (!strncasecmp(vName, "hs7119", 6))
+			|| (!strncasecmp(vName, "hs7429", 6))
+			|| (!strncasecmp(vName, "hs7819", 6)))
+			{
+				vBoxType = Fortis;
+			}
+		else
+			if ((!strncasecmp(vName, "atemio520", 9))
+			|| (!strncasecmp(vName, "atemio530", 9)))
+			{
+				vBoxType = CNBox;
+			}
 		else if (!strncasecmp(vName, "hs5101", 6))
 			vBoxType = Hs5101;
-		else if (!strncasecmp(vName, "octagon1008", 11))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "ufs912", 6))
-			vBoxType = Ufs912;
-		else if (!strncasecmp(vName, "ufs913", 6))
-			vBoxType = Ufs912;
-		else if (!strncasecmp(vName, "spark", 5))
-			vBoxType = Spark;
-		else if (!strncasecmp(vName, "spark7162", 9))
-			vBoxType = Spark;
+		else
+			if ((!strncasecmp(vName, "spark", 5))
+			|| (!strncasecmp(vName, "spark7162", 9)))
+			{
+				vBoxType = Spark;
+			}
 		else if (!strncasecmp(vName, "adb_box", 7))
 			vBoxType = Adb_Box;
-		else if ((!strncasecmp(vName, "cuberevo", 8))
-		     || (!strncasecmp(vName, "cuberevo-mini", 13))
-		     || (!strncasecmp(vName, "cuberevo-mini2", 14))
-		     || (!strncasecmp(vName, "cuberevo-mini-fta", 17))
-		     || (!strncasecmp(vName, "cuberevo-250hd", 14))
-		     || (!strncasecmp(vName, "cuberevo-2000hd", 15))
-		     || (!strncasecmp(vName, "cuberevo-9500hd", 15))
-		     || (!strncasecmp(vName, "cuberevo-3000hd", 14)))
-			vBoxType = Cuberevo;
+		else
+			if ((!strncasecmp(vName, "cuberevo", 8))
+		    || (!strncasecmp(vName, "cuberevo-mini", 13))
+		    || (!strncasecmp(vName, "cuberevo-mini2", 14))
+		    || (!strncasecmp(vName, "cuberevo-mini-fta", 17))
+		    || (!strncasecmp(vName, "cuberevo-250hd", 14))
+		    || (!strncasecmp(vName, "cuberevo-2000hd", 15))
+		    || (!strncasecmp(vName, "cuberevo-9500hd", 15))
+		    || (!strncasecmp(vName, "cuberevo-3000hd", 14)))
+			{
+				vBoxType = Cuberevo;
+			}
 		else
 		{
 			vBoxType = Unknown;
@@ -746,9 +767,9 @@ int getModel()
 
 int main(int argc, char *argv[])
 {
-	eBoxType vBoxType = Unknown;
 	Context_t context;
 	int i;
+	eBoxType vBoxType = Unknown;
 
 	if (argc > 1)
 	{
@@ -777,3 +798,4 @@ int main(int argc, char *argv[])
 	processCommand(&context, argc, argv);
 	return 0;
 }
+// vim:ts=4

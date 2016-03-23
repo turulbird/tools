@@ -2,6 +2,7 @@
 #define __Spark__
 
 #define VFDGETVERSION     0xc0425af7
+#define VFDSETTIME2       0xc0425afd
 #define VFDGETWAKEUPTIME  0xc0425b03
 #define VFDSETDISPLAYTIME 0xc0425b04 // added by Audioniek (Cuberevo uses 0xc0425b02)
 #define VFDGETDISPLAYTIME 0xc0425b05 /* Spark specific */
