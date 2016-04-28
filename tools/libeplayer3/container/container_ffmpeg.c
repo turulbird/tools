@@ -754,8 +754,12 @@ static void FFMPEGThread(Context_t *context)
 					latestPts = pts;
 
 				/*Hellmaster1024: in mkv the duration for ID_TEXT is stored in convergence_duration */
+#if (LIBAVFORMAT_VERSION_MAJOR == 57 && LIBAVFORMAT_VERSION_MINOR == 25)
+				ffmpeg_printf(20, "Packet duration %lld\n", packet.duration);
+#else
 				ffmpeg_printf(20, "Packet duration %d\n", packet.duration);
 				ffmpeg_printf(20, "Packet convergence_duration %lld\n", packet.convergence_duration);
+#endif
 
 				if (packet.duration != 0) // FIXME: packet.duration is 32 bit, AV_NOPTS_VALUE is 64 bit --martii
 					duration = ((float)packet.duration) / 1000.0;
@@ -1420,7 +1424,11 @@ int container_ffmpeg_init(Context_t *context, char *filename)
 	avContext->flags = AVFMT_FLAG_GENPTS;
 
 	if (context->playback->noprobe)
+#if (LIBAVFORMAT_VERSION_MAJOR == 57 && LIBAVFORMAT_VERSION_MINOR == 25)
+		avContext->max_analyze_duration = 1;
+#else
 		avContext->max_analyze_duration2 = 1;
+#endif
 
 	ffmpeg_printf(20, "find_streaminfo\n");
 
