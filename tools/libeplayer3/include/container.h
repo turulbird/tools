@@ -29,21 +29,18 @@ typedef enum
 	CONTAINER_STOP_BUFFER
 } ContainerCmd_t;
 
+struct Context_s;
+typedef struct Context_s Context_t;
+
 typedef struct Container_s
 {
 	char *Name;
-	int (* Command)(/*Context_t*/void *, ContainerCmd_t, void *);
+	int (* Command)(Context_t *, ContainerCmd_t, void *);
 	char **Capabilities;
 
 } Container_t;
 
 extern Container_t FFMPEGContainer;
-
-static Container_t *AvailableContainer[] =
-{
-	&FFMPEGContainer,
-	NULL
-};
 
 typedef struct ContainerHandler_s
 {
@@ -52,7 +49,8 @@ typedef struct ContainerHandler_s
 	Container_t *textSrtContainer;
 	Container_t *textSsaContainer;
 	Container_t *assContainer;
-	int (* Command)(/*Context_t*/void *, ContainerCmd_t, void *);
+
+	int (* Command)(Context_t *, ContainerCmd_t, void *);
 } ContainerHandler_t;
 
 #endif

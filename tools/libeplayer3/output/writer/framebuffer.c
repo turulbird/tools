@@ -53,7 +53,7 @@
 
 #ifdef FB_DEBUG
 
-static short debug_level = 10;
+static short debug_level = 0;
 
 #define fb_printf(level, fmt, x...) do { \
 		if (debug_level >= level) printf("[%s:%s] " fmt, __FILE__, __FUNCTION__, ## x); } while (0)
@@ -99,30 +99,21 @@ static int reset()
 
 static int writeData(void *_call)
 {
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
 	unsigned char a;
-	int x, y;
+	int y;
 	int res = 0;
-	unsigned char *dst;
-
 	WriterFBCallData_t *call = (WriterFBCallData_t *) _call;
-
 	fb_printf(100, "\n");
-
 	if (call == NULL)
 	{
 		fb_err("call data is NULL...\n");
 		return 0;
 	}
-
 	if (call->destination == NULL)
 	{
 		fb_err("file pointer < 0. ignoring ...\n");
 		return 0;
 	}
-
 	if (call->data != NULL)
 	{
 		unsigned int opacity = 255 - ((unsigned int)_a(call->color));
@@ -137,9 +128,7 @@ static int writeData(void *_call)
 		unsigned char *dst = call->destination + (call->y * dst_stride + call->x * 4);
 		//uint32_t *dst = call->destination + call->y * dst_stride + call->x;
 		unsigned int k, ck, t;
-
 		static uint32_t last_color = 0, colortable[256];
-
 		if (last_color != call->color)
 		{
 			// call->color is rgba, our spark frame buffer is argb
@@ -152,7 +141,6 @@ static int writeData(void *_call)
 			}
 			last_color = call->color;
 		}
-
 		fb_printf(100, "x           %d\n", call->x);
 		fb_printf(100, "y           %d\n", call->y);
 		fb_printf(100, "width       %d\n", call->Width);
@@ -162,17 +150,14 @@ static int writeData(void *_call)
 		fb_printf(100, "data        %p\n", call->data);
 		fb_printf(100, "dest        %p\n", call->destination);
 		fb_printf(100, "dest.stride %d\n", call->destStride);
-
 		fb_printf(100, "r 0x%hhx, g 0x%hhx, b 0x%hhx, a 0x%hhx, opacity %d\n", r, g, b, a, opacity);
-
 		for (y = 0; y < call->Height; y++)
 		{
 			for (x = 0; x < call->Width; x++)
 			{
-				//uint32_t c = colortable[src[x]];
-				//if (c)
-				//  *dst = c;
-
+				uint32_t c = colortable[src[x]];
+				if (c)
+					*dst = c;
 				k = ((unsigned)src[x]) * opacity / 255;
 				ck = 255 - k;
 				t = *dst;
@@ -185,7 +170,6 @@ static int writeData(void *_call)
 				if (k > t)*dst++ = k;
 				else dst++;
 			}
-
 			dst += dst_delta;
 			src += src_stride;
 		}
@@ -195,7 +179,6 @@ static int writeData(void *_call)
 		for (y = 0; y < call->Height; y++)
 			memset(call->destination + ((call->y + y) * call->destStride) + call->x * 4, 0, call->Width * 4);
 	}
-
 	fb_printf(100, "< %d\n", res);
 	return res;
 }
@@ -215,6 +198,5 @@ struct Writer_s WriterFramebuffer =
 {
 	&reset,
 	&writeData,
-	NULL,
 	&caps
 };

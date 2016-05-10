@@ -1,7 +1,13 @@
-AC_INIT(main.c)
-AM_INIT_AUTOMAKE(grab,1.0)
+AC_INIT([grab],[1.0],[],[grab])
+AC_PREREQ(2.53)
+
+AM_INIT_AUTOMAKE
 
 AC_PROG_CC
-AC_OPENMP()
+AC_PROG_CXX
 
-AC_OUTPUT(Makefile)
+m4_ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
+
+AC_OUTPUT([
+Makefile
+])

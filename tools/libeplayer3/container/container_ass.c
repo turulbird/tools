@@ -76,7 +76,7 @@ static short debug_level = 10;
 
 #define ASS_RING_SIZE 5
 
-#define ASS_FONT "/usr/share/fonts/FreeSans.ttf"
+#define ASS_FONT "/usr/share/fonts/LiberationSans-Regular.ttf"
 
 /* ***************************** */
 /* Types                         */
@@ -118,8 +118,8 @@ static unsigned char isContainerRunning = 0;
 static ASS_Library *ass_library;
 static ASS_Renderer *ass_renderer;
 
-static float ass_font_scale = 0.9;
-static float ass_line_spacing = 0.9;
+static float ass_font_scale = 0.7;
+static float ass_line_spacing = 0.7;
 
 static unsigned int screen_width     = 0;
 static unsigned int screen_height    = 0;
@@ -144,11 +144,9 @@ static region_t *firstRegion = NULL;
 
 void ass_msg_callback(int level __attribute__((unused)), const char *format, va_list va, void *ctx __attribute__((unused)))
 {
-	ass_printf(20, ">\n");
 	int n;
 	char *str;
 	va_list dst;
-
 	va_copy(dst, va);
 	n = vsnprintf(NULL, 0, format, va);
 	if (n > 0 && (str = malloc(n + 1)))
@@ -157,22 +155,18 @@ void ass_msg_callback(int level __attribute__((unused)), const char *format, va_
 		ass_printf(100, "%s\n", str);
 		free(str);
 	}
-	ass_printf(20, "<\n");
 }
 
 static void getMutex(int line)
 {
 	ass_printf(150, "%d requesting mutex\n", line);
-
 	pthread_mutex_lock(&mutex);
-
 	ass_printf(150, "%d received mutex\n", line);
 }
 
 static void releaseMutex(int line)
 {
 	pthread_mutex_unlock(&mutex);
-
 	ass_printf(150, "%d released mutex\n", line);
 }
 
@@ -184,40 +178,32 @@ static void releaseMutex(int line)
  */
 void releaseRegions(Writer_t *writer)
 {
-	ass_printf(20, ">\n");
 	region_t *next, *old;
-
 	if (firstRegion == NULL)
 		return;
-
 	if (writer == NULL)
 	{
 		ass_err("no framebuffer writer found!\n");
 		return;
 	}
-
 	next = firstRegion;
 	while (next != NULL)
 	{
 		if (writer)
 		{
 			WriterFBCallData_t out;
-
 			ass_printf(100, "release: w %d h %d x %d y %d\n",
-					   next->w, next->h, next->x, next->y);
-
+				   next->w, next->h, next->x, next->y);
 			out.fd            = framebufferFD;
 			out.data          = NULL;
 			out.Width         = next->w;
 			out.Height        = next->h;
 			out.x             = next->x;
 			out.y             = next->y;
-
 			out.Screen_Width  = screen_width;
 			out.Screen_Height = screen_height;
 			out.destination   = destination;
 			out.destStride    = destStride;
-
 			writer->writeData(&out);
 			needsBlit = 1;
 		}
@@ -225,9 +211,7 @@ void releaseRegions(Writer_t *writer)
 		next = next->next;
 		free(old);
 	}
-
 	firstRegion = NULL;
-	ass_printf(20, "<\n");
 }
 
 /* check for regions which should be undisplayed.
@@ -237,56 +221,42 @@ void releaseRegions(Writer_t *writer)
  */
 void checkRegions(Writer_t *writer)
 {
-	ass_printf(20, ">\n");
 #define cDeltaTime 2
 	region_t *next, *old, *prev;
 	time_t now = time(NULL);
-
 	if (firstRegion == NULL)
-	{
-		ass_printf(20, "<\n");
 		return;
-	}
-
 	if (!writer)
 	{
 		ass_err("no framebuffer writer found!\n");
 		return;
 	}
-
 	prev = next = firstRegion;
 	while (next != NULL)
 	{
 		if (now > next->undisplay + cDeltaTime)
 		{
 			ass_printf(100, "undisplay: %ld > %ld\n", now, next->undisplay + cDeltaTime);
-
 			if (writer)
 			{
 				WriterFBCallData_t out;
-
 				ass_printf(100, "release: w %d h %d x %d y %d\n",
-						   next->w, next->h, next->x, next->y);
-
+					   next->w, next->h, next->x, next->y);
 				out.fd            = framebufferFD;
 				out.data          = NULL;
 				out.Width         = next->w;
 				out.Height        = next->h;
 				out.x             = next->x;
 				out.y             = next->y;
-
 				out.Screen_Width  = screen_width;
 				out.Screen_Height = screen_height;
 				out.destination   = destination;
 				out.destStride    = destStride;
-
 				writer->writeData(&out);
 				needsBlit = 1;
 			}
-
 			old = next;
 			next = prev->next = next->next;
-
 			if (old == firstRegion)
 				firstRegion = next;
 			free(old);
@@ -297,22 +267,16 @@ void checkRegions(Writer_t *writer)
 			next = next->next;
 		}
 	}
-	ass_printf(20, "<\n");
 }
 
 /* store a display region for later release */
 void storeRegion(unsigned int x, unsigned int y, unsigned int w, unsigned int h, time_t undisplay)
 {
-	ass_printf(20, ">\n");
 	region_t **new = &firstRegion;
-
 	ass_printf(100, "%d %d %d %d %ld\n", x, y, w, h, undisplay);
-
 	while (*new)
 		new = &(*new)->next;
-
 	*new = malloc(sizeof(region_t));
-
 	if (*new != NULL)
 	{
 		(*new)->next      = NULL;
@@ -336,72 +300,55 @@ static void ASSThread(Context_t *context)
 	threadname[16] = 0;
 	prctl(PR_SET_NAME, (unsigned long)&threadname);
 	Writer_t *writer;
-
 	ass_printf(10, ">\n");
 	hasPlayThreadStarted = 1;
-
 	while (context->playback->isCreationPhase || isContainerRunning == 0)
 	{
 		ass_err("Thread waiting for end of init phase...\n");
 		usleep(1000);
 	}
-
 	ass_printf(10, "Running!\n");
-
 	writer = getDefaultFramebufferWriter();
-
 	if (writer == NULL)
 	{
 		ass_err("no framebuffer writer found!\n");
 	}
-
 	while (context && context->playback && context->playback->isPlaying && hasPlayThreadStarted == 1)
 	{
-
 		//IF MOVIE IS PAUSED, WAIT
 		if (context->playback->isPaused)
 		{
 			ass_printf(20, "paused\n");
-
 			usleep(100000);
 			continue;
 		}
-
 		if (context->playback->isSeeking)
 		{
 			ass_printf(10, "seeking\n");
-
 			usleep(100000);
 			continue;
 		}
-
 		if ((isContainerRunning) && (ass_track))
 		{
 			ASS_Image        *img   = NULL;
 			int               change = 0;
 			unsigned long int playPts = 0;
-
 			if (context && context->playback)
 			{
 				if (context->playback->Command(context, PLAYBACK_PTS, &playPts) < 0)
 					continue;
 			}
-
 			//FIXME: durch den sleep bleibt die cpu usage zw. 5 und 13%, ohne
 			//       steigt sie bei Verwendung von subtiteln bis auf 95%.
 			//       ich hoffe dadurch gehen keine subtitle verloren, wenn die playPts
-			//       durch den sleep verschlafen wird. Besser wäre es den nächsten
+			//       durch den sleep verschlafen wird. Besser wÃ¤re es den nÃ¤chsten
 			//       subtitel zeitpunkt zu bestimmen und solange zu schlafen.
 			usleep(1000);
-
 			getMutex(__LINE__);
 			checkRegions(writer);
-
 			if (ass_renderer && ass_track)
 				img = ass_render_frame(ass_renderer, ass_track, playPts / 90.0, &change);
-
 			ass_printf(150, "img %p pts %lu %f\n", img, playPts, playPts / 90.0);
-
 			if (img != NULL && ass_renderer && ass_track)
 			{
 				/* the spec says, that if a new set of regions is present
@@ -410,24 +357,20 @@ static void ASSThread(Context_t *context)
 				 */
 				if (change != 0)
 					releaseRegions(writer);
-
 				while (context && context->playback && context->playback->isPlaying &&
 						(img) && (change != 0))
 				{
 					WriterFBCallData_t out;
 					time_t now = time(NULL);
 					time_t undisplay = now + 10;
-
 					if (ass_track && ass_track->events)
 					{
 						undisplay = now + ass_track->events->Duration / 1000 + 0.5;
 					}
-
 					ass_printf(100, "w %d h %d s %d x %d y %d c %d chg %d now %ld und %ld\n",
-							   img->w, img->h, img->stride,
-							   img->dst_x, img->dst_y, img->color,
-							   change, now, undisplay);
-
+						   img->w, img->h, img->stride,
+						   img->dst_x, img->dst_y, img->color,
+						   change, now, undisplay);
 					/* api docu said w and h can be zero which
 					 * means image should not be rendered
 					 */
@@ -441,15 +384,12 @@ static void ASSThread(Context_t *context)
 						out.x             = img->dst_x;
 						out.y             = img->dst_y;
 						out.color         = img->color;
-
 						out.Screen_Width  = screen_width;
 						out.Screen_Height = screen_height;
 						out.destination   = destination;
 						out.destStride    = destStride;
-
 						storeRegion(img->dst_x, img->dst_y,
-									img->w, img->h, undisplay);
-
+							    img->w, img->h, undisplay);
 						if (shareFramebuffer)
 						{
 							if (context && context->playback && context->playback->isPlaying && writer)
@@ -465,9 +405,7 @@ static void ASSThread(Context_t *context)
 							 * in the subtitle output!
 							 */
 							SubtitleOut_t out;
-
 							out.type         = eSub_Gfx;
-
 							if (ass_track->events)
 							{
 								/* fixme: check values */
@@ -479,7 +417,6 @@ static void ASSThread(Context_t *context)
 								out.pts          = playPts;
 								out.duration     = 10.0;
 							}
-
 							out.u.gfx.data   = img->bitmap;
 							out.u.gfx.Width  = img->w;
 							out.u.gfx.Height = img->h;
@@ -490,7 +427,6 @@ static void ASSThread(Context_t *context)
 								context->output->subtitle->Write(context, &out);
 						}
 					}
-
 					/* Next image */
 					img = img->next;
 				}
@@ -501,7 +437,6 @@ static void ASSThread(Context_t *context)
 		{
 			usleep(1000);
 		}
-
 		/* cleanup no longer used but not overwritten regions */
 		checkRegions(writer);
 		if (framebufferBlit != NULL && needsBlit)
@@ -510,10 +445,8 @@ static void ASSThread(Context_t *context)
 			(*framebufferBlit)();
 		}
 	} /* while */
-
 	hasPlayThreadStarted = 0;
-
-	ass_printf(10, "< terminating\n");
+	ass_printf(10, "terminating\n");
 	pthread_exit(NULL);
 }
 
@@ -524,38 +457,27 @@ static void ASSThread(Context_t *context)
 int container_ass_init(Context_t *context)
 {
 	SubtitleOutputDef_t output;
-
 	ass_printf(10, ">\n");
-
 	ass_library = ass_library_init();
-
 	if (!ass_library)
 	{
 		ass_err("ass_library_init failed!\n");
 		return cERR_CONTAINER_ASS_ERROR;
 	}
-
 	if (debug_level >= 100)
 		ass_set_message_cb(ass_library, ass_msg_callback, NULL);
-
 	ass_set_extract_fonts(ass_library, 1);
 	ass_set_style_overrides(ass_library, NULL);
-
 	ass_renderer = ass_renderer_init(ass_library);
-
 	if (!ass_renderer)
 	{
 		ass_err("ass_renderer_init failed!\n");
-
 		if (ass_library)
 			ass_library_done(ass_library);
 		ass_library = NULL;
-
 		return cERR_CONTAINER_ASS_ERROR;
 	}
-
 	context->output->subtitle->Command(context, OUTPUT_GET_SUBTITLE_OUTPUT, &output);
-
 	screen_width     = output.screen_width;
 	screen_height    = output.screen_height;
 	shareFramebuffer = output.shareFramebuffer;
@@ -563,46 +485,34 @@ int container_ass_init(Context_t *context)
 	destination      = output.destination;
 	destStride       = output.destStride;
 	framebufferBlit  = output.framebufferBlit;
-
 	ass_printf(10, "width %d, height %d, share %d, fd %d\n",
-			   screen_width, screen_height, shareFramebuffer, framebufferFD);
-
+		   screen_width, screen_height, shareFramebuffer, framebufferFD);
 	ass_set_frame_size(ass_renderer, screen_width, screen_height);
 	ass_set_margins(ass_renderer, (int)(0.03 * screen_height), (int)(0.03 * screen_height) ,
-					(int)(0.03 * screen_width), (int)(0.03 * screen_width));
-
+			(int)(0.03 * screen_width), (int)(0.03 * screen_width));
 	ass_set_use_margins(ass_renderer, 0);
 	ass_set_font_scale(ass_renderer, ass_font_scale);
-
 	ass_set_hinting(ass_renderer, ASS_HINTING_LIGHT);
 	ass_set_line_spacing(ass_renderer, ass_line_spacing);
 	ass_set_fonts(ass_renderer, ASS_FONT, "Arial", 0, NULL, 1);
-
 	ass_set_aspect_ratio(ass_renderer, 1.0, 1.0);
-
 	isContainerRunning = 1;
-
-	ass_printf(20, "<\n");
 	return cERR_CONTAINER_ASS_NO_ERROR;
 }
 
 int container_ass_process_data(Context_t *context __attribute__((unused)), SubtitleData_t *data)
 {
 	int first_kiss = 0;
-
 	ass_printf(20, ">\n");
-
 	if (!isContainerRunning)
 	{
 		ass_err("Container not running\n");
 		return cERR_CONTAINER_ASS_ERROR;
 	}
-
 	if (ass_track == NULL)
 	{
 		first_kiss = 1;
 		ass_track = ass_new_track(ass_library);
-
 		if (ass_track == NULL)
 		{
 			ass_err("error creating ass_track\n");
@@ -611,22 +521,18 @@ int container_ass_process_data(Context_t *context __attribute__((unused)), Subti
 		ass_track->PlayResX = screen_width;
 		ass_track->PlayResY = screen_height;
 	}
-
 	if ((data->extradata) && (first_kiss))
 	{
 		ass_printf(30, "processing private %d bytes\n", data->extralen);
 		ass_process_codec_private(ass_track, (char *) data->extradata, data->extralen);
 		ass_printf(30, "processing private done\n");
 	}
-
 	if (data->data)
 	{
 		ass_printf(30, "processing data %d bytes\n", data->len);
 		ass_process_data(ass_track, (char *) data->data, data->len);
 		ass_printf(30, "processing data done\n");
 	}
-
-	ass_printf(20, "<\n");
 	return cERR_CONTAINER_ASS_NO_ERROR;
 }
 
@@ -635,15 +541,12 @@ static int container_ass_stop(Context_t *context __attribute__((unused)))
 	int ret = cERR_CONTAINER_ASS_NO_ERROR;
 	int wait_time = 100;
 	Writer_t *writer;
-
-	ass_printf(10, ">\n");
-
+	ass_printf(10, "\n");
 	if (!isContainerRunning)
 	{
 		ass_err("Container not running\n");
 		return cERR_CONTAINER_ASS_ERROR;
 	}
-
 	if (hasPlayThreadStarted != 0)
 	{
 		hasPlayThreadStarted = 2;
@@ -653,44 +556,31 @@ static int container_ass_stop(Context_t *context __attribute__((unused)))
 			usleep(100000);
 		}
 	}
-
 	if (wait_time == 0)
 	{
 		ass_err("Timeout waiting for thread!\n");
-
 		ret = cERR_CONTAINER_ASS_ERROR;
 	}
-
 	getMutex(__LINE__);
-
 	writer = getDefaultFramebufferWriter();
 	releaseRegions(writer);
-
 	if (ass_track)
 		ass_free_track(ass_track);
-
 	ass_track = NULL;
-
 	if (ass_renderer)
 		ass_renderer_done(ass_renderer);
 	ass_renderer = NULL;
-
 	if (ass_library)
 		ass_library_done(ass_library);
 	ass_library = NULL;
-
 	isContainerRunning = 0;
-
 	hasPlayThreadStarted = 0;
-
 	if (writer)
 	{
 		writer->reset();
 	}
-
 	releaseMutex(__LINE__);
-
-	ass_printf(10, "< ret %d\n", ret);
+	ass_printf(10, "ret %d\n", ret);
 	return ret;
 }
 
@@ -700,15 +590,12 @@ static int container_ass_switch_subtitle(Context_t *context, int *arg __attribut
 	int ret = cERR_CONTAINER_ASS_NO_ERROR;
 	pthread_attr_t attr;
 	Writer_t *writer;
-
-	ass_printf(10, ">\n");
-
+	ass_printf(10, "\n");
 	if (!isContainerRunning)
 	{
 		ass_err("Container not running\n");
 		return cERR_CONTAINER_ASS_ERROR;
 	}
-
 	if (context && context->playback && context->playback->isPlaying)
 	{
 		ass_printf(10, "is Playing\n");
@@ -717,16 +604,13 @@ static int container_ass_switch_subtitle(Context_t *context, int *arg __attribut
 	{
 		ass_printf(10, "is NOT Playing\n");
 	}
-
 	if (hasPlayThreadStarted == 0)
 	{
 		pthread_attr_init(&attr);
 		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-
 		if ((error = pthread_create(&PlayThread, &attr, (void *)&ASSThread, context)) != 0)
 		{
 			ass_printf(10, "Error creating thread, error:%d:%s\n", error, strerror(error));
-
 			hasPlayThreadStarted = 0;
 			ret = cERR_CONTAINER_ASS_ERROR;
 		}
@@ -738,38 +622,26 @@ static int container_ass_switch_subtitle(Context_t *context, int *arg __attribut
 	else
 	{
 		ass_printf(10, "A thread already exists!\n");
-
 		ret = cERR_CONTAINER_ASS_ERROR;
 	}
-
 	getMutex(__LINE__);
-
 	writer = getDefaultFramebufferWriter();
 	releaseRegions(writer);
-
 	/* free the track so extradata will be written next time
 	 * process_data is called.
 	 */
 	if (ass_track)
 		ass_free_track(ass_track);
-
 	ass_track = NULL;
-
 	releaseMutex(__LINE__);
-
-	ass_printf(10, "< exiting with value %d\n", ret);
-
+	ass_printf(10, "exiting with value %d\n", ret);
 	return ret;
 }
 
-static int Command(void  *_context, ContainerCmd_t command, void *argument)
+static int Command(Context_t *context, ContainerCmd_t command, void *argument)
 {
-	ass_printf(20, ">\n");
-	Context_t  *context = (Context_t *) _context;
 	int ret = cERR_CONTAINER_ASS_NO_ERROR;
-
 	ass_printf(50, "Command %d\n", command);
-
 	switch (command)
 	{
 		case CONTAINER_INIT:
@@ -798,9 +670,7 @@ static int Command(void  *_context, ContainerCmd_t command, void *argument)
 			ret = cERR_CONTAINER_ASS_ERROR;
 			break;
 	}
-
-	ass_printf(50, "< exiting with value %d\n", ret);
-
+	ass_printf(50, "exiting with value %d\n", ret);
 	return ret;
 }
 

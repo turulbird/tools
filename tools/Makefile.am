@@ -15,7 +15,7 @@ SUBDIRS = \
 	vfdctl \
 	hd-idle \
 	libmme_host \
-	libmmeimage \
+	libmme_image \
 	ipbox_eeprom \
 	wait4button
 
@@ -28,4 +28,9 @@ endif
 if ENABLE_EPLAYER3
 SUBDIRS += \
 	libeplayer3
+endif
+
+if ENABLE_SPF
+SUBDIRS += \
+	spf_tool
 endif

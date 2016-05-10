@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -58,14 +58,6 @@ typedef struct
 	char *arg_description;
 } tArgs;
 
-time_t *theGMTTime;
-char vName[129] = "Unknown";
-int Vdisplay = 0; //
-int Vdisplay_custom = 0;
-char *VtimeFormat = "Unknown";
-int Vwakeup = 5 * 60; //default wakeup decrement in minutes
-const char *wakeupreason[4] = { "Unknown", "Power on", "From deep standby", "Timer" };
-
 tArgs vArgs[] =
 {
 	{ "-e", "  --setTimer           ", "Args: None or [time date] in format HH:MM:SS dd-mm-YYYY \
@@ -99,7 +91,13 @@ tArgs vArgs[] =
 	{ "-ms", " --set_model_specific ", "Args: int\n\tModel specific set function" },
 	{ NULL, NULL, NULL }
 };
-
+time_t *theGMTTime;
+char vName[129] = "Unknown";
+int Vdisplay = 0; //
+int Vdisplay_custom = 0;
+char *VtimeFormat = "Unknown";
+int Vwakeup = 5 * 60; //default wakeup decrement in minutes
+const char *wakeupreason[4] = { "Unknown", "Power on", "From deep standby", "Timer" };
 
 int usage(Context_t *context, char *prg, char *cmd)
 {
@@ -465,7 +463,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			{
 				if (i + 1 < argc) // accept 1 or 2 arguments
 				{
-					int on = 1; // default is on
+					int on;
 					on = atoi(argv[i + 1]);
 
 					if (((Model_t *)context->m)->SetLight)

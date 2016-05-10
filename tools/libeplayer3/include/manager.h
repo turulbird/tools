@@ -38,7 +38,6 @@ typedef struct Track_s
 	long long int         duration;
 	unsigned int          frame_rate;
 	unsigned int          TimeScale;
-	int                   version;
 	long long int         pts;
 
 	/* for later use: */
@@ -56,20 +55,20 @@ typedef struct Track_s
 	unsigned int          aacbuflen;
 	int                   have_aacheader;
 
-	/*
-	* If player2 or the elf do not support decoding of audio codec set this.
-	* AVCodec is than used for softdecoding and stream will be injected as PCM
-	*/
+	/* If player2 or the elf do not support decoding of audio codec set this.
+	 * AVCodec is than used for softdecoding and stream will be injected as PCM */
 	int                   inject_as_pcm;
-	int                   inject_raw_pcm;
 
-	int           pending;
+	int                   pending;
 } Track_t;
+
+struct Context_s;
+typedef struct Context_s Context_t;
 
 typedef struct Manager_s
 {
 	char *Name;
-	int (* Command)(/*Context_t*/void *, ManagerCmd_t, void *);
+	int (* Command)(Context_t *, ManagerCmd_t, void *);
 	char **Capabilities;
 } Manager_t;
 
@@ -79,8 +78,6 @@ typedef struct ManagerHandler_s
 	Manager_t *audio;
 	Manager_t *video;
 	Manager_t *subtitle;
-	Manager_t *dvbsubtitle;
-	Manager_t *teletext;
 } ManagerHandler_t;
 
 void freeTrack(Track_t *track);

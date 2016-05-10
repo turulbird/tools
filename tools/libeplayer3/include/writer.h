@@ -2,6 +2,7 @@
 #define WRITER_H_
 
 #include <stdio.h>
+#include <stdint.h>
 
 typedef enum { eNone, eAudio, eVideo, eGfx} eWriterType_t;
 
@@ -52,7 +53,6 @@ typedef struct Writer_s
 {
 	int (* reset)();
 	int (* writeData)(void *);
-	int (* writeReverseData)(void *);
 	WriterCaps_t *caps;
 } Writer_t;
 
@@ -63,7 +63,6 @@ extern Writer_t WriterAudioMPEGL3;
 extern Writer_t WriterAudioAC3;
 extern Writer_t WriterAudioAAC;
 extern Writer_t WriterAudioDTS;
-extern Writer_t WriterAudioWMA;
 extern Writer_t WriterAudioFLAC;
 extern Writer_t WriterAudioVORBIS;
 
@@ -80,33 +79,6 @@ extern Writer_t WriterVideoVC1;
 extern Writer_t WriterFramebuffer;
 extern Writer_t WriterPipe;
 extern Writer_t WriterDVBSubtitle;
-
-static Writer_t *AvailableWriter[] =
-{
-	&WriterAudioIPCM,
-	&WriterAudioPCM,
-	&WriterAudioMP3,
-	&WriterAudioMPEGL3,
-	&WriterAudioAC3,
-	&WriterAudioAAC,
-	&WriterAudioDTS,
-	&WriterAudioWMA,
-	&WriterAudioFLAC,
-	&WriterAudioVORBIS,
-
-	&WriterVideoMPEG2,
-	&WriterVideoMPEGH264,
-	&WriterVideoH264,
-	&WriterVideoDIVX,
-	&WriterVideoFOURCC,
-	&WriterVideoMSCOMP,
-	&WriterVideoWMV,
-	&WriterVideoH263,
-	&WriterVideoFLV,
-	&WriterVideoVC1,
-	&WriterFramebuffer,
-	NULL
-};
 
 Writer_t *getWriter(char *encoding);
 

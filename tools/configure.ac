@@ -32,6 +32,14 @@ AC_ARG_ENABLE(eplayer3,
 AM_CONDITIONAL(ENABLE_EPLAYER3,test "$enable_eplayer3" = "yes")
 AC_SUBST(EPLAYER3)
 
+AC_ARG_ENABLE(spf,
+	AS_HELP_STRING(--enable-spf,    enable spf support),
+	[case "${enableval}" in
+		yes) SPF=spf ;;
+	esac],[enable_spf=no])
+AM_CONDITIONAL(ENABLE_SPF,test "$enable_spf" = "yes")
+AC_SUBST(SPF)
+
 AC_MSG_RESULT([
 summary:
 ----------------------------------------
@@ -61,6 +69,7 @@ hotplug/Makefile
 vfdctl/Makefile
 hd-idle/Makefile
 libmme_host/Makefile
-libmmeimage/Makefile
+libmme_image/Makefile
 ipbox_eeprom/Makefile
+spf_tool/Makefile
 ])

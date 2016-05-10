@@ -92,39 +92,30 @@ static int reset()
 static int writeData(void *_call)
 {
 	WriterAVCallData_t *call = (WriterAVCallData_t *) _call;
-
 	unsigned char  PesHeader[PES_MAX_HEADER_SIZE];
-
 	flac_printf(10, "\n");
-
 	if (call == NULL)
 	{
 		flac_err("call data is NULL...\n");
 		return 0;
 	}
-
 	flac_printf(10, "AudioPts %lld\n", call->Pts);
-
 	if ((call->data == NULL) || (call->len <= 0))
 	{
 		flac_err("parsing NULL Data. ignoring...\n");
 		return 0;
 	}
-
 	if (call->fd < 0)
 	{
 		flac_err("file pointer < 0. ignoring ...\n");
 		return 0;
 	}
-
 	struct iovec iov[2];
 	iov[0].iov_base = PesHeader;
 	iov[0].iov_len = InsertPesHeader(PesHeader, call->len , MPEG_AUDIO_PES_START_CODE, call->Pts, 0);
 	iov[1].iov_base = call->data;
 	iov[1].iov_len = call->len;
-
 	int len = writev(call->fd, iov, 2);
-
 	flac_printf(10, "flac_Write-< len=%d\n", len);
 	return len;
 }
@@ -145,6 +136,5 @@ struct Writer_s WriterAudioFLAC =
 {
 	&reset,
 	&writeData,
-	NULL,
 	&caps_flac
 };

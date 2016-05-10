@@ -1,15 +1,16 @@
-AUTOMAKE_OPTIONS = subdir-objects
+#AUTOMAKE_OPTIONS = subdir-objects
 
-AM_CFLAGS = -Wall -D__LINUX__
+AM_CFLAGS = -Wall -D__LINUX__ -I $(DRIVER_TOPDIR)/include/multicom -I$(DRIVER_TOPDIR)/multicom/mme
 
 if ENABLE_MULTICOM324
 lib_LTLIBRARIES = libmme_host.la
 
-libmme_host_la_SOURCES = ../../../driver/multicom/mme/mme_linux_user.c \
-			 ../../../driver/multicom/mme/ExecutionLoop.c \
-			 ../../../driver/multicom/mme/LocalTransformer.c \
-			 ../../../driver/multicom/mme/LookupTable.c \
-			 ../../../driver/multicom/mme/MMEMessageQueue.c \
-			 ../../../driver/multicom/mme/mme_tune.c \
-			 ../../../driver/multicom/embxshell/embx_linux.c
+libmme_host_la_SOURCES = \
+	$(DRIVER_TOPDIR)/multicom/mme/mme_linux_user.c \
+	$(DRIVER_TOPDIR)/multicom/mme/ExecutionLoop.c \
+	$(DRIVER_TOPDIR)/multicom/mme/LocalTransformer.c \
+	$(DRIVER_TOPDIR)/multicom/mme/LookupTable.c \
+	$(DRIVER_TOPDIR)/multicom/mme/MMEMessageQueue.c \
+	$(DRIVER_TOPDIR)/multicom/mme/mme_tune.c \
+	$(DRIVER_TOPDIR)/multicom/embxshell/embx_linux.c
 endif

@@ -58,6 +58,32 @@ static short debug_level = 0;
 /* Varaibles                     */
 /* ***************************** */
 
+static Writer_t *AvailableWriter[] =
+{
+	&WriterAudioIPCM,
+	&WriterAudioPCM,
+	&WriterAudioMP3,
+	&WriterAudioMPEGL3,
+	&WriterAudioAC3,
+	&WriterAudioAAC,
+	&WriterAudioDTS,
+	&WriterAudioFLAC,
+	&WriterAudioVORBIS,
+
+	&WriterVideoMPEG2,
+	&WriterVideoMPEGH264,
+	&WriterVideoH264,
+	&WriterVideoDIVX,
+	&WriterVideoFOURCC,
+	&WriterVideoMSCOMP,
+	&WriterVideoWMV,
+	&WriterVideoH263,
+	&WriterVideoFLV,
+	&WriterVideoVC1,
+	&WriterFramebuffer,
+	NULL
+};
+
 /* ***************************** */
 /* Prototypes                    */
 /* ***************************** */
@@ -69,7 +95,6 @@ static short debug_level = 0;
 Writer_t *getWriter(char *encoding)
 {
 	int i;
-
 	for (i = 0; AvailableWriter[i] != NULL; i++)
 	{
 		if (strcmp(AvailableWriter[i]->caps->textEncoding, encoding) == 0)
@@ -78,16 +103,13 @@ Writer_t *getWriter(char *encoding)
 			return AvailableWriter[i];
 		}
 	}
-
 	writer_printf(1, "%s: no writer found for \"%s\"\n", __func__, encoding);
-
 	return NULL;
 }
 
 Writer_t *getDefaultVideoWriter()
 {
 	int i;
-
 	for (i = 0; AvailableWriter[i] != NULL; i++)
 	{
 		if (strcmp(AvailableWriter[i]->caps->textEncoding, "V_MPEG2") == 0)
@@ -96,16 +118,13 @@ Writer_t *getDefaultVideoWriter()
 			return AvailableWriter[i];
 		}
 	}
-
 	writer_printf(1, "%s: no writer found\n", __func__);
-
 	return NULL;
 }
 
 Writer_t *getDefaultAudioWriter()
 {
 	int i;
-
 	for (i = 0; AvailableWriter[i] != NULL; i++)
 	{
 		if (strcmp(AvailableWriter[i]->caps->textEncoding, "A_MP3") == 0)
@@ -114,16 +133,13 @@ Writer_t *getDefaultAudioWriter()
 			return AvailableWriter[i];
 		}
 	}
-
 	writer_printf(1, "%s: no writer found\n", __func__);
-
 	return NULL;
 }
 
 Writer_t *getDefaultFramebufferWriter()
 {
 	int i;
-
 	for (i = 0; AvailableWriter[i] != NULL; i++)
 	{
 		writer_printf(10, "%s\n", AvailableWriter[i]->caps->textEncoding);
@@ -133,8 +149,6 @@ Writer_t *getDefaultFramebufferWriter()
 			return AvailableWriter[i];
 		}
 	}
-
 	writer_printf(1, "%s: no writer found\n", __func__);
-
 	return NULL;
 }

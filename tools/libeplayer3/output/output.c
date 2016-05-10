@@ -63,6 +63,13 @@ static const char *FILENAME = "output.c";
 /* Varaibles                     */
 /* ***************************** */
 
+static Output_t *AvailableOutput[] =
+{
+	&LinuxDvbOutput,
+	&SubtitleOutput,
+	NULL
+};
+
 /* ***************************** */
 /* Prototypes                    */
 /* ***************************** */
@@ -71,23 +78,6 @@ static const char *FILENAME = "output.c";
 /* MISC Functions                */
 /* ***************************** */
 
-static void printOutputCapabilities()
-{
-	int i, j;
-
-	output_printf(10, "%s::%s\n", FILENAME, __FUNCTION__);
-	output_printf(10, "Capabilities:\n");
-
-	for (i = 0; AvailableOutput[i] != NULL; i++)
-	{
-		output_printf(10, "\t%s : ", AvailableOutput[i]->Name);
-
-		for (j = 0; AvailableOutput[i]->Capabilities[j] != NULL; j++)
-			output_printf(10, "%s ", AvailableOutput[i]->Capabilities[j]);
-		output_printf(10, "\n");
-	}
-}
-
 /* ***************************** */
 /* Output Functions              */
 /* ***************************** */
@@ -95,9 +85,7 @@ static void printOutputCapabilities()
 static void OutputAdd(Context_t  *context, char *port)
 {
 	int i, j;
-
 	output_printf(10, "%s::%s\n", FILENAME, __FUNCTION__);
-
 	for (i = 0; AvailableOutput[i] != NULL; i++)
 		for (j = 0; AvailableOutput[i]->Capabilities[j] != NULL; j++)
 			if (!strcmp(AvailableOutput[i]->Capabilities[j], port))
@@ -117,42 +105,24 @@ static void OutputAdd(Context_t  *context, char *port)
 					context->output->subtitle = AvailableOutput[i];
 					return;
 				}
-				if (!strcmp("dvbsubtitle", port))
-				{
-					context->output->dvbsubtitle = AvailableOutput[i];
-					return;
-				}
-				if (!strcmp("teletext", port))
-				{
-					context->output->teletext = AvailableOutput[i];
-					return;
-				}
 			}
 }
 
 static void OutputDel(Context_t  *context, char *port)
 {
 	output_printf(10, "%s::%s\n", FILENAME, __FUNCTION__);
-
 	if (!strcmp("audio", port))
 		context->output->audio = NULL;
 	else if (!strcmp("video", port))
 		context->output->video = NULL;
 	else if (!strcmp("subtitle", port))
 		context->output->subtitle = NULL;
-	else if (!strcmp("dvbsubtitle", port))
-		context->output->dvbsubtitle = NULL;
-	else if (!strcmp("teletext", port))
-		context->output->teletext = NULL;
 }
 
-static int Command(void  *_context, OutputCmd_t command, void *argument)
+static int Command(Context_t *context, OutputCmd_t command, void *argument)
 {
-	Context_t  *context = (Context_t *) _context;
 	int ret = cERR_OUTPUT_NO_ERROR;
-
 	output_printf(10, "%s::%s Command %d\n", FILENAME, __FUNCTION__, command);
-
 	switch (command)
 	{
 		case OUTPUT_OPEN:
@@ -163,12 +133,6 @@ static int Command(void  *_context, OutputCmd_t command, void *argument)
 					ret |= context->output->video->Command(context, OUTPUT_OPEN, "video");
 				if (context->playback->isAudio)
 					ret |= context->output->audio->Command(context, OUTPUT_OPEN, "audio");
-				if (context->playback->isSubtitle)
-					ret |= context->output->subtitle->Command(context, OUTPUT_OPEN, "subtitle");
-				if (context->playback->isDvbSubtitle)
-					ret |= context->output->dvbsubtitle->Command(context, command, "dvbsubtitle");
-				if (context->playback->isTeletext)
-					ret |= context->output->teletext->Command(context, command, "teletext");
 			}
 			else
 				ret = cERR_OUTPUT_INTERNAL_ERROR;
@@ -182,12 +146,6 @@ static int Command(void  *_context, OutputCmd_t command, void *argument)
 					ret |= context->output->video->Command(context, OUTPUT_CLOSE, "video");
 				if (context->playback->isAudio)
 					ret |= context->output->audio->Command(context, OUTPUT_CLOSE, "audio");
-				if (context->playback->isSubtitle)
-					ret |= context->output->subtitle->Command(context, OUTPUT_CLOSE, "subtitle");
-				if (context->playback->isDvbSubtitle)
-					ret |= context->output->dvbsubtitle->Command(context, command, "dvbsubtitle");
-				if (context->playback->isTeletext)
-					ret |= context->output->teletext->Command(context, command, "teletext");
 			}
 			else
 				ret = cERR_OUTPUT_INTERNAL_ERROR;
@@ -203,32 +161,16 @@ static int Command(void  *_context, OutputCmd_t command, void *argument)
 			OutputDel(context, (char *) argument);
 			break;
 		}
-		case OUTPUT_CAPABILITIES:
-		{
-			printOutputCapabilities();
-			break;
-		}
 		case OUTPUT_PLAY:   // 4
 		{
 			if (context && context->playback)
 			{
 				if (context->playback->isVideo)
 					ret = context->output->video->Command(context, OUTPUT_PLAY, "video");
-
 				if (!ret)   // success or not executed, dunn care
 				{
 					if (context->playback->isAudio)
 						ret = context->output->audio->Command(context, OUTPUT_PLAY, "audio");
-
-					if (!ret)   // success or not executed, dunn care
-					{
-						if (context->playback->isSubtitle)
-							ret = context->output->subtitle->Command(context, OUTPUT_PLAY, "subtitle");
-					}
-					if (context->playback->isDvbSubtitle)
-						ret |= context->output->dvbsubtitle->Command(context, command, "dvbsubtitle");
-					if (context->playback->isTeletext)
-						ret |= context->output->teletext->Command(context, command, "teletext");
 				}
 			}
 			else
@@ -243,12 +185,6 @@ static int Command(void  *_context, OutputCmd_t command, void *argument)
 					ret |= context->output->video->Command(context, OUTPUT_STOP, "video");
 				if (context->playback->isAudio)
 					ret |= context->output->audio->Command(context, OUTPUT_STOP, "audio");
-				if (context->playback->isSubtitle)
-					ret |= context->output->subtitle->Command(context, OUTPUT_STOP, "subtitle");
-				if (context->playback->isDvbSubtitle)
-					ret |= context->output->dvbsubtitle->Command(context, command, "dvbsubtitle");
-				if (context->playback->isTeletext)
-					ret |= context->output->teletext->Command(context, command, "teletext");
 			}
 			else
 				ret = cERR_OUTPUT_INTERNAL_ERROR;
@@ -262,8 +198,6 @@ static int Command(void  *_context, OutputCmd_t command, void *argument)
 					ret |= context->output->video->Command(context, OUTPUT_FLUSH, "video");
 				if (context->playback->isAudio)
 					ret |= context->output->audio->Command(context, OUTPUT_FLUSH, "audio");
-				//if (context->playback->isSubtitle)
-				//  ret |= context->output->subtitle->Command(context, OUTPUT_FLUSH, "subtitle");
 			}
 			else
 				ret = cERR_OUTPUT_INTERNAL_ERROR;
@@ -277,8 +211,6 @@ static int Command(void  *_context, OutputCmd_t command, void *argument)
 					ret |= context->output->video->Command(context, OUTPUT_PAUSE, "video");
 				if (context->playback->isAudio)
 					ret |= context->output->audio->Command(context, OUTPUT_PAUSE, "audio");
-				//if (context->playback->isSubtitle)
-				//  ret |= context->output->subtitle->Command(context, OUTPUT_PAUSE, "subtitle");
 			}
 			else
 				ret = cERR_OUTPUT_INTERNAL_ERROR;
@@ -292,8 +224,6 @@ static int Command(void  *_context, OutputCmd_t command, void *argument)
 					ret |= context->output->video->Command(context, OUTPUT_FASTFORWARD, "video");
 				if (context->playback->isAudio)
 					ret |= context->output->audio->Command(context, OUTPUT_FASTFORWARD, "audio");
-				//if (context->playback->isSubtitle)
-				//  ret |= context->output->subtitle->Command(context, OUTPUT_PAUSE, "subtitle");
 			}
 			else
 				ret = cERR_OUTPUT_INTERNAL_ERROR;
@@ -320,12 +250,6 @@ static int Command(void  *_context, OutputCmd_t command, void *argument)
 					ret |= context->output->video->Command(context, OUTPUT_CONTINUE, "video");
 				if (context->playback->isAudio)
 					ret |= context->output->audio->Command(context, OUTPUT_CONTINUE, "audio");
-				//if (context->playback->isSubtitle)
-				//  ret |= context->output->subtitle->Command(context, OUTPUT_CONTINUE, "subtitle");
-				if (context->playback->isDvbSubtitle)
-					ret |= context->output->dvbsubtitle->Command(context, command, "dvbsubtitle");
-				if (context->playback->isTeletext)
-					ret |= context->output->teletext->Command(context, command, "teletext");
 			}
 			else
 				ret = cERR_OUTPUT_INTERNAL_ERROR;
@@ -350,12 +274,6 @@ static int Command(void  *_context, OutputCmd_t command, void *argument)
 					ret |= context->output->video->Command(context, OUTPUT_CLEAR, "video");
 				if (context->playback->isAudio && (argument == NULL || *(char *) argument == 'a'))
 					ret |= context->output->audio->Command(context, OUTPUT_CLEAR, "audio");
-				//if (context->playback->isSubtitle && (argument == NULL || *(char *) argument == 's'))
-				//  ret |= context->output->subtitle->Command(context, OUTPUT_CLEAR, "subtitle");
-				if (context->playback->isDvbSubtitle)
-					ret |= context->output->dvbsubtitle->Command(context, command, "dvbsubtitle");
-				if (context->playback->isTeletext)
-					ret |= context->output->teletext->Command(context, command, "teletext");
 			}
 			else
 				ret = cERR_OUTPUT_INTERNAL_ERROR;
@@ -369,8 +287,6 @@ static int Command(void  *_context, OutputCmd_t command, void *argument)
 					return context->output->video->Command(context, OUTPUT_PTS, argument);
 				if (context->playback->isAudio)
 					return context->output->audio->Command(context, OUTPUT_PTS, argument);
-				//if (context->playback->isSubtitle)
-				//  return context->output->subtitle->Command(context, OUTPUT_PTS, "subtitle");
 			}
 			else
 				ret = cERR_OUTPUT_INTERNAL_ERROR;
@@ -384,10 +300,6 @@ static int Command(void  *_context, OutputCmd_t command, void *argument)
 					return context->output->audio->Command(context, OUTPUT_SWITCH, "audio");
 				if (context->playback->isVideo)
 					return context->output->video->Command(context, OUTPUT_SWITCH, "video");
-				if (context->playback->isDvbSubtitle)
-					ret |= context->output->dvbsubtitle->Command(context, command, "dvbsubtitle");
-				if (context->playback->isTeletext)
-					ret |= context->output->teletext->Command(context, command, "teletext");
 			}
 			else
 				ret = cERR_OUTPUT_INTERNAL_ERROR;
@@ -401,8 +313,6 @@ static int Command(void  *_context, OutputCmd_t command, void *argument)
 					ret |= context->output->video->Command(context, OUTPUT_SLOWMOTION, "video");
 				if (context->playback->isAudio)
 					ret |= context->output->audio->Command(context, OUTPUT_SLOWMOTION, "audio");
-				//if (context->playback->isSubtitle)
-				//  ret |= context->output->subtitle->Command(context, OUTPUT_PAUSE, "subtitle");
 			}
 			else
 				ret = cERR_OUTPUT_INTERNAL_ERROR;
@@ -430,28 +340,12 @@ static int Command(void  *_context, OutputCmd_t command, void *argument)
 				ret = cERR_OUTPUT_INTERNAL_ERROR;
 			break;
 		}
-		case OUTPUT_GET_FRAME_COUNT:
-		{
-			if (context && context->playback)
-			{
-				if (context->playback->isVideo)
-					return context->output->video->Command(context, OUTPUT_GET_FRAME_COUNT, argument);
-				if (context->playback->isAudio)
-					return context->output->audio->Command(context, OUTPUT_GET_FRAME_COUNT, argument);
-				//if (context->playback->isSubtitle)
-				//  return context->output->subtitle->Command(context, OUTPUT_GET_FRAME_COUNT, "subtitle");
-			}
-			else
-				ret = cERR_OUTPUT_INTERNAL_ERROR;
-			break;
-		}
 		default:
 			output_err("%s::%s OutputCmd %d not supported!\n", FILENAME, __FUNCTION__, command);
 			ret = cERR_OUTPUT_INTERNAL_ERROR;
 			break;
 	}
 	output_printf(10, "%s::%s exiting with value %d\n", FILENAME, __FUNCTION__, ret);
-
 	return ret;
 }
 
@@ -461,7 +355,5 @@ OutputHandler_t OutputHandler =
 	NULL,
 	NULL,
 	NULL,
-	NULL, // dvbsubtitle
-	NULL, // teletext
 	&Command
 };

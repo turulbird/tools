@@ -716,7 +716,6 @@ RemoteControl_t Spark_RC =
 	&pShutdown,
 	&pRead,
 	&pNotification,
-//	cButtonsEdisionSpark,
 	cButtonsSparkDefault,
 	NULL,
 	NULL,

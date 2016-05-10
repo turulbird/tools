@@ -29,16 +29,15 @@ Collisions: Normal\n\
 Timer: 100.0000\n\n\
 [V4 Styles]\n\
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding\n\
-Style: Default,Arial,58,16777215,0,16777215,0,0,0,2,2,2,2,20,20,10,0\n\n\
+Style: Default,Arial,64,16777215,0,16777215,0,0,0,2,2,2,2,20,20,10,0\n\n\
 [Events]\n\
 Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n\n\n"
 
 static inline unsigned char *text_to_ass(char *text, long long int pts, double duration)
 {
 	char buf[2048];
-	unsigned int x, pos = 0, len = 0;
+	unsigned int x, pos = 0, len = 0, comma = 0;
 	if (text == NULL) return NULL;
-
 	len = strlen(text);
 	for (x = 0; x < len; x++)
 	{
@@ -47,7 +46,19 @@ static inline unsigned char *text_to_ass(char *text, long long int pts, double d
 			buf[pos++] = '\\';
 			buf[pos++] = 'N';
 		}
-		else if (text[x] != '\r')buf[pos++] = text[x];
+		else if (text[x] != '\r')
+		{
+			buf[pos++] = text[x];
+			if ((text[x] == ',') && (comma < 32))
+			{
+				comma++;
+				if ((comma > 5) && (text[x - 1] == ',')) //It seems that this is already ass block, text starts here
+				{
+					pos = 0;
+					comma = 32;
+				}
+			}
+		}
 	}
 	buf[pos++] = '\0';
 	len = 80 + strlen(buf);
@@ -56,17 +67,21 @@ static inline unsigned char *text_to_ass(char *text, long long int pts, double d
 	int sc = pts / 10;
 	int ec = end_pts  / 10;
 	int sh, sm, ss, eh, em, es;
-	sh = sc / 360000;  sc -= 360000 * sh;
-	sm = sc /  6000;  sc -=   6000 * sm;
-	ss = sc /   100;  sc -=    100 * ss;
-	eh = ec / 360000;  ec -= 360000 * eh;
-	em = ec /  6000;  ec -=   6000 * em;
-	es = ec /   100;  ec -=    100 * es;
+	sh = sc / 360000;
+	sc -= 360000 * sh;
+	sm = sc /  6000;
+	sc -=   6000 * sm;
+	ss = sc /   100;
+	sc -=    100 * ss;
+	eh = ec / 360000;
+	ec -= 360000 * eh;
+	em = ec /  6000;
+	ec -=   6000 * em;
+	es = ec /   100;
+	ec -=    100 * es;
 	snprintf(line, len, "Dialogue: Marked=0,%d:%02d:%02d.%02d,%d:%02d:%02d.%02d,Default,NTP,0000,0000,0000,!Effect,%s\n",
-			 sh, sm, ss, sc, eh, em, es, ec, buf);
-
+		 sh, sm, ss, sc, eh, em, es, ec, buf);
 	return (unsigned char *)line;
-
 }
 
 typedef enum

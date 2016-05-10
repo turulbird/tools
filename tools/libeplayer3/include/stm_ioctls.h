@@ -37,7 +37,7 @@
 #define VIDEO_EVENT_VSYNC_OFFSET_MEASURED       (VIDEO_EVENT_TRICK_MODE_CHANGE+1)
 #define VIDEO_EVENT_FATAL_ERROR                 (VIDEO_EVENT_VSYNC_OFFSET_MEASURED+1)
 #define VIDEO_EVENT_OUTPUT_SIZE_CHANGED         (VIDEO_EVENT_FATAL_ERROR+1)
-#define VIDEO_EVENT_FATAL_HARDWARE_FAILURE  (VIDEO_EVENT_OUTPUT_SIZE_CHANGED+1)
+#define VIDEO_EVENT_FATAL_HARDWARE_FAILURE      (VIDEO_EVENT_OUTPUT_SIZE_CHANGED+1)
 
 /*
  * List of possible container types - used to select demux..  If stream_source is VIDEO_SOURCE_DEMUX
@@ -200,15 +200,15 @@ typedef dvb_play_info_t                 audio_play_info_t;
 
 typedef enum
 {
-#define DVB_OPTION_VALUE_DISABLE                                                        0
-#define DVB_OPTION_VALUE_ENABLE                                                         1
+#define DVB_OPTION_VALUE_DISABLE                                                              0
+#define DVB_OPTION_VALUE_ENABLE                                                               1
 
 	DVB_OPTION_TRICK_MODE_AUDIO                                                         = 0,
 	DVB_OPTION_PLAY_24FPS_VIDEO_AT_25FPS                                                = 1,
 
-#define DVB_OPTION_VALUE_VIDEO_CLOCK_MASTER                                             0
-#define DVB_OPTION_VALUE_AUDIO_CLOCK_MASTER                                             1
-#define DVB_OPTION_VALUE_SYSTEM_CLOCK_MASTER                                            2
+#define DVB_OPTION_VALUE_VIDEO_CLOCK_MASTER                                                   0
+#define DVB_OPTION_VALUE_AUDIO_CLOCK_MASTER                                                   1
+#define DVB_OPTION_VALUE_SYSTEM_CLOCK_MASTER                                                  2
 	DVB_OPTION_MASTER_CLOCK                                                             = 2,
 
 	DVB_OPTION_EXTERNAL_TIME_MAPPING                                                    = 3,
@@ -220,8 +220,8 @@ typedef enum
 	DVB_OPTION_STREAM_SINGLE_GROUP_BETWEEN_DISCONTINUITIES                              = 8,
 	DVB_OPTION_CLAMP_PLAYBACK_INTERVAL_ON_PLAYBACK_DIRECTION_CHANGE                     = 9,
 
-#define DVB_OPTION_VALUE_PLAYOUT                                                        0
-#define DVB_OPTION_VALUE_DISCARD                                                        1
+#define DVB_OPTION_VALUE_PLAYOUT                                                              0
+#define DVB_OPTION_VALUE_DISCARD                                                              1
 	DVB_OPTION_PLAYOUT_ON_TERMINATE                                                     = 10,
 	DVB_OPTION_PLAYOUT_ON_SWITCH                                                        = 11,
 	DVB_OPTION_PLAYOUT_ON_DRAIN                                                         = 12,
@@ -229,18 +229,18 @@ typedef enum
 	DVB_OPTION_VIDEO_ASPECT_RATIO                                                       = 13,
 	DVB_OPTION_VIDEO_DISPLAY_FORMAT                                                     = 14,
 
-#define DVB_OPTION_VALUE_TRICK_MODE_AUTO                                                0
-#define DVB_OPTION_VALUE_TRICK_MODE_DECODE_ALL                                          1
-#define DVB_OPTION_VALUE_TRICK_MODE_DECODE_ALL_DEGRADE_NON_REFERENCE_FRAMES             2
-#define DVB_OPTION_VALUE_TRICK_MODE_START_DISCARDING_NON_REFERENCE_FRAMES               3
-#define DVB_OPTION_VALUE_TRICK_MODE_DECODE_REFERENCE_FRAMES_DEGRADE_NON_KEY_FRAMES      4
-#define DVB_OPTION_VALUE_TRICK_MODE_DECODE_KEY_FRAMES                                   5
-#define DVB_OPTION_VALUE_TRICK_MODE_DISCONTINUOUS_KEY_FRAMES                            6
+#define DVB_OPTION_VALUE_TRICK_MODE_AUTO                                                      0
+#define DVB_OPTION_VALUE_TRICK_MODE_DECODE_ALL                                                1
+#define DVB_OPTION_VALUE_TRICK_MODE_DECODE_ALL_DEGRADE_NON_REFERENCE_FRAMES                   2
+#define DVB_OPTION_VALUE_TRICK_MODE_START_DISCARDING_NON_REFERENCE_FRAMES                     3
+#define DVB_OPTION_VALUE_TRICK_MODE_DECODE_REFERENCE_FRAMES_DEGRADE_NON_KEY_FRAMES            4
+#define DVB_OPTION_VALUE_TRICK_MODE_DECODE_KEY_FRAMES                                         5
+#define DVB_OPTION_VALUE_TRICK_MODE_DISCONTINUOUS_KEY_FRAMES                                  6
 	DVB_OPTION_TRICK_MODE_DOMAIN                                                        = 15,
 
-#define DVB_OPTION_VALUE_DISCARD_LATE_FRAMES_NEVER                                      0
-#define DVB_OPTION_VALUE_DISCARD_LATE_FRAMES_ALWAYS                                     1
-#define DVB_OPTION_VALUE_DISCARD_LATE_FRAMES_AFTER_SYNCHRONIZE                          2
+#define DVB_OPTION_VALUE_DISCARD_LATE_FRAMES_NEVER                                            0
+#define DVB_OPTION_VALUE_DISCARD_LATE_FRAMES_ALWAYS                                           1
+#define DVB_OPTION_VALUE_DISCARD_LATE_FRAMES_AFTER_SYNCHRONIZE                                2
 	DVB_OPTION_DISCARD_LATE_FRAMES                                                      = 16,
 	DVB_OPTION_VIDEO_START_IMMEDIATE                                                    = 17,
 	DVB_OPTION_REBASE_ON_DATA_DELIVERY_LATE                                             = 18,
@@ -254,14 +254,14 @@ typedef enum
 	DVB_OPTION_CLOCK_RATE_ADJUSTMENT_LIMIT_2_TO_THE_N_PARTS_PER_MILLION                 = 25,                /* Value = N */
 	DVB_OPTION_LIMIT_INPUT_INJECT_AHEAD                                                 = 26,
 
-#define DVB_OPTION_VALUE_MPEG2_APPLICATION_MPEG2                                        0
-#define DVB_OPTION_VALUE_MPEG2_APPLICATION_ATSC                                         1
-#define DVB_OPTION_VALUE_MPEG2_APPLICATION_DVB                                          2
+#define DVB_OPTION_VALUE_MPEG2_APPLICATION_MPEG2                                              0
+#define DVB_OPTION_VALUE_MPEG2_APPLICATION_ATSC                                               1
+#define DVB_OPTION_VALUE_MPEG2_APPLICATION_DVB                                                2
 	DVB_OPTION_MPEG2_APPLICATION_TYPE                                                   = 27,
 
-#define DVB_OPTION_VALUE_DECIMATE_DECODER_OUTPUT_DISABLED                               0
-#define DVB_OPTION_VALUE_DECIMATE_DECODER_OUTPUT_HALF                                   1
-#define DVB_OPTION_VALUE_DECIMATE_DECODER_OUTPUT_QUARTER                                2
+#define DVB_OPTION_VALUE_DECIMATE_DECODER_OUTPUT_DISABLED                                     0
+#define DVB_OPTION_VALUE_DECIMATE_DECODER_OUTPUT_HALF                                         1
+#define DVB_OPTION_VALUE_DECIMATE_DECODER_OUTPUT_QUARTER                                      2
 	DVB_OPTION_DECIMATE_DECODER_OUTPUT                                                  = 28,
 
 	DVB_OPTION_PTS_FORWARD_JUMP_DETECTION_THRESHOLD                                     = 29,
@@ -269,7 +269,7 @@ typedef enum
 
 	DVB_OPTION_PIXEL_ASPECT_RATIO_CORRECTION                                            = 32,
 
-	DVB_OPTION_H264_FORCE_PIC_ORDER_CNT_IGNORE_DPB_DISPLAY_FRAME_ORDERING       = 33,
+	DVB_OPTION_H264_FORCE_PIC_ORDER_CNT_IGNORE_DPB_DISPLAY_FRAME_ORDERING               = 33,
 
 	DVB_OPTION_PTS_SYMMETRIC_JUMP_DETECTION                                             = 34,
 
