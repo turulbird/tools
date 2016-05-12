@@ -49,7 +49,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* software version of fp_control. please increase on every change */
-static const char *sw_version = "1.07NdV 20160323.1";
+static const char *sw_version = "1.07NdV 20160512.1";
 
 typedef struct
 {
@@ -78,7 +78,7 @@ tArgs vArgs[] =
 	{ "-l", "  --setLed             ", "Args: led on\n\tSet a led on or off" },
 	{ "-i", "  --setIcon            ", "Args: icon on\n\tSet an icon on or off" },
 	{ "-b", "  --setBrightness      ", "Arg : brightness 0..7\n\tSet display brightness" },
-	{ "-led", " --setLedBrightness   ", "Arg : brightness\n\tSet LED brightness" },
+	{ "-led", "--setLedBrightness   ", "Arg : brightness\n\tSet LED brightness" },
 	{ "-w", "  --getWakeupReason    ", "Args: No arguments\n\tGet the wake-up reason" },
 	{ "-L", "  --setLight           ", "Arg : 0/1\n\tSet light" },
 	{ "-c", "  --clear              ", "Args: No arguments\n\tClear display, all icons and leds off" },
@@ -88,7 +88,7 @@ tArgs vArgs[] =
 	{ "-dt", " --display_time       ", "Arg : 0/1\n\tSet time display on/off" },
 	{ "-tm", " --time_mode          ", "Arg : 0/1\n\tSet 12 or 24 hour time mode" },
 	{ "-V", "  --verbose            ", "Args: None\n\tVerbose operation" },
-	{ "-ms", " --set_model_specific ", "Args: int\n\tModel specific set function" },
+//	{ "-ms", " --set_model_specific ", "Args: int\n\tModel specific set function" },
 	{ NULL, NULL, NULL }
 };
 time_t *theGMTTime;

@@ -56,6 +56,7 @@ unsigned int time_mode;
 /* ******************* constants ************************ */
 
 #define cVFD_DEVICE "/dev/vfd"
+#define cRTC_OFFSET_FILE "/proc/stb/fp/rtc_offset"
 #define cMAXCharsSpark 16
 
 typedef struct
@@ -497,6 +498,8 @@ static int Spark_setSTime(Context_t *context, time_t *theGMTTime)
 	//-sst command
 	time_t systemTime = time(NULL);
 	struct tm *sst;
+	int proc_fs;
+	FILE *proc_fs_file;
 
 	sst = localtime(&systemTime);
 	if (sst->tm_year == 100)
@@ -506,6 +509,7 @@ static int Spark_setSTime(Context_t *context, time_t *theGMTTime)
 	else
 	{
 		systemTime += sst->tm_gmtoff;
+		// set front panel clock to local time
 		if (ioctl(context->fd, VFDSETTIME2, &systemTime) < 0)
 		{
 			perror("Set FP time to system time");
@@ -513,6 +517,25 @@ static int Spark_setSTime(Context_t *context, time_t *theGMTTime)
 		}
 		fprintf(stderr, "Frontprocessor time set to: %02d:%02d:%02d %02d-%02d-%04d\n", sst->tm_hour,
 			 sst->tm_min, sst->tm_sec, sst->tm_mday, sst->tm_mon + 1, sst->tm_year + 1900);
+
+		// write UTC offset to /proc/stb/fp/rtc_offset
+		proc_fs_file = fopen(cRTC_OFFSET_FILE, "w");
+		if (proc_fs_file == NULL)
+		{
+//			fprintf(stderr, "Cannot open %s\n", cRTC_OFFSET_FILE);
+			perror("Open rtc_offset");
+			return -1;
+		}
+		proc_fs = fprintf(proc_fs_file, "%d", (int)sst->tm_gmtoff);
+		if (proc_fs < 0)
+		{
+//			fprintf(stderr, "Cannot write %s\n", cRTC_OFFSET_FILE);
+			perror("Write rtc_offset");
+			return -1;
+		}
+		fclose(proc_fs_file);
+		fprintf(stderr, "/proc/stb/fp/rtc_offset set to: %+d seconds\n", (int)sst->tm_gmtoff);
+
 	}
 	return 0;
 }
