@@ -30,7 +30,9 @@
  * model specific commands -ms and -gms,
  * setLEDbrightness replaces powerLed
  * Verbose mode
- * DVFD FP detection
+ * Spark DVFD FP detection
+ * Improved argument handling
+ * Fortis -v
  * by audioniek
  */
 #include <fcntl.h>
@@ -48,8 +50,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/* software version of fp_control. please increase on every change */
-static const char *sw_version = "1.07NdV 20160512.1";
+/* Software version of fp_control, please increase on every change */
+static const char *sw_version = "1.08Audioniek 20160608.1";
 
 typedef struct
 {
@@ -58,28 +60,36 @@ typedef struct
 	char *arg_description;
 } tArgs;
 
+time_t *theGMTTime;
+char vName[129] = "Unknown";
+int Vdisplay = 0; //
+int Vdisplay_custom = 0;
+char *VtimeFormat = "Unknown";
+int Vwakeup = 5 * 60; //default wakeup decrement in minutes
+const char *wakeupreason[4] = { "Unknown", "Power on", "From deep standby", "Timer" };
+
 tArgs vArgs[] =
 {
 	{ "-e", "  --setTimer           ", "Args: None or [time date] in format HH:MM:SS dd-mm-YYYY \
 \n\tSet the most recent timer from e2 or neutrino to the frontcontroller and standby \
 \n\tSet the current frontcontroller wake-up time" 
 	},
-	{ "-d", "  --shutDown           ", "Args: [time date] Format: HH:MM:SS dd-mm-YYYY\n\tMimics shutdown command. Shutdown receiver via fc at given time." },
-	{ "-g", "  --getTime            ", "Args: No arguments\n\tReturn current set frontcontroller time" },
-	{ "-gs", " --getTimeAndSet      ", "Args: No arguments\n\tSet system time to current frontcontroller time" },
-	{ "-gw", " --getWakeupTime      ", "Args: No arguments\n\tReturn current wakeup time" },
-	{ "-s", "  --setTime            ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller time" },
-	{ "-sst", "--setSystemTime      ", "Args: No arguments\n\tSet the frontcontroller time equal to system time" },
-	{ "-gt", " --getWakeTime        ", "Args: No arguments\n\tGet the frontcontroller wake up time" },
-	{ "-st", " --setWakeTime        ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller wake up time" },
-	{ "-r", "  --reboot             ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tReboot receiver via fc at given time" },
-	{ "-p", "  --sleep              ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tReboot receiver via fc at given time" },
+	{ "-d", "  --shutDown         * ", "Args: [time date] Format: HH:MM:SS dd-mm-YYYY\n\tMimics shutdown command. Shutdown receiver via fc at given time." },
+	{ "-g", "  --getTime          * ", "Args: No arguments\n\tReturn current set frontcontroller time" },
+	{ "-gs", " --getTimeAndSet    * ", "Args: No arguments\n\tSet system time to current frontcontroller time" },
+	{ "-gw", " --getWakeupTime    * ", "Args: No arguments\n\tReturn current wakeup time" },
+	{ "-s", "  --setTime          * ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller time" },
+	{ "-sst", "--setSystemTime    * ", "Args: No arguments\n\tSet the frontcontroller time equal to system time" },
+	{ "-gt", " --getWakeTime      * ", "Args: No arguments\n\tGet the frontcontroller wake up time" },
+	{ "-st", " --setWakeTime      * ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller wake up time" },
+	{ "-r", "  --reboot           * ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tReboot receiver via fc at given time" },
+	{ "-p", "  --sleep            * ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tReboot receiver via fc at given time" },
 	{ "-t", "  --settext            ", "Arg : text\n\tSet text to frontpanel." },
 	{ "-l", "  --setLed             ", "Args: led on\n\tSet a led on or off" },
 	{ "-i", "  --setIcon            ", "Args: icon on\n\tSet an icon on or off" },
 	{ "-b", "  --setBrightness      ", "Arg : brightness 0..7\n\tSet display brightness" },
-	{ "-led", "--setLedBrightness   ", "Arg : brightness\n\tSet LED brightness" },
-	{ "-w", "  --getWakeupReason    ", "Args: No arguments\n\tGet the wake-up reason" },
+	{ "-led", " --setLedBrightness   ", "Arg : brightness\n\tSet LED brightness" },
+	{ "-w", "  --getWakeupReason  * ", "Args: No arguments\n\tGet the wake-up reason" },
 	{ "-L", "  --setLight           ", "Arg : 0/1\n\tSet light" },
 	{ "-c", "  --clear              ", "Args: No arguments\n\tClear display, all icons and leds off" },
 	{ "-v", "  --version            ", "Args: No arguments\n\tGet version from fc" },
@@ -88,16 +98,9 @@ tArgs vArgs[] =
 	{ "-dt", " --display_time       ", "Arg : 0/1\n\tSet time display on/off" },
 	{ "-tm", " --time_mode          ", "Arg : 0/1\n\tSet 12 or 24 hour time mode" },
 	{ "-V", "  --verbose            ", "Args: None\n\tVerbose operation" },
-//	{ "-ms", " --set_model_specific ", "Args: int\n\tModel specific set function" },
 	{ NULL, NULL, NULL }
 };
-time_t *theGMTTime;
-char vName[129] = "Unknown";
-int Vdisplay = 0; //
-int Vdisplay_custom = 0;
-char *VtimeFormat = "Unknown";
-int Vwakeup = 5 * 60; //default wakeup decrement in minutes
-const char *wakeupreason[4] = { "Unknown", "Power on", "From deep standby", "Timer" };
+
 
 int usage(Context_t *context, char *prg, char *cmd)
 {
@@ -120,6 +123,7 @@ int usage(Context_t *context, char *prg, char *cmd)
 				fprintf(stderr, "%s   %s   %s\n", vArgs[i].arg, vArgs[i].arg_long, vArgs[i].arg_description);
 			}
 		}
+		fprintf(stderr, "Options marked * should be the only calling argument.\n");
 	}
 	if (((Model_t *)context->m)->Exit)
 	{
@@ -159,7 +163,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 	if (argc > 1)
 	{
 		i = 1;
-		while (i < argc)
+		while (argc > i)
 		{
 			if ((strcmp(argv[i], "-V") == 0) || (strcmp(argv[i], "--verbose") == 0))
 			{
@@ -183,7 +187,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				}
 				else
 				{
-					usage(context, argv[0], argv[1]);
+					usage(context, argv[0], argv[i]);
 				}
 			}
 			else if ((strcmp(argv[i], "-g") == 0) || (strcmp(argv[i], "--getTime") == 0))
@@ -265,7 +269,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 					}
 					else
 					{
-						usage(context, argv[0], argv[1]);
+						usage(context, argv[0], argv[i]);
 					}
 				}
 				i += 2;
@@ -294,7 +298,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 					}
 					else
 					{
-						usage(context, argv[0], argv[1]);
+						usage(context, argv[0], argv[i]);
 					}
 				}
 				i += 2;
@@ -323,7 +327,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				}
 				else
 				{
-					usage(context, argv[0], argv[1]);
+					usage(context, argv[0], argv[i]);
 				}
 				i += 2;
 			}
@@ -353,7 +357,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				}
 				else
 				{
-					usage(context, argv[0], argv[1]);
+					usage(context, argv[0], argv[i]);
 				}
 			}
 			else if ((strcmp(argv[i], "-p") == 0) || (strcmp(argv[i], "--sleep") == 0))
@@ -369,33 +373,37 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				}
 				else
 				{
-					usage(context, argv[0], argv[1]);
+					usage(context, argv[0], argv[i]);
 				}
 				i += 2;
 			}
 			else if ((strcmp(argv[i], "-t") == 0) || (strcmp(argv[i], "--settext") == 0))
 			{
-				if (i + 1 <= argc)
+				if (argc >= i + 1)
 				{
+					if ((argc - i) == 1)
+					{
+						usage(context, argv[0], argv[i]);
+					}
 					/* set display text */
 					if (((Model_t *)context->m)->SetText)
 					{
 						((Model_t *)context->m)->SetText(context, argv[i + 1]);
 					}
 				}
-				else
-				{
-					usage(context, argv[0], argv[1]);
-				}
 				i += 1;
 			}
 			else if ((strcmp(argv[i], "-l") == 0) || (strcmp(argv[i], "--setLed") == 0))
 			{
-				if (i + 2 <= argc)
+				if (argc >= i + 2)
 				{
 					int which, on;
 
 					which = atoi(argv[i + 1]);
+					if ((argc - i) == 2)
+					{
+						usage(context, argv[0], argv[i]);
+					}
 					on = atoi(argv[i + 2]);
 					/* set display led */
 					if (((Model_t *)context->m)->SetLed)
@@ -405,17 +413,21 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				}
 				else
 				{
-					usage(context, argv[0], argv[1]);
+					usage(context, argv[0], argv[i]);
 				}
 				i += 2;
 			}
 			else if ((strcmp(argv[i], "-i") == 0) || (strcmp(argv[i], "--setIcon") == 0))
 			{
-				if (i + 2 <= argc)
+				if (argc >= i + 2)
 				{
 					int which, on;
 
 					which = atoi(argv[i + 1]);
+					if ((argc - i) == 2)
+					{
+						usage(context, argv[0], argv[i]);
+					}
 					on = atoi(argv[i + 2]);
 					/* set display icon */
 					if (((Model_t *)context->m)->SetIcon)
@@ -423,14 +435,22 @@ void processCommand(Context_t *context, int argc, char *argv[])
 						((Model_t *)context->m)->SetIcon(context, which, on);
 					}
 				}
+				else
+				{
+					usage(context, argv[0], argv[i]);
+				}
 				i += 2;
 			}
 			else if ((strcmp(argv[i], "-b") == 0) || (strcmp(argv[i], "--setBrightness") == 0))
 			{
-				if (i + 1 <= argc)
+				if (argc >= i + 1)
 				{
 					int brightness;
 
+					if ((argc - i) == 1)
+					{
+						usage(context, argv[0], argv[i]);
+					}
 					brightness = atoi(argv[i + 1]);
 					/* set display brightness */
 					if (((Model_t *)context->m)->SetBrightness)
@@ -461,11 +481,15 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			}
 			else if ((strcmp(argv[i], "-L") == 0) || (strcmp(argv[i], "--setLight") == 0))
 			{
-				if (i + 1 < argc) // accept 1 or 2 arguments
+				if (argc >= i + 1)
 				{
 					int on;
-					on = atoi(argv[i + 1]);
 
+					if ((argc - i) == 1)
+					{
+						usage(context, argv[0], argv[i]);
+					}
+					on = atoi(argv[i + 1]);
 					if (((Model_t *)context->m)->SetLight)
 					{
 						((Model_t *)context->m)->SetLight(context, on);
@@ -483,11 +507,15 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			}
 			else if ((strcmp(argv[i], "-led") == 0) || (strcmp(argv[i], "--setLedBrightness") == 0))
 			{
-				if (i + 1 <= argc)
+				if (argc >= i + 1)
 				{
 					/* set LED brightness */
 					int brightness;
 
+					if ((argc - i) == 1)
+					{
+						usage(context, argv[0], argv[i]);
+					}
 					brightness = atoi(argv[i + 1]);
 					if (((Model_t *)context->m)->SetLedBrightness)
 					{
@@ -525,14 +553,22 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				{
 					printf("Error: FP version is unknown\n");
 				}
+				else
+				{
+					printf("FP version is %d.%d\n", version / 100, version % 100);
+				}
 			}
 			else if ((strcmp(argv[i], "-sf") == 0) || (strcmp(argv[i], "--setFan") == 0))
 			{
-				if (i + 1 <= argc)
+				if (argc >= i + 1)
 				{
 					int on;
-					on = atoi(argv[i + 1]);
 
+					if ((argc - i) == 1)
+					{
+						usage(context, argv[0], argv[i]);
+					}
+					on = atoi(argv[i + 1]);
 					/* set fan on/off */
 					if (((Model_t *)context->m)->SetFan)
 					{
@@ -543,11 +579,15 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			}
 			else if ((strcmp(argv[i], "-sr") == 0) || (strcmp(argv[i], "--setRF") == 0))
 			{
-				if (i + 1 <= argc)
+				if (argc >= i + 1)
 				{
 					int on;
-					on = atoi(argv[i + 1]);
 
+					if ((argc - i) == 1)
+					{
+						usage(context, argv[0], argv[i]);
+					}
+					on = atoi(argv[i + 1]);
 					/* set rf on/off */
 					if (((Model_t *)context->m)->SetRF)
 					{
@@ -558,11 +598,15 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			}
 			else if ((strcmp(argv[i], "-dt") == 0) || (strcmp(argv[i], "--display_time") == 0))
 			{
-				if (i + 1 <= argc)
+				if (argc >= i + 1)
 				{
 					int on;
-					on = atoi(argv[i + 1]);
 
+					if ((argc - i) == 1)
+					{
+						usage(context, argv[0], argv[i]);
+					}
+					on = atoi(argv[i + 1]);
 					/* set time display */
 					if (((Model_t *)context->m)->SetDisplayTime)
 					{
@@ -573,11 +617,15 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			}
 			else if ((strcmp(argv[i], "-tm") == 0) || (strcmp(argv[i], "--time_mode") == 0))
 			{
-				if (i + 1 <= argc)
+				if (argc >= i + 1)
 				{
 					int twentyFour;
-					twentyFour = atoi(argv[i + 1]);
 
+					if ((argc - i) == 1)
+					{
+						usage(context, argv[0], argv[i]);
+					}
+					twentyFour = atoi(argv[i + 1]);
 					/* set 12/24 hour mode */
 					if (((Model_t *)context->m)->SetTimeMode)
 					{
@@ -585,47 +633,6 @@ void processCommand(Context_t *context, int argc, char *argv[])
 					}
 				}
 				i += 1;
-			}
-			else if ((strcmp(argv[i], "-ms") == 0) || (strcmp(argv[i], "--model_specific") == 0))
-			{
-				int len, j;
-				int testdata[17];
-//				int return_size;
-
-				len = argc - 2;
-				if ((len > 0) && (len <= 16))
-				{
-					if (i + len <= argc)
-					{
-						testdata[0] = len;
-//						printf("j=0 testdata=%02x\n",testdata[0]);
-						for (j = 1; j <= len; j++)
-						{
-							testdata[j] = atoi(argv[j + 1]) & 0xFF;
-//							printf("j=%d testdata=%02x\n",j,testdata[j]);
-						}
-						/* do model specific function */
-						if (((Model_t *)context->m)->ModelSpecific)
-						{
-							((Model_t *)context->m)->ModelSpecific(context, len, testdata);
-						}
-						if (testdata[0] != -1)
-						{
-//							printf("Return result = %02x\n",testdata[0]&0xff);
-							printf("Command executed OK.\n");
-						}
-						else
-						{
-							printf("Error occurred.\n");
-						}
-					}
-				}
-				else
-				{
-					printf("Wrong number of arguments, minimum is 1, maximum is 16.\n");
-					usage(context, argv[0], argv[1]);
-				}
-				i += len;
 			}
 			else
 			{
@@ -660,11 +667,11 @@ int getKathreinUfs910BoxType()
 
 int getModel()
 {
-	int         vFd             = -1;
-	const int   cSize           = 128;
-	char        vName[129]      = "Unknown";
-	int         vLen            = -1;
-	eBoxType    vBoxType        = Unknown;
+	int vFd = -1;
+	const int cSize = 128;
+	char vName[129] = "Unknown";
+	int vLen = -1;
+	eBoxType vBoxType = Unknown;
 
 	vFd = open("/proc/stb/info/model", O_RDONLY);
 	vLen = read(vFd, vName, cSize);
@@ -772,7 +779,7 @@ int main(int argc, char *argv[])
 	if (argc > 1)
 	{
 		i = 1;
-		while (i < argc)
+		while (argc > i) //scan the command line for -V or --verbose
 		{
 			if ((strcmp(argv[i], "-V") == 0) || (strcmp(argv[i], "--verbose") == 0))
 			{
@@ -788,6 +795,7 @@ int main(int argc, char *argv[])
 		printf("%s Version %s\n", argv[0], sw_version);
 	}
 	vBoxType = getModel();
+
 	if (searchModel(&context, vBoxType) != 0)
 	{
 		printf("Model not found\n");

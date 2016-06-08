@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <linux/reboot.h>
+#include <sys/reboot.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -115,6 +117,8 @@ static unsigned int gNextKeyFlag = 0xFF;
 static sem_t keydown_sem;
 static pthread_t keydown_thread;
 
+static bool countFlag = false;
+
 #ifdef NITS_SEM_PATCH_WOULD_WORK
 // Your patch crashes the long key press detection.
 // You know there was a reason why I didn't do it this way.
@@ -197,6 +201,12 @@ int processComplex(Context_t *context, int argc, char *argv[])
 
 	int         vCurrentCode      = -1;
 
+	unsigned int diffTime = 0;
+	unsigned int waitTime = 0;
+	int keyCount = 0;
+	bool newKey = false;
+	bool startFlag = false;
+
 	printf("%s >\n", __func__);
 
 	if (((RemoteControl_t *)context->r)->Init)
@@ -250,11 +260,56 @@ int processComplex(Context_t *context, int argc, char *argv[])
 			gNextKey++;
 			gNextKey %= 20;
 			gNextKeyFlag = nextKeyFlag;
+			newKey = true;
 		}
+		else
+			newKey = false;
 
 		gettimeofday(&time, NULL);
-		printf("**** %12u %d ****\n", (unsigned int)diffMilli(profilerLast, time), gNextKey);
+		diffTime = (unsigned int)diffMilli(profilerLast, time);
+		printf("**** %12u %d ****\n", diffTime, gNextKey);
 		profilerLast = time;
+
+		if (countFlag)
+			waitTime += diffTime;
+
+		if (countFlag && newKey && gKeyCode == 0x74) {
+			if (waitTime < 10000) {				// reboot if pressing 5 times power within 10 seconds
+				keyCount += 1;
+				printf("Power Count= %d\n", keyCount);
+				if (keyCount >= 5) {
+					countFlag = false;
+					keyCount = 0;
+					waitTime = 0;
+					printf("[evremote2] > Emergency REBOOT !!!\n");
+					fflush(stdout);
+					system("init 6");
+					sleep(4);
+					reboot(LINUX_REBOOT_CMD_RESTART);
+				}
+			}
+			else {						// release reboot counter
+				countFlag = false;
+				keyCount = 0;
+				waitTime = 0;
+			}
+		}
+		else if (countFlag && gKeyCode == 0x74)
+			countFlag = true;
+		else
+			countFlag = false;
+
+		if (startFlag && newKey && gKeyCode == 0x74 && diffTime < 1000) { //KEY_POWER > reboot counter enabled
+			countFlag = true;
+			waitTime = diffTime;
+			keyCount = 1;
+			printf("Power Count= %d\n", keyCount);
+		}
+
+		if (gKeyCode == 0x160) //KEY_OK > initiates reboot counter when pressing power within 1 second
+			startFlag = true;
+		else
+			startFlag = false;
 
 		sem_up();
 
@@ -297,7 +352,7 @@ void *detectKeyUpTask(void *dummy)
 			//Check if tuxtxt is running
 			tux = checkTuxTxt(keyCode);
 
-			if (tux == false)
+			if (tux == false && !countFlag)
 				sendInputEventT(INPUT_PRESS, keyCode);
 
 			//usleep(gBtnDelay*1000);
@@ -317,7 +372,7 @@ void *detectKeyUpTask(void *dummy)
 			printf("KEY_RELEASE - %02x %02x %d %d CAUSE=%s\n", keyCode, gKeyCode, nextKey, gNextKey, (gKeyCode == 0) ? "Timeout" : "New key");
 
 			//Check if tuxtxt is running
-			if (tux == false)
+			if (tux == false && !countFlag)
 				sendInputEventT(INPUT_RELEASE, keyCode);
 
 			//deactivate visual notification
@@ -400,19 +455,15 @@ int getModel()
 			vBoxType = Vip2;
 		else if (!strncasecmp(vName, "vip2-v1", 7))
 			vBoxType = Vip2;
-		else if (!strncasecmp(vName, "hdbox", 5))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "atevio7500", 10))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "octagon1008", 11))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "hs7110", 6))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "hs7810a", 7))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "hs7119", 6))
-			vBoxType = Fortis;
-		else if (!strncasecmp(vName, "hs7819", 6))
+		else if ((!strncasecmp(vName, "hdbox", 5)) ||
+				 (!strncasecmp(vName, "atevio7500", 10)) ||
+				 (!strncasecmp(vName, "octagon1008", 11)) ||
+				 (!strncasecmp(vName, "hs7110", 6)) ||
+				 (!strncasecmp(vName, "hs7420", 6)) ||
+				 (!strncasecmp(vName, "hs7810a", 7)) ||
+				 (!strncasecmp(vName, "hs7119", 6)) ||
+				 (!strncasecmp(vName, "hs7429", 6)) ||
+				 (!strncasecmp(vName, "hs7819", 6)))
 			vBoxType = Fortis;
 		else if (!strncasecmp(vName, "atemio520", 9))
 			vBoxType = CNBox;

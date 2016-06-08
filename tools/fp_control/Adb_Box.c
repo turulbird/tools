@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -308,8 +308,8 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 		}
 		if (private->display)
 		{
-		strftime(output, cMAXCharsADB_BOX + 1, private->timeFormat, ts);
-		setText(context, output);
+			strftime(output, cMAXCharsADB_BOX + 1, private->timeFormat, ts);
+			setText(context, output);
 		}
 	}
 	return 0;

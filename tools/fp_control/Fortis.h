@@ -1,10 +1,12 @@
 #ifndef __fortis__
 #define __fortis__
 
+#if 0
 struct set_test_s
 {
 	int len, one, two, three, four, five, six;
 };
+#endif
 
 struct set_brightness_s
 {

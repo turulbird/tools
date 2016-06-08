@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -75,7 +75,7 @@ static void setMode(int fd)
 /* Calculate the time value which we can pass to
  * the micom fp.
  */
-static void setMicomTime(time_t theGMTTime, char* destString, int seconds)
+static void setMicomTime(time_t theGMTTime, char *destString, int seconds)
 {
 	struct tm *now_tm;
 	char tmpString[13];
@@ -87,7 +87,7 @@ static void setMicomTime(time_t theGMTTime, char* destString, int seconds)
 	if (seconds)
 	{
 		sprintf(tmpString, "%02d%02d%02d%02d%02d%02d",
-			now_tm->tm_year-100, now_tm->tm_mon+1, now_tm->tm_mday, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
+			now_tm->tm_year - 100, now_tm->tm_mon + 1, now_tm->tm_mday, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
 		strncpy(destString, tmpString, 12);
 	}
 	else

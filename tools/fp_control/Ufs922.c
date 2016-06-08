@@ -5,7 +5,7 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -51,12 +51,12 @@ static int setIcon(Context_t *context, int which, int on);
 
 typedef struct
 {
-	int	display;
-	int	display_custom;
-	char	*timeFormat;
+	int display;
+	int display_custom;
+	char *timeFormat;
 
-	time_t	wakeupTime;
-	int	wakeupDecrement;
+	time_t wakeupTime;
+	int wakeupDecrement;
 } tUFS922Private;
 
 /* ******************* helper/misc functions ****************** */
@@ -81,7 +81,7 @@ void setMicomTime(time_t theGMTTime, char *destString)
 	/* from u-boot micom */
 	struct tm *now_tm;
 
-	now_tm = gmtime (&theGMTTime);
+	now_tm = gmtime(&theGMTTime);
 
 	printf("Set Time (UTC): %02d:%02d:%02d %02d-%02d-%04d\n",
 		now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec, now_tm->tm_mday, now_tm->tm_mon+1, now_tm->tm_year+1900);
@@ -313,12 +313,12 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 	tUFS922Private *private = (tUFS922Private *)((Model_t *)context->m)->private;
 	printf("%s\n", __func__);
 	vFd = open(cEVENT_DEVICE, O_RDWR);
-	
+
 	if (vFd < 0)
 	{
 		fprintf(stderr, "Cannot open %s\n", cEVENT_DEVICE);
 		perror("");
-	return -1;
+		return -1;
 	}
 	
 	printf("%s 1\n", __func__);
@@ -341,7 +341,7 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 			{
 				rd = read(vFd, ev, sizeof(struct input_event) * 64);
 
-				if (rd < (int) sizeof(struct input_event)) 
+				if (rd < (int) sizeof(struct input_event))
 				{
 					continue;
 				}

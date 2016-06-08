@@ -1,18 +1,18 @@
 /*
  * Ufs910_1W.c
- * 
+ *
  * (c) 2009 dagobert@teamducktales
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -34,7 +34,7 @@
 
 #include "global.h"
 
-static int setText(Context_t* context, char* theText);
+static int setText(Context_t *context, char *theText);
 
 /******************** constants ************************ */
 #define cTTY_DEVICE "/dev/ttyAS1"
@@ -58,15 +58,15 @@ typedef struct
 
 typedef struct
 {
-	char	*ledOn;
-	char	*ledOff;
+	char *ledOn;
+	char *ledOff;
 } tUFS910Leds;
 
-#define cGreen	1
-#define cRed	2
-#define cYellow	3
+#define cGreen  1
+#define cRed    2
+#define cYellow 3
 
-tUFS910Leds led[] = 
+tUFS910Leds led[] =
 {
 	{/* cGreen ,*/ "1", "A" },
 	{/* cRed   ,*/ "2", "B" },
@@ -131,19 +131,19 @@ static int usage(Context_t *context, char *prg_name, char *cmd_name)
 	return -1;
 }
 
-static int setTime(Context_t* context, time_t* theGMTTime)
+static int setTime(Context_t *context, time_t *theGMTTime)
 {
 	fprintf(stderr, "%s: not implemented\n", __func__);
 	return -1;
 }
-	
-static int getTime(Context_t *context, time_t* theGMTTime)
+
+static int getTime(Context_t *context, time_t *theGMTTime)
 {
 	fprintf(stderr, "%s: not implemented\n", __func__);
 	return -1;
 }
-	
-static int setTimer(Context_t *context, time_t* theGMTTime)
+
+static int setTimer(Context_t *context, time_t *theGMTTime)
 {
 	time_t curTime;
 	time_t wakeupTime;
@@ -210,7 +210,7 @@ static int getWTime(Context_t *context, time_t *theGMTTime)
 	return -1;
 }
 
-static int shutdown(Context_t *context, time_t* shutdownTimeGMT)
+static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 {
 	time_t curTime;
 	/* shutdown immediately */
@@ -284,8 +284,8 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 	}
 	return 0;
 }
-	
-static int setText(Context_t *context, char* theText)
+
+static int setText(Context_t *context, char *theText)
 {
 	struct vfd_ioctl_data data;
 	tUFS910Private *private = (tUFS910Private *)
@@ -301,7 +301,7 @@ static int setText(Context_t *context, char* theText)
 	}
 	return 0;
 }
-	
+
 static int setLed(Context_t *context, int which, int on)
 {
 	if (which < cGreen || which > cYellow)
@@ -393,7 +393,7 @@ static int Exit(Context_t *context)
 	exit(1);
 }
 
-static int Clear(Context_t* context)
+static int Clear(Context_t *context)
 {
 	int i;
 	setText(context, "                ");

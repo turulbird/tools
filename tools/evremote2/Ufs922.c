@@ -176,8 +176,8 @@ static int pRead(Context_t *context)
 
 	while (1)
 	{
-		int i;
-		int n = read(context->fd, vData, cUFS922CommandLen);
+//		int i;
+		read(context->fd, vData, cUFS922CommandLen);
 
 		if (vData[0] == 0xD2)
 			vKeyType = RemoteControl;

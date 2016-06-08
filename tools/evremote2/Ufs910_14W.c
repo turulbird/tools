@@ -64,7 +64,7 @@ static tButton cButtonsKathrein[] =
 	{"CHANNELDOWN"    , "1F", KEY_PAGEDOWN},
 	{"VOLUMEUP"       , "10", KEY_VOLUMEUP},
 	{"VOLUMEDOWN"     , "11", KEY_VOLUMEDOWN},
-	{"INFO"           , "0F", KEY_HELP}, //THIS IS WRONG SHOULD BE KEY_INFO
+	{"INFO"           , "0F", KEY_INFO},
 	{"OPTIONS_FRONT"  , "47", KEY_HELP},
 	{"OK"             , "5C", KEY_OK},
 	{"UP"             , "58", KEY_UP},

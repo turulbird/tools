@@ -35,6 +35,7 @@
 #include <time.h>
 
 #include "global.h"
+#include "remotes.h"
 
 #include "map.h"
 
@@ -104,6 +105,7 @@ int printKeyMap(tButton *cButtons)
 	if (column)
 		printf("\n");
 	printf("\n");
+	return 0;
 }
 
 static int tuxtxt_exit_count = 0;

@@ -290,16 +290,16 @@ static int pShutdown(Context_t *context)
 static int pRead(Context_t *context)
 {
 	char vBuffer[128];
-	char vData[3];
+//	char vData[3];
 	const int cSize = 128;
 	int vCurrentCode = -1;
-	char *buffer;
+//	char *buffer;
 	char KeyName[30]; 	//For flexibility we use Lircd keys names
 	int LastKeyNameChar;	//for long detection on RCU sending different codes for short/long
 	int count;
 	tButton *cButtons = cButtons_LircdName;
 
-	long long LastTime;
+//	long long LastTime;
 
 	memset(vBuffer, 0, 128);
 
@@ -338,6 +338,8 @@ static int pRead(Context_t *context)
 			{
 				printf("[LircdName RCU] EMERGENCY REBOOT !!!\n");
 				fflush(stdout);
+				system("init 6");
+				sleep(4);
 				reboot(LINUX_REBOOT_CMD_RESTART);
 				return -1;
 			}
@@ -414,13 +416,16 @@ static int pNotification(Context_t *context, const int cOn)
 	vfd_icon.on = cOn;
 
 	if ( (file_vfd = open ( "/dev/vfd", O_RDWR )) == -1 )
+	{
 		printf ( "[LircdName]: could not open vfd-device!\n" );
-	else {
+	}
+	else
+	{
 		ioctl(file_vfd, 0xc0425a0a, &data); //0xc0425a0a = VFDICONDISPLAYONOFF
 		ioctl(file_vfd, 0xc0425a0a, &vfd_icon); //0xc0425a0a = VFDICONDISPLAYONOFF
 		close ( file_vfd );
 	}
-
+	return 0;
 }
 
 RemoteControl_t LircdName_RC =

@@ -20,6 +20,14 @@
  */
 
 #include "remotes.h"
+extern RemoteControl_t LircdName_RC;
+
+static RemoteControl_t *AvailableRemoteControls[] =
+{
+	&LircdName_RC,
+	NULL
+};
+
 
 int selectRemote(Context_t  *context, eBoxType type)
 {

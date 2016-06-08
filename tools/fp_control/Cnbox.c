@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -212,7 +212,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 			/* set FP-Time if curTime > or < 12h (gost)*/
 			if (((curTimeFP - curTime) > 43200) || ((curTime - curTimeFP) > 43200))
 			{
-				setTime(context,&curTime);
+				setTime(context, &curTime);
 				curTimeFP = curTime;
 			}
 			tsw = gmtime(&curTimeFP);
@@ -243,7 +243,8 @@ static int getWTime(Context_t *context, time_t *theGMTTime)
 
 static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 {
-	time_t  curTime;
+	time_t curTime;
+
 	/* shutdown immediately */
 	if (*shutdownTimeGMT == -1)
 	{

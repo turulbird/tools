@@ -267,17 +267,18 @@ int eeprom_write (int fd, unsigned dev_addr, unsigned offset, unsigned char *buf
 	 */
 
 	while (offset < end) {
-		unsigned alen, len, maxlen;
+//		unsigned alen, len, maxlen;
+		unsigned len;
 		unsigned char addr[2];
 
 		blk_off = offset & 0xFF;	/* block offset */
 
 		addr[0] = offset >> 8;		/* block number */
 		addr[1] = blk_off;		/* block offset */
-		alen	= 2;
+//		alen	= 2;
 		addr[0] |= dev_addr;		/* insert device address */
 
-		maxlen = EEPROM_PAGE_SIZE - EEPROM_PAGE_OFFSET(blk_off);
+//		maxlen = EEPROM_PAGE_SIZE - EEPROM_PAGE_OFFSET(blk_off);
 
 		len = end - offset;
 
@@ -302,7 +303,8 @@ int eeprom_read (int fd, unsigned dev_addr, unsigned offset, unsigned char *buff
     //printf("%s> offset %d cnt %d\n", __func__, offset, cnt);
 
 	while (offset < end) {
-		unsigned len, maxlen;
+//		unsigned len, maxlen;
+		unsigned len;
 		unsigned char addr[2];
 
 		blk_off = offset & 0xFF;	/* block offset */
@@ -577,84 +579,84 @@ int add_item(int fd, db_key key, const char *data )
 int main(int argc, char* argv[])
 {
 	int fd_i2c;
-	unsigned char reg = sizeof(unsigned short); //DB_MAGIC_SIZE
-    int vLoop, ret = 0;
-	db_item item;
-    unsigned char* buffer = (unsigned char*) &item;
+//	unsigned char reg = sizeof(unsigned short); //DB_MAGIC_SIZE
+//	int vLoop, ret = 0;
+//	db_item item;
+//	unsigned char* buffer = (unsigned char*) &item;
 	db_key key;
 	int offset = DB_MAGIC_SIZE;
-        
-    //printf("%s >\n", argv[0]);
+      
+	//printf("%s >\n", argv[0]);
     
-    fd_i2c = open("/dev/i2c-2", O_RDWR);
+	fd_i2c = open("/dev/i2c-2", O_RDWR);
 
-    //printf("fd = %d\n", fd_i2c);
+	//printf("fd = %d\n", fd_i2c);
     
-    if (argc > 2)
-    {
+	if (argc > 2)
+	{
 #ifdef write_works
-        char* key_item = argv[1];
-        char* value = argv[2];
-        
-        db_key key;
-        int rc_code;
+		char* key_item = argv[1];
+		char* value = argv[2];
 
-        rc_code = get_keyvalue(key_item, &key);
+		db_key key;
+		int rc_code;
 
-        if (rc_code)
-        {
-            printf("unknown key\n");
-            goto failed;
-        }
+		rc_code = get_keyvalue(key_item, &key);
+
+	        if (rc_code)
+	        {
+			printf("unknown key\n");
+			goto failed;
+	        }
         
-        if (!isRO(key_item))
-        {
-            printf("writing \"%s\" to \"%s\".\n", key_item, value);
-            add_item(fd_i2c, key, value);
-        } else
-        {
-            printf("trying to write RO element denied.\n");
-        }
+        	if (!isRO(key_item))
+        	{
+			printf("writing \"%s\" to \"%s\".\n", key_item, value);
+			add_item(fd_i2c, key, value);
+		}
+		else
+		{
+			printf("trying to write RO element denied.\n");
+		}
 #endif                
-    } else
-    if (argc > 1)
-    {    
-	    printf( "offset\tkey\tlen\tdata\n" );
-	    do
-	    {
-            int rcode;
-		    char *name;
-		    unsigned char buf[256];
-		    int buflen;
+	}
+	else if (argc > 1)
+	{    
+		printf( "offset\tkey\tlen\tdata\n" );
+		do
+		{
+			int rcode;
+			char *name;
+			unsigned char buf[256];
+			int buflen;
 
-		    buf[0] = 0;
-		    buflen = 255;
-		    rcode = read_item(fd_i2c, offset, &key, buf, &buflen );
-		    if( rcode < 0 )
-		    {
-			    rcode = 1;
-			    goto failed;
-		    }
-            
-		    get_keyname( key, &name );
+			buf[0] = 0;
+			buflen = 255;
+			rcode = read_item(fd_i2c, offset, &key, buf, &buflen );
+			if( rcode < 0 )
+			{
+				rcode = 1;
+				goto failed;
+			}
 
-            if (strcmp(name, argv[1]) == 0)
-            {
-                  printf("found key %s ->value %s\n", name, buf);
+			get_keyname( key, &name );
+
+			if (strcmp(name, argv[1]) == 0)
+			{
+				printf("found key %s ->value %s\n", name, buf);
                   
-                  if (strcmp(name, "tvmode") == 0)
-                     return atoi((unsigned char*) buf);
-            }
+				if (strcmp(name, "tvmode") == 0)
+					return atoi((unsigned char*) buf);
+			}
 
-		    //printf( "%d\t%s\t%d\t%s\n", offset, name, rcode, (key == db_key_null) ? "" : buf );
+			//printf( "%d\t%s\t%d\t%s\n", offset, name, rcode, (key == db_key_null) ? "" : buf );
 
-		    offset += DB_HEADE_SIZE + rcode;
-	    }
-	    while( key != db_key_end );
-    }
-    
-    return 0;
+			offset += DB_HEADE_SIZE + rcode;
+		}
+		while( key != db_key_end );
+	}
+	return 0;
 failed:
-    printf("failed\n");
-    return -1;
+	printf("failed\n");
+	return -1;
 }

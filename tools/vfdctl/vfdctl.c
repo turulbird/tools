@@ -15,6 +15,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/types.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <signal.h>
@@ -387,6 +388,7 @@ int iconOnOff(char* sym, unsigned char onoff)
 
 	if (verbose)
 		printf("set icon %s(%x) %d \n",sym,icon,onoff);
+	return 0;
 }
 
 int writeCG (unsigned char adress, unsigned char pixeldata[5])
@@ -396,7 +398,7 @@ int writeCG (unsigned char adress, unsigned char pixeldata[5])
 		unsigned char data[64];
 		unsigned char length;
 	} data;
-	int i;
+//	int i;
 
 	data.start = adress & 0x07;
 	data.data[0] = pixeldata[0];
@@ -444,7 +446,8 @@ void demoMode (void)
 
 void sigfunc(int sig)
 {
-	int c;
+//	int c;
+
 	if(sig != SIGINT)
 		return;
 	else {
@@ -485,7 +488,7 @@ char decodeToChar(char in, char in2)
 
 	if (in == 48 && in2 >= 48 && in2 <= 57) {
 		return '0' + in2 - 48;
-	} else if (in = 48 && in2 == 68) {
+	} else if (in == 48 && in2 == 68) {
 		return '.';
 	}
 	return 0;
@@ -508,8 +511,9 @@ void inputRemote(char* text)
 
 	outbuffer[offset] = IN_CHAR;
 
-	FILE* fd;
-	if (fd = fopen("/dev/ttyAS1", "r")) {
+	FILE* fd = fopen("/dev/ttyAS1", "r");
+	if (fd)
+	{
 		fprintf(stderr,"opened remote control\n");
 	}
 
@@ -517,7 +521,8 @@ void inputRemote(char* text)
 	int in,in2,in3;
 	char dec_in;
 
-	while((in=fgetc(fd)) > 0) {
+	while ((in=fgetc(fd)) > 0)
+	{
 		in2=fgetc(fd);
 		in3=fgetc(fd);
 
@@ -606,21 +611,27 @@ void printBitmap(char* filename, int animationTime)
 	buf = malloc(35);
 	tx = malloc(17);
 
-	if (fd = fopen(filename, "r")) {
+	fd = fopen(filename, "r");
+	if (fd)
+	{
 		fread(buf, 35, 1, fd);		// read character bitmaps
 		x = 0;
-		for (i = 0; i < 35; i += 5) {
+		for (i = 0; i < 35; i += 5)
+		{
 			writeCG(x++, &buf[i]);
 		}
 
-		while (fread(tx, 17, 1, fd) > 0) {	// read string to display
+		while (fread(tx, 17, 1, fd) > 0)	// read string to display
+		{
 			setMessageToDisplayEx(tx, 16);
 			usleep(animationTime);
 		}
 
 		fclose(fd);
 
-	} else {
+	}
+	else
+	{
 		fprintf(stderr,"cannot open file\n");
 	}
 	free(tx);
@@ -644,8 +655,8 @@ void playVfdx(char* filename)
 #pragma pack()
 
 	buf = malloc(10 * 35);
-
-	if (fd = fopen(filename, "r")) {
+	fd = fopen(filename, "r");
+	if (fd) {
 		fread(&endless, 1, 1, fd);		// read character bitmaps
 		fread(buf, 10 * 35, 1, fd);		// read character bitmaps
 

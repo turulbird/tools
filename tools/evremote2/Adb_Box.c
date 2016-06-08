@@ -394,13 +394,13 @@ static int pRead(Context_t *context)
 	char vData[3];
 	const int cSize = 128;
 	int vCurrentCode = -1;
-	char *buffer;
+//	char *buffer;
 	//When LIRC in XMP, we need to find key by name -> codes are a bit strange
 	char KeyName[30];
 	int count;
 	tButton *cButtons = cButtonsADB_BOX_RAW;
 
-	long long LastTime;
+//	long long LastTime;
 
 	memset(vBuffer, 0, 128);
 
@@ -492,7 +492,7 @@ static int pRead(Context_t *context)
 static int pNotification(Context_t *context, const int cOn)
 {
 
-	struct adb_box_ioctl_data vfd_data;
+//	struct adb_box_ioctl_data vfd_data;
 	int ioctl_fd = -1;
 
 	struct

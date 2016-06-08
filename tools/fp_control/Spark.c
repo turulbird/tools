@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -57,7 +57,7 @@ unsigned int time_mode;
 
 #define cVFD_DEVICE "/dev/vfd"
 #define cRTC_OFFSET_FILE "/proc/stb/fp/rtc_offset"
-#define cMAXCharsSpark 16
+#define cMAXCharsSpark 8
 
 typedef struct
 {
@@ -77,7 +77,7 @@ tArgs vHArgs[] =
 	{ "", "                         ", "      No arg:     Shut down immediately" },
 	{ "", "                         ", "      Arg time date: Shut down at given time/date" },
 	{ "-r", "  --reboot             ", "Args: [time date] (format: HH:MM:SS dd-mm-YYYY)" },
-	{ "", "                         ", "      No arg:     Reboot immediately (= -e current time+5 date today" },
+	{ "", "                         ", "      No arg:     Reboot immediately (= -e current time+5 date today)" },
 	{ "", "                         ", "      Arg time date: Reboot at given time/date (= -e time date)" },
 	{ "-g", "  --getTime            ", "Args: None        Display currently set frontprocessor time" },
 	{ "-gs", " --getTimeAndSet      ", "Args: None        Set system time to current frontprocessor time" },
@@ -99,8 +99,6 @@ tArgs vHArgs[] =
 	{ "-c", "  --clear              ", "Args: None        Clear display, all icons and LEDs off" },
 	{ "-v", "  --version            ", "Args: None        Get version info from frontprocessor" },
 	{ "-V", "  --verbose            ", "Args: None        Verbose operation" },
-//	{ "-gms", "--get_model_specific ", "Arg : int         Model specific get function" },
-	{ "-ms ", "--set_model_specific ", "Args: long long   Model specific set function" },
 	{ NULL, NULL, NULL }
 };
 
@@ -427,7 +425,6 @@ static int Spark_getTime(Context_t *context, time_t *theGMTTime)
 static int Spark_getWTime(Context_t *context, time_t *theGMTTime)
 {
 	//-gt command, note: VFDGETWAKEUPTIME not supported by older aotoms
-	struct tm *g_tm;
 	time_t iTime;
 
 	/* front controller wake up time */
@@ -441,9 +438,6 @@ static int Spark_getWTime(Context_t *context, time_t *theGMTTime)
 	{
 		/* current frontcontroller wake up time */
 		*theGMTTime = iTime;
-		g_tm = gmtime(&iTime);
-		printf("Frontprocessor wakeup time: %02d:%02d:%02d %02d-%02d-%04d\n", g_tm->tm_hour,
-			g_tm->tm_min, g_tm->tm_sec, g_tm->tm_mday, g_tm->tm_mon + 1, g_tm->tm_year + 1900);
 	}
 	else
 	{
@@ -479,16 +473,35 @@ static int Spark_setWTime(Context_t *context, time_t *theGMTTime)
 	//-st command
 	struct tm *swtm;
 	time_t iTime;
+	int proc_fs;
+	FILE *proc_fs_file;
 
 	iTime = *theGMTTime;
 	swtm = localtime(&iTime);
 	fprintf(stderr, "Setting wake up time to %02d:%02d:%02d %02d-%02d-%04d\n", swtm->tm_hour,
 		swtm->tm_min, swtm->tm_sec, swtm->tm_mday, swtm->tm_mon + 1, swtm->tm_year + 1900);
+
 	iTime += swtm->tm_gmtoff;
 	if (ioctl(context->fd, VFDSETPOWERONTIME, &iTime) < 0)
 	{
 		perror("Set wake up time");
 		return -1;
+
+		// write UTC offset to /proc/stb/fp/rtc_offset
+		proc_fs_file = fopen(cRTC_OFFSET_FILE, "w");
+		if (proc_fs_file == NULL)
+		{
+			perror("Open rtc_offset");
+			return -1;
+		}
+		proc_fs = fprintf(proc_fs_file, "%d", (int)swtm->tm_gmtoff);
+		if (proc_fs < 0)
+		{
+			perror("Write rtc_offset");
+			return -1;
+		}
+		fclose(proc_fs_file);
+		fprintf(stderr, "/proc/stb/fp/rtc_offset set to: %+d seconds\n", (int)swtm->tm_gmtoff);
 	}
 	return 0;
 }
@@ -522,20 +535,17 @@ static int Spark_setSTime(Context_t *context, time_t *theGMTTime)
 		proc_fs_file = fopen(cRTC_OFFSET_FILE, "w");
 		if (proc_fs_file == NULL)
 		{
-//			fprintf(stderr, "Cannot open %s\n", cRTC_OFFSET_FILE);
 			perror("Open rtc_offset");
 			return -1;
 		}
 		proc_fs = fprintf(proc_fs_file, "%d", (int)sst->tm_gmtoff);
 		if (proc_fs < 0)
 		{
-//			fprintf(stderr, "Cannot write %s\n", cRTC_OFFSET_FILE);
 			perror("Write rtc_offset");
 			return -1;
 		}
 		fclose(proc_fs_file);
 		fprintf(stderr, "/proc/stb/fp/rtc_offset set to: %+d seconds\n", (int)sst->tm_gmtoff);
-
 	}
 	return 0;
 }
@@ -799,6 +809,7 @@ static int Spark_getVersion(Context_t *context, int *version)
 	unsigned char strVersion[20];
 	const char *CPU_type[3] = { "Unknown", "ATTING48", "ATTING88" };
 	const char *Display_type[9] = { "Unknown", "VFD", "LCD", "DVFD", "LED", "?", "?", "?", "LBD" };
+
 	if (ioctl(context->fd, VFDGETVERSION, &strVersion) < 0) // get version info (1x u32 4x u8)
 	{
 		perror("Get version info");
@@ -811,11 +822,7 @@ static int Spark_getVersion(Context_t *context, int *version)
 		printf("Display type is  : %d (%s)\n", strVersion[4], Display_type[strVersion[4]]);
 		printf("# of keys        : %d\n", strVersion[5]);
 		printf("FP SW version is : %d.%d\n", strVersion[6], strVersion[7]);
-//		if (strVersion[4] == 3 && (strVersion[8] == 0 || strVersion[8] == 1))
-//		{
-//			printf("Time mode is     : %s (%d)\n", timeMode_type[strVersion[8]], strVersion[8]);
-//		}
-		*version = strVersion[4];
+		*version = strVersion[6] * 100 + strVersion[7];
 	}
 	else
 	{

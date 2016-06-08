@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -62,7 +62,7 @@ typedef struct
 void setProtonTime(time_t theGMTTime, char *destString)
 {
 	/* from u-boot proton */
-	struct	 tm *now_tm;
+	struct tm *now_tm;
 	now_tm = gmtime(&theGMTTime);
 	printf("Set Time (UTC): %02d:%02d:%02d %02d-%02d-%04d\n",
 		   now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec, now_tm->tm_mday, now_tm->tm_mon + 1, now_tm->tm_year + 1900);
@@ -75,7 +75,7 @@ void setProtonTime(time_t theGMTTime, char *destString)
 	destString[4] = now_tm->tm_sec;
 }
 
-unsigned long getProtonTime(char* protonTimeString)
+unsigned long getProtonTime(char *protonTimeString)
 {
 	unsigned int    mjd     = ((protonTimeString[1] & 0xFF) * 256) + (protonTimeString[2] & 0xFF);
 	unsigned long   epoch   = ((mjd - 40587) * 86400);

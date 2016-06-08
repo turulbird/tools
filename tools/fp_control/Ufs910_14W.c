@@ -5,12 +5,12 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -162,7 +162,7 @@ void hdmi_standby(int fd_hdmi, int mode)
 }
 
 /* ----------------------------------------------------- */
-int helloSerial() 
+int helloSerial()
 {
 	int fd = open("/dev/ttyAS0", O_RDWR);
 	printf("%s\n", __func__);
@@ -172,11 +172,11 @@ int helloSerial()
 }
 /* ----------------------------------------------------- */
 
-void startPseudoStandby(Context_t* context, tUFS910Private* private) 
+void startPseudoStandby(Context_t *context, tUFS910Private *private)
 {
 	int id;
 	int fd_avs = open("/proc/stb/avs/0/standby", O_RDWR);
-	int fd_hdmi  = open("/dev/fb0",   O_RDWR);
+	int fd_hdmi = open("/dev/fb0", O_RDWR);
 	printf("%s\n", __func__);
 	setLed(context, 1, 0);
 	setLed(context, 2, 1);
@@ -220,7 +220,7 @@ void stopPseudoStandby(Context_t *context, tUFS910Private *private)
 	/* deactivated, because box will hang and remote control not longer works */
 #if 0
 	int fd_avs = open("/proc/stb/avs/0/standby", O_RDWR);
-	int fd_hdmi  = open("/dev/fb0",   O_RDWR);
+	int fd_hdmi = open("/dev/fb0", O_RDWR);
 	int id;
 	printf("%s\n", __func__);
 	if (private->display == 0)
@@ -251,8 +251,8 @@ void stopPseudoStandby(Context_t *context, tUFS910Private *private)
 
 static int init(Context_t *context)
 {
-	char	cmdLine[512];
-	int	vFd;
+	char cmdLine[512];
+	int vFd;
 	tUFS910Private *private = malloc(sizeof(tUFS910Private));
 //	printf("%s\n", __func__);
 	((Model_t *)context->m)->private = private;

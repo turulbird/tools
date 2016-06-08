@@ -93,7 +93,7 @@ int getInternalCode(tButton *cButtons, const char cCode[3])
 // Translates lirc key name to known linux input key value
 int getInternalCodeLircKeyName(tButton *cButtons, const char cCode[30])
 {
-	int         vLoop       = 0;
+	int vLoop = 0;
 
 	for (vLoop = 0; cButtons[vLoop].KeyCode != KEY_NULL; vLoop++)
 	{
@@ -104,7 +104,6 @@ int getInternalCodeLircKeyName(tButton *cButtons, const char cCode[30])
 			return cButtons[vLoop].KeyCode;
 		}
 	}
-
 	return 0;
 }
 
@@ -113,7 +112,10 @@ int printKeyMap(tButton *cButtons)
 	int vLoop = 0;
 
 	for (vLoop = 0; cButtons[vLoop].KeyCode != KEY_NULL; vLoop++)
+	{
 		printf("%20s - %2s - %3d\n", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode);
+	}
+	return 0;
 }
 
 // Translates internal remote control hex value to known linux input key value
@@ -121,13 +123,11 @@ int getInternalCodeHex(tButton *cButtons, const unsigned char cCode)
 {
 	char vCode[3];
 
-
 	sprintf(vCode, "%.2hhx", cCode);
 	vCode[2] = '\0';
 
 	return getInternalCode(cButtons, vCode);
 }
-
 
 static int tuxtxt_exit_count = 0;
 static int sSockethandle = -1;

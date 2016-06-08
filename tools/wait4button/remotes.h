@@ -26,15 +26,6 @@ typedef struct RemoteControl_s
 		tLongKeyPressSupport *LongKeyPressSupport;
 } RemoteControl_t;
 
-extern RemoteControl_t LircdName_RC;
-
-static RemoteControl_t *AvailableRemoteControls[] =
-{
-	&LircdName_RC,
-	NULL
-};
-
-
 int selectRemote(Context_t  *context, eBoxType type);
 
 #endif

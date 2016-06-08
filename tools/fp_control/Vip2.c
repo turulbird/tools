@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -44,12 +44,12 @@ static int setText(Context_t *context, char *theText);
 
 typedef struct
 {
-	int	display;
-	int	display_custom;
-	char	*timeFormat;
+	int display;
+	int display_custom;
+	char *timeFormat;
 
-	time_t	wakeupTime;
-	int	wakeupDecrement;
+	time_t wakeupTime;
+	int wakeupDecrement;
 } tVIP2Private;
 
 /* ******************* helper/misc functions ****************** */
@@ -97,7 +97,7 @@ unsigned long getAotomTime(char *aotomTimeString)
 static int init(Context_t *context)
 {
 	tVIP2Private *private = malloc(sizeof(tVIP2Private));
-	int	vFd;
+	int vFd;
 
 //	printf("%s\n", __func__);
 
@@ -123,7 +123,7 @@ static int usage(Context_t *context, char *prg_name, char *cmd_name)
 
 static int setTime(Context_t *context, time_t *theGMTTime)
 {
-	struct	aotom_ioctl_data vData;
+	struct aotom_ioctl_data vData;
 
 	printf("%s\n", __func__);
 	setAotomTime(*theGMTTime, vData.u.time.time);
@@ -164,10 +164,10 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 
 static int setTimer(Context_t *context, time_t *theGMTTime)
 {
-	struct	aotom_ioctl_data vData;
-	time_t	curTime;
-	time_t	wakeupTime;
-	struct	tm *ts;
+	struct aotom_ioctl_data vData;
+	time_t curTime;
+	time_t wakeupTime;
+	struct tm *ts;
 
 	time(&curTime);
 	ts = localtime(&curTime);
@@ -197,7 +197,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	else
 	{
 		unsigned long diff;
-		char   	fp_time[8];
+		char fp_time[8];
 
 		fprintf(stderr, "Waiting for current time from fp ...\n");
 
@@ -265,8 +265,8 @@ static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 
 static int reboot(Context_t *context, time_t *rebootTimeGMT)
 {
-	time_t	curTime;
-	struct	aotom_ioctl_data vData;
+	time_t curTime;
+	struct aotom_ioctl_data vData;
 
 	while (1)
 	{
@@ -304,13 +304,13 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 	{
 		fprintf(stderr, "cannot open %s\n", cRC_DEVICE);
 		perror("");
-	return -1;
+		return -1;
 	}
 	printf("%s 1\n", __func__);
 	while (sleep)
 	{
 		time(&curTime);
-		ts = localtime (&curTime);
+		ts = localtime(&curTime);
 
 		if (curTime >= *wakeUpGMT)
 		{
@@ -340,7 +340,7 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 
 static int setText(Context_t *context, char *theText)
 {
-	char	vHelp[128];
+	char vHelp[128];
 
 	strncpy(vHelp, theText, cMAXCharsVIP2);
 	vHelp[cMAXCharsVIP2] = '\0';

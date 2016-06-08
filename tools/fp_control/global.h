@@ -3,8 +3,8 @@
 
 #ifndef bool
 #define bool unsigned char
+#define true 1
 #define false 0
-#define true  1
 #endif
 
 #define VFDDISPLAYCHARS         0xc0425a00
@@ -66,8 +66,8 @@ typedef struct Context_s
 
 typedef struct Model_s
 {
-	char	*Name;
-	eBoxType	Type;
+	char *Name;
+	eBoxType Type;
 	int	(*Init)             (Context_t *context);
 	int	(*Clear)            (Context_t *context);
 	int	(*Usage)            (Context_t *context, char *prg_name, char *cmd_name);
@@ -113,19 +113,19 @@ extern Model_t Adb_Box_model;
 extern Model_t Cuberevo_model;
 extern Model_t CNBOX_model;
 
-double	modJulianDate(struct tm *theTime);
-time_t	read_timers_utc(time_t curTime);
-time_t	read_fake_timer_utc(time_t curTime);
-int 	searchModel(Context_t *context, eBoxType type);
-int 	checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeup);
+double modJulianDate(struct tm *theTime);
+time_t read_timers_utc(time_t curTime);
+time_t read_fake_timer_utc(time_t curTime);
+int searchModel(Context_t *context, eBoxType type);
+int checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeup);
 
-int	getWakeupReasonPseudo(int *reason);
-int	syncWasTimerWakeup(eWakeupReason reason);
+int getWakeupReasonPseudo(int *reason);
+int syncWasTimerWakeup(eWakeupReason reason);
 
 int	disp; //controls screen output
 int	Vdisplay;
 int	Vdisplay_custom;
-char	*VtimeFormat;
+char *VtimeFormat;
 int	Vwakeup;
 
 #endif

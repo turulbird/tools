@@ -5,12 +5,12 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -51,10 +51,12 @@ static int setIcon(Context_t *context, int which, int on);
 /* ******************* constants ************************ */
 
 #define cVFD_DEVICE "/dev/vfd"
+#define cRTC_OFFSET_FILE "/proc/stb/fp/rtc_offset"
 #define cEVENT_DEVICE "/dev/input/event0"
 
 #define cMAXCharsFortis 12
 #define VFDGETWAKEUPTIME        0xc0425b03 // added by audioniek
+#define VFDGETVERSION           0xc0425af7
 
 typedef struct
 {
@@ -81,6 +83,8 @@ tArgs vSArgs[] =
 	{ "", "                         ", "      Set system time to current frontprocessor time" },
 	{ "", "                         ", "      WARNING: system date will be 01-01-1970!" },
 	{ "-gt", " --getWTime           ", "Args: None        Get the current frontcontroller wake up time" },
+	{ "-st", " --setWakeTime        ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
+	{ "", "                         ", "      Set the frontcontroller wake up time" },
 	{ "-s", "  --setTime            ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
 	{ "", "                         ", "      Set the frontprocessor time" },
 	{ "-sst", "--setSystemTime      ", "Args: None        Set front processor time to system time" },
@@ -90,14 +94,12 @@ tArgs vSArgs[] =
 	{ "-l", "  --setLed             ", "Args: LED# int    LED#: int=brightness (0..31)" },
 	{ "-i", "  --setIcon            ", "Args: icon# 1|0   Set an icon on or off" },
 	{ "-b", "  --setBrightness      ", "Arg : 0..7        Set display brightness" },
-//	{ "-led","--setLedBrightness   ","Args: brightness  Set LED brightness" },
 	{ "-w", "  --getWakeupReason    ", "Args: None        Get the wake up reason" },
 	{ "-L", "  --setLight           ", "Arg : 0|1         Set display on/off" },
-	{ "-dt", " --display_time       ", "Arg : 0|1         Set display time to system time" },
 	{ "-c", "  --clear              ", "Args: None        Clear display, all icons and LEDs off" },
-//	{ "-v","  --version            ","Args: None        Get version info from frontprocessor" },
+	{ "-v", "  --version            ", "Args: None        Get version info from frontprocessor" },
 	{ "-tm", " --time_mode          ", "Args: 0/1         Set time mode" },
-	{ "-ms", " --model_specific     ", "Args: int1 [int2] [int3] [int4]" },
+//	{ "-ms", " --model_specific     ", "Args: int1 [int2] [int3] [int4]" },
 	{ "", "                         ", "                  Model specific function" },
 	{ NULL, NULL, NULL }
 };
@@ -106,7 +108,7 @@ typedef struct
 {
 	int display;
 	int display_custom;
-	char    *timeFormat;
+	char *timeFormat;
 
 	time_t wakeupTime;
 	int wakeupDecrement;
@@ -219,7 +221,8 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 	char fp_time[8];
 	time_t curTimeFP;
 	struct tm *ts;
-//	struct nuvoton_ioctl_data vData;
+	int proc_fs;
+	FILE *proc_fs_file;
 
 	time(&curTime);  //get system time (UTC)
 	ts = localtime(&curTime);  // get local time
@@ -233,10 +236,29 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 		perror("Gettime");
 		return -1;
 	}
-	curTimeFP = (time_t) calcGetNuvotonTime(fp_time);
+	curTimeFP = (time_t)calcGetNuvotonTime(fp_time);
 	ts = localtime(&curTimeFP);
 	printf("Front panel time set to: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts->tm_hour, ts->tm_min, ts->tm_sec,
 		ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
+	ts = gmtime(&curTimeFP); //get UTC offset
+
+	// write UTC offset to /proc/stb/fp/rtc_offset
+	proc_fs_file = fopen(cRTC_OFFSET_FILE, "w");
+	if (proc_fs_file == NULL)
+	{
+//		fprintf(stderr, "Cannot open %s\n", cRTC_OFFSET_FILE);
+		perror("Open rtc_offset");
+		return -1;
+	}
+	proc_fs = fprintf(proc_fs_file, "%d", (int)ts->tm_gmtoff);
+	if (proc_fs < 0)
+	{
+//		fprintf(stderr, "Cannot write %s\n", cRTC_OFFSET_FILE);
+		perror("Write rtc_offset");
+		return -1;
+	}
+	fclose(proc_fs_file);
+	fprintf(stderr, "/proc/stb/fp/rtc_offset set to: %+d seconds\n", (int)ts->tm_gmtoff);
 	return 0;
 }
 
@@ -253,7 +275,7 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 	/* if we get the fp time */
 	if (fp_time[0] != '\0')
 	{
-		*theGMTTime = (time_t) calcGetNuvotonTime(fp_time);
+		*theGMTTime = (time_t)calcGetNuvotonTime(fp_time);
 	}
 	else
 	{
@@ -348,23 +370,20 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 static int getWTime(Context_t *context, time_t *theGMTTime)
 {
 	//-gt command: VFDGETWAKEUPTIME not supported by older nuvotons
-	struct tm *get_tm;
+	char fp_time[5];
 	time_t iTime;
 
 	/* front controller wake up time */
-	if (ioctl(context->fd, VFDGETWAKEUPTIME, &iTime) < 0)
+	if (ioctl(context->fd, VFDGETWAKEUPTIME, &fp_time) < 0)
 	{
 		perror("Get wakeup time");
 		return -1;
 	}
-	/* if we get the fp time */
-	if (iTime != '\0')
+	/* if we get the fp wakeup time */
+	if (fp_time[0] != '\0')
 	{
-		/* current frontcontroller wake up time */
+		iTime = (time_t)calcGetNuvotonTime(fp_time);
 		*theGMTTime = iTime;
-		get_tm = gmtime(&iTime);
-		printf("Frontprocessor wakeup time: %02d:%02d:%02d %02d-%02d-%04d\n", get_tm->tm_hour, get_tm->tm_min,
-			get_tm->tm_sec, get_tm->tm_mday, get_tm->tm_mon + 1, get_tm->tm_year + 1900);
 	}
 	else
 	{
@@ -372,7 +391,48 @@ static int getWTime(Context_t *context, time_t *theGMTTime)
 		*theGMTTime = 0;
 		return -1;
 	}
-	return 1;
+	return 0;
+}
+
+static int setWTime(Context_t *context, time_t *theGMTTime)
+{
+	//-st command
+	struct nuvoton_ioctl_data vData;
+	struct tm *swtm;
+	time_t wakeupTime;
+	int proc_fs;
+	FILE *proc_fs_file;
+
+	wakeupTime = *theGMTTime;
+	swtm = localtime(&wakeupTime);
+	fprintf(stderr, "Setting wake up time to %02d:%02d:%02d %02d-%02d-%04d (local, seconds ignored) %+d\n", swtm->tm_hour,
+		swtm->tm_min, swtm->tm_sec, swtm->tm_mday, swtm->tm_mon + 1, swtm->tm_year + 1900, (int)swtm->tm_gmtoff);
+
+	// write UTC offset to /proc/stb/fp/rtc_offset
+	proc_fs_file = fopen(cRTC_OFFSET_FILE, "w");
+	if (proc_fs_file == NULL)
+	{
+		perror("Open rtc_offset");
+		return -1;
+	}
+	proc_fs = fprintf(proc_fs_file, "%d", (int)swtm->tm_gmtoff);
+	if (proc_fs < 0)
+	{
+		perror("Write rtc_offset");
+		return -1;
+	}
+	fclose(proc_fs_file);
+	fprintf(stderr, "/proc/stb/fp/rtc_offset set to: %+d seconds\n", (int)swtm->tm_gmtoff);
+
+	wakeupTime -= swtm->tm_gmtoff; //get wake up time in UTC
+
+	calcSetNuvotonTime(wakeupTime, vData.u.standby.time);
+	if (ioctl(context->fd, VFDSETPOWERONTIME, &vData) < 0)
+	{
+		perror("Set wake up time");
+		return -1;
+	}
+	return 0;
 }
 
 static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
@@ -502,7 +562,6 @@ static int setText(Context_t *context, char *theText)
 }
 
 static int setLed(Context_t *context, int which, int level)
-/* FIXME: can not (re)set more than one LED at a time */
 {
 	// -l command, OK
 	struct nuvoton_ioctl_data vData;
@@ -565,7 +624,7 @@ static int setBrightness(Context_t *context, int brightness)
 	if (brightness < 0 || brightness > 7)
 	{
 		printf("Illegal brightness level %d (valid is 0..7)\n", brightness);
-		return 0;
+		return -1;
 	}
 	vData.u.brightness.level = brightness;
 	setMode(context->fd);
@@ -611,6 +670,29 @@ static int setLight(Context_t *context, int on)
 	return 0;
 }
 
+static int getVersion(Context_t *context, int *version)
+{
+	//-v command
+	int strVersion;
+
+	if (ioctl(context->fd, VFDGETVERSION, &strVersion) < 0) // get version info (1x u32)
+	{
+		perror("Get version info");
+		return -1;
+	}
+	if (strVersion != '\0')  /* if the version info is OK */
+	{
+		*version = strVersion;
+//		printf("Bootloader/front processor version: %d.%d\n", (int)(strVersion / 100), (int)(strVersion % 100));
+	}
+	else
+	{
+		fprintf(stderr, "Error reading version from fp\n");
+		*version = -1;
+	}
+	return 0;
+}
+
 static int setTimeMode(Context_t *context, int timemode)
 {
 	// -tm command, OK
@@ -648,6 +730,7 @@ static int getWakeupReason(Context_t *context, int *reason)
 	return 0;
 }
 
+#if 0
 static int modelSpecific(Context_t *context, int len, int *testdata)
 {
 	//-ms command
@@ -686,6 +769,7 @@ static int modelSpecific(Context_t *context, int len, int *testdata)
 	}
 	return testdata[0];
 }
+#endif
 
 static int Exit(Context_t *context)
 {
@@ -709,7 +793,7 @@ Model_t Fortis_model =
 	.GetTime          = getTime,
 	.SetTimer         = setTimer,
 	.GetWTime         = getWTime,
-	.SetWTime         = NULL,
+	.SetWTime         = setWTime,
 	.SetSTime         = setSTime,
 	.Shutdown         = shutdown,
 	.Reboot           = reboot,
@@ -721,12 +805,13 @@ Model_t Fortis_model =
 	.GetWakeupReason  = getWakeupReason,
 	.SetLight         = setLight,
 	.SetLedBrightness = NULL,
-	.GetVersion       = NULL,
+	.GetVersion       = getVersion,
 	.SetRF            = NULL,
 	.SetFan           = NULL,
 	.GetWakeupTime    = getWTime,
 	.SetDisplayTime   = NULL,
 	.SetTimeMode      = setTimeMode,
-	.ModelSpecific    = modelSpecific,
+//	.ModelSpecific    = modelSpecific,
+	.ModelSpecific    = NULL,
 	.Exit             = Exit
 };

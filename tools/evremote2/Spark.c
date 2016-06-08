@@ -45,9 +45,21 @@
 #define	SPARK_RC08_PREDATA      "44BB"
 #define	SPARK_RC09_PREDATA      "9966"
 #define	SPARK_RC12_PREDATA      "08F7"
-#define	SPARK_DEFAUYLT_PREDATA  "A25D" //HOF-12, SAB Unix Triple HD
+#define	SPARK_DEFAULT_PREDATA   "A25D" //HOF-12, SAB Unix Triple HD, Sogno Triple
 #define	SPARK_EDV_RC1           "C43B"
 #define	SPARK_EDV_RC2           "1CE3"
+#define	UFS910_RC660_PREDATA    "2290"
+#define	UFS913_RC230_PREDATA    "7FB9"
+#define	SAMSUNG_AA59_PREDATA    "E0E0"
+
+#define STB_ID_GOLDENMEDIA_GM990        "09:00:07"
+#define STB_ID_EDISION_PINGULUX         "09:00:08"
+#define STB_ID_AMIKO_ALIEN_SDH8900      "09:00:0A"
+#define STB_ID_GALAXYINNOVATIONS_S8120  "09:00:0B"
+#define STB_ID_SOGNO_TRIPLE_HD          "0C:00:43" // Sogno Spark Triple
+#define STB_ID_SAB_UNIX_TRIPLE_HD       "0C:00:0E" // SAB Unix Triple HD (S903)
+
+char VendorStbId[] = "00:00:00\0";
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
@@ -106,7 +118,7 @@ static tButton cButtonsEdisionSpark[] =
 	{"TV/RADIO"       , "77", KEY_TV2}, //WE USE TV2 AS TV/RADIO SWITCH BUTTON
 	{"USB"            , "95", KEY_CLOSE},
 	{"TIMER"          , "8d", KEY_TIME},
-	{""               , ""  , KEY_NULL},
+	{""               , ""  , KEY_NULL}
 };
 
 /* spark RC8 */
@@ -167,7 +179,7 @@ static tButton cButtonsSparkRc08[] =
 	{"SAT"            , "2F", KEY_SAT},
 	{"TTX"            , "DF", KEY_TITLE},
 	{"AUDIO"          , "D7", KEY_SUBTITLE},
-	{""               , ""  , KEY_NULL},
+	{""               , ""  , KEY_NULL}
 };
 
 /* Amiko alien-spark RCU */
@@ -227,7 +239,7 @@ static tButton cButtonsSparkRc09[] =
 	{"F2"             , "FF", KEY_PREVIOUS},
 	{"F3"             , "3F", KEY_NEXT},
 	{"F4"             , "BF", KEY_TITLE},
-	{""               , ""  , KEY_NULL},
+	{""               , ""  , KEY_NULL}
 };
 
 static tButton cButtonsSparkRc12[] =
@@ -284,7 +296,7 @@ static tButton cButtonsSparkRc12[] =
 	{"YELLOW"         , "EF", KEY_YELLOW},
 	{"BLUE"           , "05", KEY_BLUE},
 	{"WHITE"          , "2D", KEY_W},
-	{""               , ""  , KEY_NULL},
+	{""               , ""  , KEY_NULL}
 };
 
 /* spark Default (HOF-12D with portal key) */
@@ -348,6 +360,205 @@ static tButton cButtonsSparkDefault[] =
 	{""               , ""  , KEY_NULL},
 };
 
+static tButton cButtonsSognoTriplex[] =
+{
+	{"KEY_POWER"		, "10", KEY_POWER},			//# Power
+	{"KEY_MODE"		, "01", KEY_MODE},			//# V.Format
+	{"KEY_TEXT"		, "05", KEY_TEXT},			//# TV/SAT
+	{"KEY_SLEEP"		, "4C", KEY_SLEEP},			//# SLEEP
+	{"KEY_MUTE"		, "54", KEY_MUTE},			//# MUTE
+	{"KEY_1"		, "14", KEY_1},				//# 1
+	{"KEY_2"		, "00", KEY_2},				//# 2
+	{"KEY_3"		, "5C", KEY_3},				//# 3
+	{"KEY_4"		, "12", KEY_4},				//# 4
+	{"KEY_5"		, "04", KEY_5},				//# 5
+	{"KEY_6"		, "5A", KEY_6},				//# 6
+	{"KEY_7"		, "16", KEY_7},				//# 7
+	{"KEY_8"		, "02", KEY_8},				//# 8
+	{"KEY_9"		, "5E", KEY_9},				//# 9
+	{"KEY_RADIO"		, "59", KEY_RADIO},			//# TV/Radio
+	{"KEY_0"		, "06", KEY_0},				//# 0
+	{"KEY_BACK"		, "19", KEY_BACK},			//# Recall
+	{"KEY_PAGEUP"		, "5D", KEY_PAGEUP},			//# PAGE+
+	{"KEY_PAGEDOWN"		, "5B", KEY_PAGEDOWN},			//# PAGE-
+	{"KEY_SEARCH"		, "58", KEY_SEARCH},			//# FIND
+	{"KEY_VOLUMEUP"		, "15", KEY_VOLUMEUP},			//# VOL+
+	{"KEY_VOLUMEDOWN"	, "13", KEY_VOLUMEDOWN},		//# VOL-
+	{"KEY_MEDIA"		, "0C", KEY_MEDIA},			//# FOLDER
+	{"KEY_MENU"		, "18", KEY_MENU},			//# MENU
+	{"KEY_INFO"		, "03", KEY_INFO},			//# INFO
+	{"KEY_UP"		, "07", KEY_UP},			//# UP
+	{"KEY_LEFT"		, "17", KEY_LEFT},			//# LEFT
+	{"KEY_RIGHT"		, "5F", KEY_RIGHT},			//# RIGHT
+	{"KEY_DOWN"		, "50", KEY_DOWN},			//# DOWN
+	{"KEY_OK"		, "40", KEY_OK},			//# OK
+	{"KEY_HOME"		, "DF", KEY_HOME},			//# EXIT
+	{"KEY_EPG"		, "48", KEY_EPG},			//# EPG
+	{"KEY_FAVORITES"	, "47", KEY_FAVORITES},			//# FAV
+	{"KEY_EPG"		, "44", KEY_EPG},			//# Portal
+	{"KEY_SAT"		, "41", KEY_SAT},			//# SAT
+	{"KEY_RED"		, "4D", KEY_RED},			//# RED
+	{"KEY_GREEN"		, "51", KEY_GREEN},			//# GREEN
+	{"KEY_YELLOW"		, "0E", KEY_YELLOW},			//# YELLOW
+	{"KEY_BLUE"		, "55", KEY_BLUE},			//# BLUE
+	{"KEY_RECORD"		, "1E", KEY_RECORD},			//# RECORD
+	{"KEY_STOP"		, "97", KEY_STOP},			//# STOP
+	{"KEY_PAUSE"		, "49", KEY_PAUSE},			//# PAUSE
+	{"KEY_PLAY"		, "0A", KEY_PLAY},			//# PLAY
+	{"KEY_PREVIOUS"		, "9F", KEY_PREVIOUS},			//# PREVIOUS
+	{"KEY_NEXT"		, "87", KEY_NEXT},			//# NEXT
+	{"KEY_PAGEDOWN"		, "0F", KEY_PAGEDOWN},			//# REWIND
+	{"KEY_PAGEUP"		, "46", KEY_PAGEUP},			//# FORWARD
+	{"KEY_REWIND"		, "8F", KEY_REWIND},			//# SLOW
+	{"KEY_FASTFORWARD"	, "1C", KEY_FASTFORWARD},		//# FASTFORWARD
+	{"KEY_PLAYPAUSE"	, "56", KEY_PLAYPAUSE},			//# PLAYMODE
+	{"KEY_CLOSE"		, "1B", KEY_CLOSE},			//# USB
+	{"KEY_TIME"		, "4A", KEY_TIME},			//# Timeshift
+	{"KEY_AUDIO"		, "52", KEY_AUDIO},			//# F1
+	{"KEY_SUBTITLE"		, "42", KEY_SUBTITLE},			//# F2
+	{"KEY_LIST"		, "1A", KEY_LIST},			//# F3
+	{""			, ""  , KEY_NULL}
+};
+
+static tButton cButtonsUfs910Rc660[] =
+{
+	{"KEY_0"		, "00", KEY_0},
+	{"KEY_1"		, "01", KEY_1},
+	{"KEY_2"		, "02", KEY_2},
+	{"KEY_3"		, "03", KEY_3},
+	{"KEY_4"		, "04", KEY_4},
+	{"KEY_5"		, "05", KEY_5},
+	{"KEY_6"		, "06", KEY_6},
+	{"KEY_7"		, "07", KEY_7},
+	{"KEY_8"		, "08", KEY_8},
+	{"KEY_9"		, "09", KEY_9},
+	{"KEY_INFO"		, "0F", KEY_INFO},
+	{"KEY_OK"		, "5C", KEY_OK},
+	{"KEY_POWER"		, "0C", KEY_POWER},
+	{"KEY_MUTE"		, "0D", KEY_MUTE},
+	{"KEY_RIGHT"		, "5B", KEY_RIGHT},
+	{"KEY_LEFT"		, "5A", KEY_LEFT},
+	{"KEY_UP"		, "58", KEY_UP},
+	{"KEY_DOWN"		, "59", KEY_DOWN},
+	{"KEY_VOLUMEUP"		, "10", KEY_VOLUMEUP},
+	{"KEY_VOLUMEDOWN"	, "11", KEY_VOLUMEDOWN},
+	{"KEY_RED"		, "6D", KEY_RED},
+	{"KEY_GREEN"		, "6E", KEY_GREEN},
+	{"KEY_YELLOW"		, "6F", KEY_YELLOW},
+	{"KEY_BLUE"		, "70", KEY_BLUE},
+	{"KEY_EPG"		, "CC", KEY_EPG},
+	{"KEY_HOME"		, "55", KEY_HOME},
+	{"KEY_MENU"		, "54", KEY_MENU},
+	{"KEY_PAGEUP"		, "1E", KEY_PAGEUP},
+	{"KEY_PAGEDOWN"		, "1F", KEY_PAGEDOWN},
+	{"KEY_PLAY"		, "38", KEY_PLAY},
+	{"KEY_STOP"		, "31", KEY_STOP},
+	{"KEY_RECORD"		, "37", KEY_RECORD},
+	{"KEY_PAUSE"		, "39", KEY_PAUSE},
+	{"KEY_FASTFORWARD"	, "20", KEY_FASTFORWARD},
+	{"KEY_REWIND"		, "21", KEY_REWIND},
+	{"KEY_TEXT"		, "3C", KEY_TEXT},
+	{""			, ""  , KEY_NULL}
+};
+
+static tButton cButtonsSamsungAA59[] =
+{
+	{"KEY_POWER"		, "BF", KEY_POWER},
+	{"KEY_MODE"		, "7F", KEY_MODE},		//# SOURCE
+	{"KEY_SLEEP"		, "2E", KEY_SLEEP},		//# HDMI
+	{"KEY_1"		, "DF", KEY_1},
+	{"KEY_2"		, "5F", KEY_2},
+	{"KEY_3"		, "9F", KEY_3},
+	{"KEY_4"		, "EF", KEY_4},
+	{"KEY_5"		, "6F", KEY_5},
+	{"KEY_6"		, "AF", KEY_6},
+	{"KEY_7"		, "CF", KEY_7},
+	{"KEY_8"		, "4F", KEY_8},
+	{"KEY_9"		, "8F", KEY_9},
+	{"KEY_0"		, "77", KEY_0},
+	{"KEY_VOLUMEUP"		, "1F", KEY_VOLUMEUP},
+	{"KEY_VOLUMEDOWN"	, "2F", KEY_VOLUMEDOWN},
+	{"KEY_PAGEUP"		, "B7", KEY_PAGEUP},
+	{"KEY_PAGEDOWN"		, "F7", KEY_PAGEDOWN},
+	{"KEY_MUTE"		, "0F", KEY_MUTE},
+	{"KEY_TEXT"		, "29", KEY_TEXT},		//# CKLIST
+	{"KEY_MENU"		, "A7", KEY_MENU},
+	{"KEY_smart"		, "61", KEY_ARCHIVE},		//# SMART
+	{"KEY_EPG"		, "0D", KEY_EPG},		//# GUIDE
+	{"KEY_FAVORITES"	, "2D", KEY_FAVORITES},		//# TOOLS
+	{"KEY_INFO"		, "07", KEY_INFO},
+	{"KEY_UP"		, "F9", KEY_UP},
+	{"KEY_DOWN"		, "79", KEY_DOWN},
+	{"KEY_LEFT"		, "59", KEY_LEFT},
+	{"KEY_RIGHT"		, "B9", KEY_RIGHT},
+	{"KEY_OK"		, "E9", KEY_OK},
+	{"KEY_OK"		, "E5", KEY_OK},		//# RETURN
+	{"KEY_HOME"		, "4B", KEY_HOME},		//# EXIT
+	{"KEY_RED"		, "C9", KEY_RED},
+	{"KEY_GREEN"		, "D7", KEY_GREEN},
+	{"KEY_YELLOW"		, "57", KEY_YELLOW},
+	{"KEY_BLUE"		, "97", KEY_BLUE},
+	{"KEY_AUDIO"		, "D9", KEY_AUDIO},		//# SOCIAL
+	{"search"		, "31", KEY_TIME},		//# SEARCH
+	{"3d"			, "06", KEY_LIST},		//# 3D
+	{"manual"		, "03", KEY_PREVIOUS},		//# MANUAL
+	{"size"			, "83", KEY_NEXT},		//# SIZE
+	{"subt"			, "5B", KEY_SUBTITLE},
+	{"KEY_REWIND"		, "5D", KEY_REWIND},
+	{"KEY_PAUSE"		, "AD", KEY_PAUSE},
+	{"KEY_FASTFORWARD"	, "ED", KEY_FASTFORWARD},
+	{"KEY_RECORD"		, "6D", KEY_RECORD},
+	{"KEY_PLAY"		, "1D", KEY_PLAY},
+	{"KEY_STOP"		, "9D", KEY_STOP},
+	{""			, ""  , KEY_NULL}
+};
+
+
+static tButton cButtonsUfs913Rc230[] =
+{
+	{"KEY_MODE"		, "7E", KEY_MODE},
+	{"KEY_POWER"		, "F3", KEY_POWER},
+	{"KEY_1"		, "FE", KEY_1},
+	{"KEY_2"		, "FD", KEY_2},
+	{"KEY_3"		, "FC", KEY_3},
+	{"KEY_4"		, "FB", KEY_4},
+	{"KEY_5"		, "FA", KEY_5},
+	{"KEY_6"		, "F9", KEY_6},
+	{"KEY_7"		, "F8", KEY_7},
+	{"KEY_8"		, "F7", KEY_8},
+	{"KEY_9"		, "F6", KEY_9},
+	{"KEY_0"		, "FF", KEY_0},
+	{"KEY_VOLUMEDOWN"	, "EE", KEY_VOLUMEDOWN},
+	{"KEY_VOLUMEUP"		, "EF", KEY_VOLUMEUP},
+	{"KEY_PAGEUP"		, "E1", KEY_PAGEUP},
+	{"KEY_PAGEDOWN"		, "E0", KEY_PAGEDOWN},
+	{"KEY_OK"		, "A3", KEY_OK},
+	{"KEY_MENU"		, "AB", KEY_MENU},
+	{"KEY_TEXT"		, "C3", KEY_TEXT},
+	{"KEY_MUTE"		, "F2", KEY_MUTE},
+	{"KEY_INFO"		, "F0", KEY_INFO},
+	{"KEY_RED"		, "92", KEY_RED},
+	{"KEY_GREEN"		, "91", KEY_GREEN},
+	{"KEY_YELLOW"		, "90", KEY_YELLOW},
+	{"KEY_BLUE"		, "8F", KEY_BLUE},
+	{"KEY_EPG"		, "33", KEY_EPG},
+	{"KEY_MEDIA"		, "B9", KEY_MEDIA},
+	{"KEY_UP"		, "A7", KEY_UP},
+	{"KEY_DOWN"		, "A6", KEY_DOWN},
+	{"KEY_LEFT"		, "A5", KEY_LEFT},
+	{"KEY_RIGHT"		, "A4", KEY_RIGHT},
+	{"KEY_HOME"		, "AA", KEY_HOME},
+	{"KEY_FAVORITES"	, "2A", KEY_FAVORITES}, //Portal
+	{"KEY_REWIND"		, "DE", KEY_REWIND},
+	{"KEY_FASTFORWARD"	, "DF", KEY_FASTFORWARD},
+	{"KEY_PLAY"		, "C7", KEY_PLAY},
+	{"KEY_PAUSE"		, "C6", KEY_PAUSE},
+	{"KEY_RECORD"		, "C8", KEY_RECORD},
+	{"KEY_STOP"		, "CE", KEY_STOP},
+	{""			, ""  , KEY_NULL}
+};
+
+/* spark Default */
 static tButton cButtonsSparkRc04[] =
 {
 	{"POWER"          , "45", KEY_POWER},
@@ -400,7 +611,7 @@ static tButton cButtonsSparkRc04[] =
 	{"GREEN"          , "87", KEY_GREEN},
 	{"YELLOW"         , "C5", KEY_YELLOW},
 	{"BLUE"           , "47", KEY_BLUE},
-	{""               , ""  , KEY_NULL},
+	{""               , ""  , KEY_NULL}
 };
 
 /* GALAXY RC */
@@ -460,7 +671,7 @@ static tButton cButtonsGalaxy[] =
 	{"PLAY_MODE"      , "1F", KEY_P},
 	{"SLOW"           , "5D", KEY_SLOW},
 	{"FAST"           , "DF", KEY_FASTFORWARD},
-	{""               , ""  , KEY_NULL},
+	{""               , ""  , KEY_NULL}
 };
 
 static tButton cButtonsSparkEdv[] =
@@ -518,18 +729,35 @@ static tButton cButtonsSparkEdv[] =
 	{"Tms"            , "55", KEY_T},
 	{"F1"             , "15", KEY_F1},
 	{"F2"             , "D1", KEY_F2},
-	{""               , ""  , KEY_NULL},
+	{""               , ""  , KEY_NULL}
 };
 
 /* fixme: move this to a structure and
  * use the private structure of RemoteControl_t
  */
-static struct sockaddr_un  vAddr;
 
-#define STB_ID_GOLDENMEDIA_GM990        "09:00:07"
-#define STB_ID_EDISION_PINGULUX	        "09:00:08"
-#define STB_ID_AMIKO_ALIEN_SDH8900      "09:00:0A"
-#define STB_ID_GALAXYINNOVATIONS_S8120  "09:00:0B"
+void Get_StbId()
+{
+	char * pch;
+	int fn = open("/proc/cmdline", O_RDONLY);
+
+	if (fn > -1)
+	{
+		char procCmdLine[1024];
+		int len = read(fn, procCmdLine, sizeof(procCmdLine) - 1);
+		if (len > 0)
+		{
+			procCmdLine[len] = 0;
+
+			pch = strstr(procCmdLine, "STB_ID=");
+			strncpy(VendorStbId, pch + 7, 8);
+			printf("Vendor STB-ID=%s\n", VendorStbId);
+		}
+		close(fn);
+	}
+}
+
+static struct sockaddr_un  vAddr;
 
 static tButton *pSparkGetButton(char *pData)
 
@@ -547,7 +775,17 @@ static tButton *pSparkGetButton(char *pData)
 	else if (!strncasecmp(pData, SPARK_RC09_PREDATA, sizeof(SPARK_RC09_PREDATA)))
 	{
 		static tButton *cButtons = NULL;
-
+		if (!cButtons)
+		{
+			if (strstr(STB_ID_EDISION_PINGULUX, VendorStbId))
+				cButtons = cButtonsEdisionSpark;
+			else if (strstr(STB_ID_GALAXYINNOVATIONS_S8120, VendorStbId))
+				cButtons = cButtonsGalaxy;
+			else
+				cButtons = cButtonsSparkRc09; /* Amiko Alien 8900 */
+		}
+		return cButtons;
+#if 0
 		if (!cButtons)
 		{
 			int fn = open("/proc/cmdline", O_RDONLY);
@@ -576,10 +814,33 @@ static tButton *pSparkGetButton(char *pData)
 		}
 
 		return cButtons;
+#endif
 	}
-	else if (!strncasecmp(pData, SPARK_DEFAUYLT_PREDATA, sizeof(SPARK_DEFAUYLT_PREDATA)))
+	else if (!strncasecmp(pData, SPARK_DEFAULT_PREDATA, sizeof(SPARK_DEFAULT_PREDATA)))
 	{
-		pButtons = cButtonsSparkDefault;
+		static tButton *cButtons = NULL;
+		if (!cButtons)
+		{
+			if (strstr(STB_ID_SOGNO_TRIPLE_HD, VendorStbId))
+				cButtons = cButtonsSognoTriplex;
+			else if (strstr(STB_ID_SAB_UNIX_TRIPLE_HD, VendorStbId))
+				cButtons = cButtonsSparkDefault;
+			else
+				cButtons = cButtonsSparkDefault;
+		}
+		return cButtons;
+	}
+	else if (!strncasecmp(pData, UFS910_RC660_PREDATA, sizeof(UFS910_RC660_PREDATA)))
+	{
+		pButtons = cButtonsUfs910Rc660;
+	}
+	else if (!strncasecmp(pData, UFS913_RC230_PREDATA, sizeof(UFS913_RC230_PREDATA)))
+	{
+		pButtons = cButtonsUfs913Rc230;
+	}
+	else if (!strncasecmp(pData, SAMSUNG_AA59_PREDATA, sizeof(SAMSUNG_AA59_PREDATA)))
+	{
+		pButtons = cButtonsSamsungAA59;
 	}
 	else if (!strncasecmp(pData, SPARK_RC12_PREDATA, sizeof(SPARK_RC12_PREDATA)))
 	{
@@ -604,6 +865,8 @@ static tButton *pSparkGetButton(char *pData)
 static int pInit(Context_t *context, int argc, char *argv[])
 {
 	int vHandle;
+
+	Get_StbId();
 
 	vAddr.sun_family = AF_UNIX;
 	strcpy(vAddr.sun_path, "/var/run/lirc/lircd");

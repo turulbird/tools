@@ -21,6 +21,28 @@
 
 #include "remotes.h"
 
+static RemoteControl_t *AvailableRemoteControls[] =
+{
+	&Ufs910_1W_RC,
+	&Ufs910_14W_RC,
+	&Tf7700_RC,
+	&Hl101_RC,
+	&Vip2_RC,
+	&UFS922_RC,
+	&UFC960_RC,
+	&Fortis_RC,
+	&Hs5101_RC,
+	&UFS912_RC,
+	&Spark_RC,
+	&Adb_Box_RC,
+	&Cuberevo_RC,
+	&Ipbox_RC,
+	&CNBOX_RC,
+	&VitaminHD5000_RC,
+	&LircdName_RC,
+	NULL
+};
+
 int selectRemote(Context_t  *context, eBoxType type)
 {
 	int i;
