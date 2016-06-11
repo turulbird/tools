@@ -60,7 +60,7 @@ static const char *FILENAME = "output.c";
 /* ***************************** */
 
 /* ***************************** */
-/* Varaibles                     */
+/* Variables                     */
 /* ***************************** */
 
 static Output_t *AvailableOutput[] =
@@ -85,6 +85,7 @@ static Output_t *AvailableOutput[] =
 static void OutputAdd(Context_t  *context, char *port)
 {
 	int i, j;
+
 	output_printf(10, "%s::%s\n", FILENAME, __FUNCTION__);
 	for (i = 0; AvailableOutput[i] != NULL; i++)
 		for (j = 0; AvailableOutput[i]->Capabilities[j] != NULL; j++)
@@ -122,6 +123,7 @@ static void OutputDel(Context_t  *context, char *port)
 static int Command(Context_t *context, OutputCmd_t command, void *argument)
 {
 	int ret = cERR_OUTPUT_NO_ERROR;
+
 	output_printf(10, "%s::%s Command %d\n", FILENAME, __FUNCTION__, command);
 	switch (command)
 	{

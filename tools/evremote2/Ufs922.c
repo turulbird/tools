@@ -81,7 +81,7 @@ static tButton cButtonUFS922[] =
 	{"CHANNELDOWN"    , "1F", KEY_PAGEDOWN},
 	{"VOLUMEUP"       , "10", KEY_VOLUMEUP},
 	{"VOLUMEDOWN"     , "11", KEY_VOLUMEDOWN},
-	{"INFO"           , "0F", KEY_HELP}, //THIS IS WRONG SHOULD BE KEY_INFO
+	{"INFO"           , "0F", KEY_INFO},
 	{"OK"             , "5C", KEY_OK},
 	{"UP"             , "58", KEY_UP},
 	{"RIGHT"          , "5B", KEY_RIGHT},

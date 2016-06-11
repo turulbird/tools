@@ -101,6 +101,7 @@ static int writeData(void *_call)
 	unsigned int   FakeStartCode       = (Version << 8) | PES_VERSION_FAKE_START_CODE;
 	unsigned int   usecPerFrame = 41708; /* Hellmaster1024: default value */
 	BitPacker_t ld = {FakeHeaders, 0, 32};
+
 	divx_printf(10, "\n");
 	if (call == NULL)
 	{

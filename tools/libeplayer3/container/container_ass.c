@@ -105,7 +105,7 @@ typedef struct region_s
 } region_t;
 
 /* ***************************** */
-/* Varaibles                     */
+/* Variables                     */
 /* ***************************** */
 
 static pthread_mutex_t mutex;
@@ -147,6 +147,7 @@ void ass_msg_callback(int level __attribute__((unused)), const char *format, va_
 	int n;
 	char *str;
 	va_list dst;
+
 	va_copy(dst, va);
 	n = vsnprintf(NULL, 0, format, va);
 	if (n > 0 && (str = malloc(n + 1)))
@@ -225,7 +226,9 @@ void checkRegions(Writer_t *writer)
 	region_t *next, *old, *prev;
 	time_t now = time(NULL);
 	if (firstRegion == NULL)
+	{
 		return;
+	}
 	if (!writer)
 	{
 		ass_err("no framebuffer writer found!\n");
@@ -457,6 +460,7 @@ static void ASSThread(Context_t *context)
 int container_ass_init(Context_t *context)
 {
 	SubtitleOutputDef_t output;
+
 	ass_printf(10, ">\n");
 	ass_library = ass_library_init();
 	if (!ass_library)
@@ -503,6 +507,7 @@ int container_ass_init(Context_t *context)
 int container_ass_process_data(Context_t *context __attribute__((unused)), SubtitleData_t *data)
 {
 	int first_kiss = 0;
+
 	ass_printf(20, ">\n");
 	if (!isContainerRunning)
 	{
@@ -541,6 +546,7 @@ static int container_ass_stop(Context_t *context __attribute__((unused)))
 	int ret = cERR_CONTAINER_ASS_NO_ERROR;
 	int wait_time = 100;
 	Writer_t *writer;
+
 	ass_printf(10, "\n");
 	if (!isContainerRunning)
 	{
@@ -590,6 +596,7 @@ static int container_ass_switch_subtitle(Context_t *context, int *arg __attribut
 	int ret = cERR_CONTAINER_ASS_NO_ERROR;
 	pthread_attr_t attr;
 	Writer_t *writer;
+
 	ass_printf(10, "\n");
 	if (!isContainerRunning)
 	{
@@ -641,6 +648,7 @@ static int container_ass_switch_subtitle(Context_t *context, int *arg __attribut
 static int Command(Context_t *context, ContainerCmd_t command, void *argument)
 {
 	int ret = cERR_CONTAINER_ASS_NO_ERROR;
+
 	ass_printf(50, "Command %d\n", command);
 	switch (command)
 	{

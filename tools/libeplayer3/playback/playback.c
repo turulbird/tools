@@ -337,6 +337,7 @@ static int PlaybackTerminate(Context_t  *context)
 {
 	int ret = cERR_PLAYBACK_NO_ERROR;
 	int wait_time = 20;
+
 	playback_printf(20, "\n");
 	if (context && context->playback && context->playback->isPlaying)
 	{
@@ -525,6 +526,7 @@ static int PlaybackPts(Context_t  *context, unsigned long long int *pts)
 static int PlaybackLength(Context_t  *context, double *length)
 {
 	int ret = cERR_PLAYBACK_NO_ERROR;
+
 	playback_printf(20, "\n");
 	*length = -1;
 	if (context->playback->isPlaying)
@@ -546,6 +548,7 @@ static int PlaybackSwitchAudio(Context_t  *context, int *track)
 	int ret = cERR_PLAYBACK_NO_ERROR;
 	int curtrackid = 0;
 	int nextrackid = 0;
+
 	playback_printf(10, "\n");
 	if (context->playback->isPlaying)
 	{
@@ -577,6 +580,7 @@ static int PlaybackSwitchAudio(Context_t  *context, int *track)
 static int PlaybackSwitchSubtitle(Context_t  *context, int *track)
 {
 	int ret = cERR_PLAYBACK_NO_ERROR;
+
 	playback_printf(10, "Track: %d\n", *track);
 	if (context && context->playback && context->playback->isPlaying)
 	{
@@ -637,6 +641,7 @@ static int PlaybackInfo(Context_t  *context, char **infoString)
 static int Command(Context_t *context, PlaybackCmd_t command, void *argument)
 {
 	int ret = cERR_PLAYBACK_NO_ERROR;
+
 	playback_printf(20, "Command %d\n", command);
 	switch (command)
 	{

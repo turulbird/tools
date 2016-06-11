@@ -217,7 +217,9 @@ static int writeData(void *_call)
 	unsigned char PesHeader[PES_MAX_HEADER_SIZE];
 	unsigned char ExtraData[AAC_HEADER_LENGTH];
 	unsigned int  PacketLength;
+
 	aac_printf(10, "\n");
+
 	if (call == NULL)
 	{
 		aac_err("call data is NULL...\n");

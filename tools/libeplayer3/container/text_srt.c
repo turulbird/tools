@@ -245,6 +245,7 @@ static void SrtManagerDel(Context_t *context __attribute__((unused)))
 {
 	int i = 0;
 	srt_printf(10, "\n");
+
 	if (Tracks != NULL)
 	{
 		for (i = 0; i < TrackCount; i++)
@@ -269,6 +270,7 @@ static int SrtGetSubtitle(Context_t  *context, char *Filename)
 	char   *FilenameExtension    = NULL;
 	char   *FilenameFolder       = NULL;
 	char   *FilenameShort        = NULL;
+
 	srt_printf(10, "\n");
 	if (Filename == NULL)
 	{
@@ -327,7 +329,9 @@ static int SrtGetSubtitle(Context_t  *context, char *Filename)
 					i,
 				};
 				SrtManagerAdd(context, SrtSubtitle);
+
 				Track_t Subtitle;
+
 				memset(&Subtitle, 0, sizeof(Subtitle));
 				Subtitle.Name = subtitleExtension;
 				Subtitle.Encoding = "S_TEXT/SRT";
@@ -350,7 +354,9 @@ static int SrtOpenSubtitle(Context_t *context __attribute__((unused)), int pid)
 		srt_err("trackid not for us\n");
 		return cERR_SRT_ERROR;
 	}
+
 	int trackid;
+
 	for (trackid = 0; trackid < TrackCount; trackid++)
 		if (Tracks[trackid].Id == pid)
 			break;
@@ -409,6 +415,7 @@ static int SrtDel(Context_t *context)
 static int Command(Context_t *context, ContainerCmd_t command, void *argument)
 {
 	int ret = cERR_SRT_NO_ERROR;
+
 	srt_printf(10, "\n");
 	switch (command)
 	{

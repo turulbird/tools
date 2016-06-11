@@ -124,6 +124,7 @@ static int writeData(void *_call)
 	WriterAVCallData_t *call = (WriterAVCallData_t *) _call;
 	awmv_t private_data;
 	int len = 0;
+
 	wmv_printf(10, "\n");
 	if (call == NULL)
 	{

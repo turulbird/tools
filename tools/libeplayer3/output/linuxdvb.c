@@ -197,6 +197,7 @@ int LinuxDvbPlay(Context_t  *context, char *type)
 	Writer_t *writer = NULL;
 	unsigned char video = !strcmp("video", type);
 	unsigned char audio = !strcmp("audio", type);
+
 	linuxdvb_printf(10, "v%d a%d\n", video, audio);
 	if (video && videofd != -1)
 	{
@@ -274,6 +275,7 @@ int LinuxDvbStop(Context_t  *context __attribute__((unused)), char *type)
 	int ret = cERR_LINUXDVB_NO_ERROR;
 	unsigned char video = !strcmp("video", type);
 	unsigned char audio = !strcmp("audio", type);
+
 	linuxdvb_printf(10, "v%d a%d\n", video, audio);
 	getLinuxDVBMutex(FILENAME, __FUNCTION__, __LINE__);
 	if (video && videofd != -1)
@@ -325,6 +327,7 @@ int LinuxDvbPause(Context_t  *context __attribute__((unused)), char *type)
 	int ret = cERR_LINUXDVB_NO_ERROR;
 	unsigned char video = !strcmp("video", type);
 	unsigned char audio = !strcmp("audio", type);
+
 	linuxdvb_printf(10, "v%d a%d\n", video, audio);
 	getLinuxDVBMutex(FILENAME, __FUNCTION__, __LINE__);
 	if (video && videofd != -1)
@@ -495,6 +498,7 @@ int LinuxDvbFastForward(Context_t  *context, char *type)
 	unsigned char video = !strcmp("video", type);
 	unsigned char audio = !strcmp("audio", type);
 	linuxdvb_printf(10, "v%d a%d\n", video, audio);
+
 	if (video && videofd != -1)
 	{
 		getLinuxDVBMutex(FILENAME, __FUNCTION__, __LINE__);
@@ -758,6 +762,7 @@ static int Write(Context_t *context, void *_out)
 	int                ret       = cERR_LINUXDVB_NO_ERROR;
 	int                res       = 0;
 	WriterAVCallData_t call;
+
 	if (out == NULL)
 	{
 		linuxdvb_err("null pointer passed\n");
@@ -858,6 +863,7 @@ static int reset(Context_t  *context)
 	int ret = cERR_LINUXDVB_NO_ERROR;
 	Writer_t   *writer = NULL;
 	char *Encoding = NULL;
+
 	context->manager->video->Command(context, MANAGER_GETENCODING, &Encoding);
 	if (Encoding != NULL)
 		writer = getWriter(Encoding);
@@ -889,7 +895,9 @@ static int reset(Context_t  *context)
 static int Command(Context_t *context, OutputCmd_t command, void *argument)
 {
 	int ret = cERR_LINUXDVB_NO_ERROR;
+
 	linuxdvb_printf(50, "Command %d\n", command);
+
 	switch (command)
 	{
 		case OUTPUT_OPEN:

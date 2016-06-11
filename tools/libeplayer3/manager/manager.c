@@ -61,7 +61,7 @@ static const char FILENAME[] = __FILE__;
 /* ***************************** */
 
 /* ***************************** */
-/* Varaibles                     */
+/* Variables                     */
 /* ***************************** */
 
 enum TrackType

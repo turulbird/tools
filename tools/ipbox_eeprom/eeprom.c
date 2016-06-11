@@ -603,14 +603,14 @@ int main(int argc, char* argv[])
 
 		rc_code = get_keyvalue(key_item, &key);
 
-	        if (rc_code)
-	        {
+        if (rc_code)
+        {
 			printf("unknown key\n");
 			goto failed;
-	        }
+        }
         
-        	if (!isRO(key_item))
-        	{
+		if (!isRO(key_item))
+        {
 			printf("writing \"%s\" to \"%s\".\n", key_item, value);
 			add_item(fd_i2c, key, value);
 		}
@@ -639,7 +639,7 @@ int main(int argc, char* argv[])
 				goto failed;
 			}
 
-			get_keyname( key, &name );
+			get_keyname(key, &name);
 
 			if (strcmp(name, argv[1]) == 0)
 			{

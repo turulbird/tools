@@ -2,7 +2,6 @@
 #define OUTPUT_H_
 
 #include <stdio.h>
-#include <stdint.h>
 
 typedef enum
 {

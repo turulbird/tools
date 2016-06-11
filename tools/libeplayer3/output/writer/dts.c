@@ -98,6 +98,7 @@ static int writeData(void *_call)
 	WriterAVCallData_t *call = (WriterAVCallData_t *) _call;
 	unsigned char   PesHeader[PES_AUDIO_HEADER_SIZE];
 	dts_printf(10, "\n");
+
 	if (call == NULL)
 	{
 		dts_err("call data is NULL...\n");

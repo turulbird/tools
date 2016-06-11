@@ -204,6 +204,7 @@ float getDurationFromSSALine(unsigned char *line)
 	char *ptr1;
 	char *ptr[10];
 	long int msec;
+
 	ptr1 = Text;
 	ptr[0] = Text;
 	for (i = 0; i < 3 && *ptr1 != '\0'; ptr1++)
@@ -231,12 +232,19 @@ static char *searchMeta(AVDictionary *metadata, char *ourTag)
 {
 	AVDictionaryEntry *tag = NULL;
 	int i = 0;
+
 	while (metadata_map[i])
 	{
 		if (!strcasecmp(ourTag, metadata_map[i]))
+		{
 			while ((tag = av_dict_get(metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
+			{
 				if (!strcasecmp(tag->key, ourTag) || !strcmp(tag->key, metadata_map[i + 1]))
+				{
 					return tag->value;
+				}
+			}
+		}
 		i += 2;
 	}
 	return NULL;
@@ -255,6 +263,7 @@ static void FFMPEGThread(Context_t *context)
 	hasPlayThreadStarted = 1;
 	long long int currentVideoPts = -1, currentAudioPts = -1, showtime = 0, bofcount = 0;
 	AudioVideoOut_t avOut;
+
 	SwrContext *swr = NULL;
 	AVFrame *decoded_frame = NULL;
 	int out_sample_rate = 44100;
@@ -359,6 +368,7 @@ static void FFMPEGThread(Context_t *context)
 					avcodec_flush_buffers(avContext->streams[i]->codec);
 		}
 		AVPacket   packet;
+
 		av_init_packet(&packet);
 		packet.data = NULL;
 		packet.size = 0;
@@ -722,7 +732,9 @@ int container_ffmpeg_update_tracks(Context_t *context, char *filename)
 		 * so set it by default to NULL!
 		 */
 		memset(&track, 0, sizeof(track));
+
 		AVDictionaryEntry *lang;
+
 		lang = av_dict_get(stream->metadata, "language", NULL, 0);
 		track.Name = lang ? lang->value : "und";
 		ffmpeg_printf(10, "Language %s\n", track.Name);
@@ -758,7 +770,7 @@ int container_ffmpeg_update_tracks(Context_t *context, char *filename)
 					track.TimeScale = 1001;
 				else
 					track.TimeScale = 1000;
-				ffmpeg_printf(10, "bit_rate = %d\n", stream->codec->bit_rate);
+				ffmpeg_printf(10, "bit_rate = %d\n", (int)stream->codec->bit_rate);
 				ffmpeg_printf(10, "flags = %d\n", stream->codec->flags);
 				ffmpeg_printf(10, "frame_bits = %d\n", stream->codec->frame_bits);
 				ffmpeg_printf(10, "time_base.den %d\n", stream->time_base.den);
@@ -1011,6 +1023,7 @@ static int container_ffmpeg_play(Context_t *context)
 	int error;
 	int ret = 0;
 	pthread_attr_t attr;
+
 	ffmpeg_printf(10, "\n");
 	if (context && context->playback && context->playback->isPlaying)
 	{
@@ -1047,6 +1060,7 @@ static int container_ffmpeg_stop(Context_t *context)
 {
 	int ret = cERR_CONTAINER_FFMPEG_NO_ERROR;
 	int wait_time = 20;
+
 	ffmpeg_printf(10, "\n");
 	if (!isContainerRunning)
 	{
@@ -1068,7 +1082,9 @@ static int container_ffmpeg_stop(Context_t *context)
 	}
 	terminating = 1;
 	if (avContext)
+	{
 		avformat_close_input(&avContext);
+	}
 	isContainerRunning = 0;
 	avformat_network_deinit();
 	ffmpeg_printf(10, "ret %d\n", ret);
@@ -1207,6 +1223,7 @@ static int Command(Context_t *context, ContainerCmd_t command, void *argument)
 	int ret = cERR_CONTAINER_FFMPEG_NO_ERROR;
 	char *FILENAME = NULL;
 	double length = 0;
+
 	ffmpeg_printf(50, "Command %d\n", command);
 	if (command != CONTAINER_INIT && !avContext)
 		return cERR_CONTAINER_FFMPEG_ERR;
@@ -1215,39 +1232,59 @@ static int Command(Context_t *context, ContainerCmd_t command, void *argument)
 	switch (command)
 	{
 		case CONTAINER_INIT:
+		{
 			FILENAME = (char *)argument;
 			ret = container_ffmpeg_init(context, FILENAME);
 			break;
+		}
 		case CONTAINER_PLAY:
+		{
 			ret = container_ffmpeg_play(context);
 			break;
+		}
 		case CONTAINER_STOP:
+		{
 			ret = container_ffmpeg_stop(context);
 			break;
+		}
 		case CONTAINER_SEEK:
+		{
 			ret = container_ffmpeg_seek((float) * ((float *)argument), 0);
 			break;
+		}
 #if 0
 		case CONTAINER_SEEK_ABS:
+		{
 			ret = container_ffmpeg_seek((float) * ((float *)argument), -1);
 			break;
+		}
 #endif
 		case CONTAINER_LENGTH:
+		{
 			ret = container_ffmpeg_get_length(context, &length);
 			*((double *)argument) = (double)length;
 			break;
+		}
 		case CONTAINER_SWITCH_AUDIO:
+		{
 			ret = container_ffmpeg_switch_audio(context, (int *) argument);
 			break;
+		}
 		case CONTAINER_SWITCH_SUBTITLE:
+		{
 			ret = container_ffmpeg_switch_subtitle(context, (int *) argument);
 			break;
+		}
 		case CONTAINER_INFO:
+		{
 			ret = container_ffmpeg_get_info(context, (char **)argument);
 			break;
+		}
 		case CONTAINER_STATUS:
+		{
 			*((int *)argument) = hasPlayThreadStarted;
 			break;
+		}
 		default:
 			ffmpeg_err("ContainerCmd %d not supported!\n", command);
 			ret = cERR_CONTAINER_FFMPEG_ERR;

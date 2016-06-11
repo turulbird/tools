@@ -37,7 +37,9 @@ static inline unsigned char *text_to_ass(char *text, long long int pts, double d
 {
 	char buf[2048];
 	unsigned int x, pos = 0, len = 0, comma = 0;
+
 	if (text == NULL) return NULL;
+
 	len = strlen(text);
 	for (x = 0; x < len; x++)
 	{

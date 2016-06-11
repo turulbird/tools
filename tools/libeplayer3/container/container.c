@@ -52,6 +52,7 @@ static Container_t *AvailableContainer[] =
 static void printContainerCapabilities()
 {
 	int i, j;
+
 	container_printf(10, "%s::%s\n", FILENAME, __FUNCTION__);
 	container_printf(10, "Capabilities: ");
 	for (i = 0; AvailableContainer[i] != NULL; i++)
@@ -64,6 +65,7 @@ static int selectContainer(Context_t  *context, char *extension)
 {
 	int i, j;
 	int ret = -1;
+
 	container_printf(10, "%s::%s\n", FILENAME, __FUNCTION__);
 	for (i = 0; AvailableContainer[i] != NULL; i++)
 	{

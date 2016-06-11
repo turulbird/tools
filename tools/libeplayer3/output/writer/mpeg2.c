@@ -96,6 +96,7 @@ static int writeData(void *_call)
 	unsigned char               PesHeader[PES_MAX_HEADER_SIZE];
 	int len = 0;
 	unsigned int Position = 0;
+
 	mpeg2_printf(10, "\n");
 	if (call == NULL)
 	{
@@ -118,6 +119,7 @@ static int writeData(void *_call)
 		int PacketLength = (call->len - Position) <= MAX_PES_PACKET_SIZE ?
 				   (call->len - Position) : MAX_PES_PACKET_SIZE;
 		int Remaining = call->len - Position - PacketLength;
+
 		mpeg2_printf(20, "PacketLength=%d, Remaining=%d, Position=%d\n", PacketLength, Remaining, Position);
 		struct iovec iov[2];
 		iov[0].iov_base = PesHeader;

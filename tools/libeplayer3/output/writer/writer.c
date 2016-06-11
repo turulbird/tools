@@ -95,6 +95,7 @@ static Writer_t *AvailableWriter[] =
 Writer_t *getWriter(char *encoding)
 {
 	int i;
+
 	for (i = 0; AvailableWriter[i] != NULL; i++)
 	{
 		if (strcmp(AvailableWriter[i]->caps->textEncoding, encoding) == 0)
@@ -110,6 +111,7 @@ Writer_t *getWriter(char *encoding)
 Writer_t *getDefaultVideoWriter()
 {
 	int i;
+
 	for (i = 0; AvailableWriter[i] != NULL; i++)
 	{
 		if (strcmp(AvailableWriter[i]->caps->textEncoding, "V_MPEG2") == 0)

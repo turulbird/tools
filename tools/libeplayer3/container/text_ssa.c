@@ -84,7 +84,7 @@ typedef struct
 } SsaTrack_t;
 
 /* ***************************** */
-/* Varaibles                     */
+/* Variables                     */
 /* ***************************** */
 
 static pthread_t thread_sub;
@@ -108,6 +108,7 @@ char *SSAgetLine()
 	char c[SSA_BUFFER_SIZE];
 	int ch;
 	int k, tam, tamAux;
+
 	k = tamAux = 0;
 	if (SSA_BUFFER_SIZE > 0)
 	{
@@ -177,6 +178,7 @@ static void *SsaSubtitleThread(void *Data)
 				context->playback->isPlaying)
 		{
 			SubtitleData_t data;
+
 			data.data      = (unsigned char *) line;
 			data.len       = strlen(line);
 			data.extradata = (unsigned char *) head;
@@ -222,6 +224,7 @@ static void SsaManagerAdd(Context_t  *context __attribute__((unused)), SsaTrack_
 static char **SsaManagerList(Context_t  *context __attribute__((unused)))
 {
 	char **tracklist = NULL;
+
 	ssa_printf(10, "\n");
 	if (Tracks != NULL)
 	{
@@ -243,6 +246,7 @@ static char **SsaManagerList(Context_t  *context __attribute__((unused)))
 static void SsaManagerDel(Context_t *context __attribute__((unused)))
 {
 	int i = 0;
+
 	ssa_printf(10, "\n");
 	if (Tracks != NULL)
 	{
@@ -267,6 +271,7 @@ static int SsaGetSubtitle(Context_t  *context, char *Filename)
 	char   *FilenameExtension    = NULL;
 	char   *FilenameFolder       = NULL;
 	char   *FilenameShort        = NULL;
+
 	ssa_printf(10, "\n");
 	if (Filename == NULL)
 	{
@@ -301,6 +306,7 @@ static int SsaGetSubtitle(Context_t  *context, char *Filename)
 		{
 			char subtitleFilename[PATH_MAX];
 			char *subtitleExtension = NULL;
+
 			ssa_printf(20, "%s\n", (*dirzeiger).d_name);
 			strcpy(subtitleFilename, (*dirzeiger).d_name);
 			// Extension of Relativ Subtitle File Name
@@ -382,6 +388,7 @@ static int SsaCloseSubtitle(Context_t *context __attribute__((unused)))
 static int SsaSwitchSubtitle(Context_t *context, int *arg)
 {
 	int ret = cERR_SSA_NO_ERROR;
+
 	ssa_printf(10, "\n");
 	ret = SsaCloseSubtitle(context);
 	if (((ret |= SsaOpenSubtitle(context, *arg)) == cERR_SSA_NO_ERROR) && (!hasThreadStarted))
@@ -398,6 +405,7 @@ static int SsaSwitchSubtitle(Context_t *context, int *arg)
 static int SsaDel(Context_t *context)
 {
 	int ret = cERR_SSA_NO_ERROR;
+
 	ssa_printf(10, "\n");
 	ret = SsaCloseSubtitle(context);
 	SsaManagerDel(context);
@@ -407,6 +415,7 @@ static int SsaDel(Context_t *context)
 static int Command(Context_t *context, ContainerCmd_t command, void *argument)
 {
 	int ret = cERR_SSA_NO_ERROR;
+
 	ssa_printf(10, "\n");
 	switch (command)
 	{

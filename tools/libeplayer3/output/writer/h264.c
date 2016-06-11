@@ -117,6 +117,7 @@ static int writeData(void *_call)
 	int                     len = 0;
 	int ic = 0;
 	struct iovec iov[128];
+
 	h264_printf(10, "\n");
 	if (call == NULL)
 	{
@@ -169,6 +170,7 @@ static int writeData(void *_call)
 		unsigned int    ParamOffset;
 		unsigned int    InitialHeaderLength     = 0;
 		unsigned int    ParametersLength;
+
 		if (avcCHeader == NULL)
 		{
 			h264_err("private_data NULL\n");
@@ -263,6 +265,7 @@ static int writeData(void *_call)
 		unsigned int   NalLength;
 		unsigned char  NalData[4];
 		int NalPresent = 1;
+
 		memcpy(NalData, call->data + VideoPosition, NalLengthBytes);
 		VideoPosition += NalLengthBytes;
 		NalStart += NalLengthBytes;

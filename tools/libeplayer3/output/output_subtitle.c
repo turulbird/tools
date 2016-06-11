@@ -130,6 +130,7 @@ void replace_all(char **string, char *search, char *replace)
 	char *ptr = NULL;
 	char tempString[512];
 	char newString[512];
+
 	newString[0] = '\0';
 	if ((string == NULL) || (*string == NULL) || (search == NULL) || (replace == NULL))
 	{
@@ -161,6 +162,7 @@ int subtitle_ParseASS(char **Line)
 	char *Text;
 	int   i;
 	char *ptr1;
+
 	if ((Line == NULL) || (*Line == NULL))
 	{
 		subtitle_err("null pointer passed\n");
@@ -293,6 +295,7 @@ void addSub(Context_t  *context, char *text, unsigned long long int pts, unsigne
 	if (count == 0)
 	{
 		int i;
+
 		subtitle_err("freeing not delivered data\n");
 		//Reset all
 		readPointer = 0;
@@ -336,6 +339,7 @@ static int Write(Context_t *context, void *data)
 	int DataLength;
 	unsigned long long int Pts;
 	float Duration;
+
 	subtitle_printf(10, "\n");
 	if (data == NULL)
 	{
@@ -391,6 +395,7 @@ static int Write(Context_t *context, void *data)
 static int Command(Context_t *context, OutputCmd_t command, void *argument)
 {
 	int ret = cERR_SUBTITLE_NO_ERROR;
+
 	subtitle_printf(50, "%d\n", command);
 	switch (command)
 	{

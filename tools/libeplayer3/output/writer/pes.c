@@ -70,6 +70,7 @@ int InsertVideoPrivateDataHeader(unsigned char *data, unsigned int payload_size)
 {
 	BitPacker_t ld2 = {data, 0, 32};
 	int         i;
+
 	PutBits(&ld2, PES_PRIVATE_DATA_FLAG, 8);
 	PutBits(&ld2, payload_size & 0xff, 8);
 	PutBits(&ld2, (payload_size >> 8) & 0xff, 8);

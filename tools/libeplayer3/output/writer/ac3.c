@@ -96,6 +96,7 @@ static int writeData(void *_call)
 	WriterAVCallData_t *call = (WriterAVCallData_t *) _call;
 	ac3_printf(10, "\n");
 	unsigned char  PesHeader[PES_MAX_HEADER_SIZE];
+
 	if (call == NULL)
 	{
 		ac3_err("call data is NULL...\n");

@@ -67,6 +67,7 @@ int kbhit(void)
 void framebuffer_init()
 {
 	int available = 0;
+
 	fd = open("/dev/fb0", O_RDWR);
 	if (fd < 0)
 	{
@@ -499,7 +500,7 @@ int main(int argc, char *argv[])
 							break;
 					}
 #else
-					char seek [256];
+					char seek[256];
 					gets(seek);
 					unsigned int seekTo = atoi(seek);
 					double length = 0;

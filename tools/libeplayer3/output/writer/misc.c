@@ -66,6 +66,7 @@ void PutBits(BitPacker_t *ld, unsigned int code, unsigned int length)
 {
 	unsigned int bit_buf;
 	unsigned int bit_left;
+
 	bit_buf = ld->BitBuffer;
 	bit_left = ld->Remaining;
 #ifdef DEBUG_PUTBITS

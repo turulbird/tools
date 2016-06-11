@@ -93,6 +93,7 @@ static int writeData(void *_call)
 {
 	WriterAVCallData_t *call = (WriterAVCallData_t *) _call;
 	unsigned char PesHeader[PES_MAX_HEADER_SIZE];
+
 	h263_printf(10, "\n");
 	if (call == NULL)
 	{
@@ -117,6 +118,7 @@ static int writeData(void *_call)
 	PesHeader[PES_LENGTH_BYTE_1]            = (PesLength >> 8) & 0xff;
 	PesHeader[PES_HEADER_DATA_LENGTH_BYTE] += PrivateHeaderLength;
 	PesHeader[PES_FLAGS_BYTE]              |= PES_EXTENSION_DATA_PRESENT;
+
 	HeaderLength                           += PrivateHeaderLength;
 	struct iovec iov[2];
 	iov[0].iov_base = PesHeader;
