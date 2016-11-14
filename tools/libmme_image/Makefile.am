@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I m4
+
 AM_CFLAGS = -Wall -I$(DRIVER_TOPDIR)/include/multicom -I$(DRIVER_TOPDIR)/bpamem -I$(DRIVER_TOPDIR)/include/player2
 
 lib_LTLIBRARIES = libmmeimage.la

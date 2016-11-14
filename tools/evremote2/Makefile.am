@@ -24,6 +24,7 @@ evremote2_SOURCES = \
 
 AM_CFLAGS = -Wall
 AM_LDFLAGS = -lrt -lpthread
+ACLOCAL_AMFLAGS = -I m4
 
 evtest_SOURCES = \
 	evtest.c

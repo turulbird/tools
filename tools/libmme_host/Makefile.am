@@ -1,6 +1,7 @@
 #AUTOMAKE_OPTIONS = subdir-objects
 
 AM_CFLAGS = -Wall -D__LINUX__ -I $(DRIVER_TOPDIR)/include/multicom -I$(DRIVER_TOPDIR)/multicom/mme
+#ACLOCAL_AMFLAGS = -I m4
 
 if ENABLE_MULTICOM324
 lib_LTLIBRARIES = libmme_host.la

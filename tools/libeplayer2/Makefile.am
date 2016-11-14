@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I m4
+
 lib_LTLIBRARIES = libeplayer2.la
 
 CFLAGS = -Wall

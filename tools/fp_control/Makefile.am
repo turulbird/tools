@@ -19,3 +19,5 @@ fp_control_SOURCES = \
 
 AM_CFLAGS = -Wall
 AM_LDFLAGS = -lrt
+ACLOCAL_AMFLAGS = -I m4
+
