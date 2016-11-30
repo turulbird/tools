@@ -646,7 +646,7 @@ int main(int argc, char* argv[])
 				printf("found key %s ->value %s\n", name, buf);
                   
 				if (strcmp(name, "tvmode") == 0)
-					return atoi((unsigned char*) buf);
+					return atoi((char*) buf);
 			}
 
 			//printf( "%d\t%s\t%d\t%s\n", offset, name, rcode, (key == db_key_null) ? "" : buf );

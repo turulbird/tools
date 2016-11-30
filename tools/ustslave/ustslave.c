@@ -365,7 +365,7 @@ int loadElf(int cpuf, int fd, unsigned int *entry_p, unsigned int *stack_p, int 
 	
 	//printTable();
 
-	err = sectionToSlave(cpuf, fd, entry_p);
+	err = sectionToSlave(cpuf, fd, (int *)entry_p);
 	if(err != 0) return 1;
 
 	//printf("start address = 0x%08X\n", *entry_p);

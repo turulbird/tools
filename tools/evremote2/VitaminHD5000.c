@@ -146,7 +146,7 @@ static int pInit(Context_t *context, int argc, char *argv[])
 static int pRead(Context_t *context)
 {
 	unsigned char   vData[cVitaminHD5000CommandLen];
-	eKeyType        vKeyType = RemoteControl;
+//	eKeyType        vKeyType = RemoteControl;
 	int             vCurrentCode = -1;
 
 	//printf("%s >\n", __func__);
@@ -168,7 +168,7 @@ static int pRead(Context_t *context)
 		{
 			if ((vData[1] == 0x01) && (vData[2] == 0xFE) && (vData[4] == 0x00))
 			{
-				vKeyType = RemoteControl;
+//				vKeyType = RemoteControl;
 				vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData[3]);
 			}
 		}
@@ -180,7 +180,7 @@ static int pRead(Context_t *context)
 		 *-----------------------------------------*/
 		else if ((vData[0] == 0x10) && (vData[2] == 0x00))
 		{
-			vKeyType = FrontPanel;
+//			vKeyType = FrontPanel;
 			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->Frontpanel, vData[1]);
 		}
 		else
