@@ -240,7 +240,7 @@ LIBMMEIMG_ERROR mme_deinit_transformer(MMEData *data)
 
 LIBMMEIMG_ERROR create_mme_data_buffer(MME_DataBuffer_t **buf, unsigned int flags, void *dstbuf, unsigned long size)
 {
-	DEBUG_PRINT("creating databuffer of size = %d, dstbuf = %x\n", size, dstbuf);
+	DEBUG_PRINT("creating databuffer of size = %d, dstbuf = %x\n", (int)size, (unsigned int)dstbuf);
 	
 	*buf 			     = (MME_DataBuffer_t *)malloc(sizeof(MME_DataBuffer_t));
 	if(!*buf)
@@ -395,7 +395,7 @@ LIBMMEIMG_ERROR mme_send_data(MMEData *data, char *data_content, unsigned long d
 	
 	sem_init(&data->decode_event, 0, 0);
 
-	DEBUG_PRINT("sending %d bytes of data to coproc", data_size);
+	DEBUG_PRINT("sending %d bytes of data to coproc", (int)data_size);
 
 	if(create_mme_data_buffer(&data_buffer, MME_ALLOCATION_PHYSICAL, data_content, data_size))
 	{
