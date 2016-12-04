@@ -61,6 +61,7 @@ tools/streamproxy/streamproxy
 tools/ustslave/ustslave
 tools/tfd2mtd/tfd2mtd
 tools/tffpctl/tffpctl
+tools/USB_boot/busybox
 tools/vfdctl/vfdctl
 tools/wait4button/wait4button
 
