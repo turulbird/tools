@@ -1,0 +1,94 @@
+# This is a very simple, default initramfs (inspired by tfinstaller)
+
+file    /init                     ../../apps/tools/USB_boot/init_no_hdd.sh       0755 0 0
+
+dir     /bin                                                                     0755 0 0
+file    /bin/busybox              ../../apps/tools/USB_boot/busybox              0755 0 0
+slink   /bin/cat                  /bin/busybox                                   0755 0 0
+slink   /bin/grep                 /bin/busybox                                   0755 0 0
+slink   /bin/mount                /bin/busybox                                   0755 0 0
+slink   /bin/umount               /bin/busybox                                   0755 0 0
+slink   /bin/sh                   /bin/busybox                                   0777 0 0
+slink   /bin/sleep                /bin/busybox                                   0755 0 0
+slink   /bin/switch_root          /bin/busybox                                   0755 0 0
+
+dir     /dev                                                                     0755 0 0
+nod     /dev/null                                                                0644 0 0 c   1   3
+nod     /dev/tty0                                                                0700 0 0 c   4   0
+nod     /dev/tty1                                                                0700 0 0 c   4   1
+nod     /dev/tty                                                                 0600 0 0 c   5   0
+nod     /dev/console                                                             0644 0 0 c   5   1
+nod     /dev/loop0                                                               0644 0 0 b   7   0
+nod     /dev/sda                                                                 0744 0 0 b   8   0
+nod     /dev/sda1                                                                0744 0 0 b   8   1
+nod     /dev/sda2                                                                0744 0 0 b   8   2
+nod     /dev/sda3                                                                0744 0 0 b   8   3
+nod     /dev/mtdblock0                                                           0664 0 0 b  31   0
+nod     /dev/mtdblock1                                                           0664 0 0 b  31   1
+nod     /dev/mtdblock2                                                           0664 0 0 b  31   2
+nod     /dev/mtdblock3                                                           0664 0 0 b  31   3
+nod     /dev/mtdblock4                                                           0664 0 0 b  31   4
+nod     /dev/mtdblock5                                                           0664 0 0 b  31   5
+nod     /dev/mtdblock6                                                           0664 0 0 b  31   6
+nod     /dev/mtdblock7                                                           0664 0 0 b  31   7
+nod     /dev/mtdblock8                                                           0664 0 0 b  31   8
+#nod    /dev/mtdblock9                                                           0664 0 0 b  31   9
+#nod    /dev/mtdblock10                                                          0664 0 0 b  31  10
+nod     /dev/initctl                                                             0644 0 0 p  63   0
+nod     /dev/ttyAS0                                                              0700 0 0 c 204  40
+
+dir     /etc                                                                      0755 0 0
+file    /etc/mdev.conf            ../../apps/tools/USB_boot/zero                  0664 0 0
+slink   /etc/mtab                 /proc/self/mounts                               0664 0 0
+dir     /etc/init.d                                                               0755 0 0
+
+dir     /lib                                                                      0755 0 0
+file    /lib/ld-2.14.1.so         ../../tufsbox/cdkroot/lib/ld-2.14.1.so          0755 0 0
+slink   /lib/ld-linux.so.2        /lib/ld-2.14.1.so                               0755 0 0
+slink   /lib/libblkid.so.1        /usr/lib/libblkid.so.1.0                        0755 0 0
+file    /lib/libc-2.14.1.so       ../../tufsbox/cdkroot/lib/libc-2.14.1.so        0755 0 0
+slink   /lib/libc.so.6            /lib/libc-2.14.1.so                             0755 0 0
+slink   /lib/libcom_err.so.0.0    /usr/lib/libcom_err.so.0.0                      0755 0 0
+slink   /lib/libe2p.so.2          /usr/lib/libe2p.so.2                            0755 0 0
+slink   /lib/libext2fs.so.2       /usr/lib/libext2fs.so.2.4                       0755 0 0
+file    /lib/libpthread-2.14.1.so ../../tufsbox/cdkroot/lib/libpthread-2.14.1.so  0755 0 0
+slink   /lib/libpthread.so.0      /lib/libpthread-2.14.1.so                       0755 0 0
+slink   /lib/libuuid.so.1         /usr/lib/libuuid.so.1                           0755 0 0
+file    /lib/libcrypt-2.14.1.so   ../../tufsbox/cdkroot/lib/libcrypt-2.14.1.so    0755 0 0
+slink   /lib/libcrypt.so.1        /lib/libcrypt-2.14.1.so                         0755 0 0
+
+dir     /mnt                                                                      0755 0 0
+
+dir     /root2                                                                    0755 0 0
+
+dir     /proc                                                                     0755 0 0
+
+dir     /sbin                                                                     0755 0 0
+file    /sbin/init                ../../tufsbox/cdkroot/sbin/init                 0755 0 0
+slink   /sbin/mount               /bin/busybox                                    0755 0 0
+slink   /sbin/umount              /bin/busybox                                    0755 0 0
+slink   /sbin/swapoff             /bin/busybox                                    0755 0 0
+slink   /sbin/reboot              /bin/busybox                                    0755 0 0
+file    /sbin/e2fsck              ../../tufsbox/cdkroot/sbin/e2fsck               0755 0 0
+slink   /sbin/fsck.ext2           /sbin/e2fsck                                    0755 0 0
+slink   /sbin/fsck.ext3           /sbin/e2fsck                                    0755 0 0
+slink   /sbin/fsck.ext4           /sbin/e2fsck                                    0755 0 0
+slink   /sbin/fsck.ext4dev        /sbin/e2fsck                                    0755 0 0
+file    /sbin/mke2fs              ../../tufsbox/cdkroot/sbin/mke2fs               0755 0 0
+slink   /sbin/mkfs.ext2           /sbin/mke2fs                                    0755 0 0
+slink   /sbin/mkfs.ext3           /sbin/mke2fs                                    0755 0 0
+slink   /sbin/mkfs.ext4           /sbin/mke2fs                                    0755 0 0
+slink   /sbin/mkfs.ext4dev        /sbin/mke2fs                                    0755 0 0
+
+dir     /sys                                                                      0755 0 0
+
+dir     /usr                                                                      0755 0 0
+dir     /usr/bin                                                                  0755 0 0
+dir     /usr/lib                                                                  0755 0 0
+file    /usr/lib/libblkid.so.1.0  ../../tufsbox/cdkroot/usr/lib/libblkid.so.1.0   0755 0 0
+file    /usr/lib/libcom_err.so.0  ../../tufsbox/cdkroot/usr/lib/libcom_err.so.0.0 0755 0 0
+file    /usr/lib/libe2p.so.2      ../../tufsbox/cdkroot/usr/lib/libe2p.so.2.3     0755 0 0
+file    /usr/lib/libext2fs.so.2.4 ../../tufsbox/cdkroot/usr/lib/libext2fs.so.2.4  0755 0 0
+file    /lib/libuuid.so.1         ../../tufsbox/cdkroot/usr/lib/libuuid.so.1.2    0755 0 0
+dir     /usr/sbin                                                                 0755 0 0
+
