@@ -30,7 +30,8 @@
  * List of possible container types - used to select demux..  If stream_source is VIDEO_SOURCE_DEMUX
  * then default is TRANSPORT, if stream_source is VIDEO_SOURCE_MEMORY then default is PES
  */
-typedef enum {
+typedef enum
+{
 	STREAM_TYPE_NONE,     /* Deprecated */
 	STREAM_TYPE_TRANSPORT,/* Use latest PTI driver so it can be Deprecated */
 	STREAM_TYPE_PES,
@@ -51,7 +52,8 @@ typedef enum {
 /*
  * List of possible video encodings - used to select frame parser and codec.
  */
-typedef enum {
+typedef enum
+{
 	VIDEO_ENCODING_AUTO,
 	VIDEO_ENCODING_MPEG1,
 	VIDEO_ENCODING_MPEG2,
@@ -75,7 +77,8 @@ typedef enum {
 /*
  * List of possible audio encodings - used to select frame parser and codec.
  */
-typedef enum {
+typedef enum
+{
 	AUDIO_ENCODING_AUTO,
 	AUDIO_ENCODING_PCM,
 	AUDIO_ENCODING_LPCM,
@@ -100,13 +103,15 @@ typedef enum {
 /*
  * List of possible sources for SP/DIF output.
  */
-typedef enum audio_spdif_source {
+typedef enum audio_spdif_source
+{
 	AUDIO_SPDIF_SOURCE_PP,  /*<! normal decoder output */
 	AUDIO_SPDIF_SOURCE_DEC, /*<! decoder output w/o post-proc */
 	AUDIO_SPDIF_SOURCE_ES,  /*<! raw elementary stream data */
 } audio_spdif_source_t;
 
-typedef struct {
+typedef struct
+{
 	int x;
 	int y;
 	int width;
@@ -115,15 +120,16 @@ typedef struct {
 
 typedef enum
 {
-    DVB_DISCONTINUITY_SKIP                = 0x01,
-    DVB_DISCONTINUITY_CONTINUOUS_REVERSE  = 0x02,
-    DVB_DISCONTINUITY_SURPLUS_DATA        = 0x04
+	DVB_DISCONTINUITY_SKIP                = 0x01,
+	DVB_DISCONTINUITY_CONTINUOUS_REVERSE  = 0x02,
+	DVB_DISCONTINUITY_SURPLUS_DATA        = 0x04
 } dvb_discontinuity_t;
 
 /*
  * audio discontinuity
  */
-typedef enum {
+typedef enum
+{
 	AUDIO_DISCONTINUITY_SKIP                = DVB_DISCONTINUITY_SKIP,
 	AUDIO_DISCONTINUITY_CONTINUOUS_REVERSE  = DVB_DISCONTINUITY_CONTINUOUS_REVERSE,
 	AUDIO_DISCONTINUITY_SURPLUS_DATA        = DVB_DISCONTINUITY_SURPLUS_DATA,
@@ -132,7 +138,8 @@ typedef enum {
 /*
  * video discontinuity
  */
-typedef enum {
+typedef enum
+{
 	VIDEO_DISCONTINUITY_SKIP                = DVB_DISCONTINUITY_SKIP,
 	VIDEO_DISCONTINUITY_CONTINUOUS_REVERSE  = DVB_DISCONTINUITY_CONTINUOUS_REVERSE,
 	VIDEO_DISCONTINUITY_SURPLUS_DATA        = DVB_DISCONTINUITY_SURPLUS_DATA,
@@ -140,51 +147,54 @@ typedef enum {
 
 #define DVB_TIME_NOT_BOUNDED            0xfedcba9876543210ULL
 
-typedef struct dvb_play_interval_s {
+typedef struct dvb_play_interval_s
+{
 	unsigned long long              start;
 	unsigned long long              end;
-}dvb_play_interval_t;
+} dvb_play_interval_t;
 
 typedef dvb_play_interval_t             video_play_interval_t;
 typedef dvb_play_interval_t             audio_play_interval_t;
 
-typedef struct dvb_play_time_s {
+typedef struct dvb_play_time_s
+{
 	unsigned long long              system_time;
 	unsigned long long              presentation_time;
 	unsigned long long              pts;
-}dvb_play_time_t;
+} dvb_play_time_t;
 
 typedef dvb_play_time_t                 video_play_time_t;
 typedef dvb_play_time_t                 audio_play_time_t;
 
 
-typedef enum {
+typedef enum
+{
 #define DVB_OPTION_VALUE_DISABLE                                                    0
 #define DVB_OPTION_VALUE_ENABLE                                                     1
 
-    DVB_OPTION_TRICK_MODE_AUDIO               = 0,
-    DVB_OPTION_PLAY_24FPS_VIDEO_AT_25FPS,
+	DVB_OPTION_TRICK_MODE_AUDIO               = 0,
+	DVB_OPTION_PLAY_24FPS_VIDEO_AT_25FPS,
 
 #define DVB_OPTION_VALUE_VIDEO_CLOCK_MASTER                                         0
 #define DVB_OPTION_VALUE_AUDIO_CLOCK_MASTER                                         1
 #define DVB_OPTION_VALUE_SYSTEM_CLOCK_MASTER                                        2
-    DVB_OPTION_MASTER_CLOCK,
+	DVB_OPTION_MASTER_CLOCK,
 
-    DVB_OPTION_EXTERNAL_TIME_MAPPING,
-    DVB_OPTION_AV_SYNC,
-    DVB_OPTION_DISPLAY_FIRST_FRAME_EARLY,
-    DVB_OPTION_VIDEO_BLANK,
-    DVB_OPTION_STREAM_ONLY_KEY_FRAMES,
-    DVB_OPTION_STREAM_SINGLE_GROUP_BETWEEN_DISCONTINUITIES,
+	DVB_OPTION_EXTERNAL_TIME_MAPPING,
+	DVB_OPTION_AV_SYNC,
+	DVB_OPTION_DISPLAY_FIRST_FRAME_EARLY,
+	DVB_OPTION_VIDEO_BLANK,
+	DVB_OPTION_STREAM_ONLY_KEY_FRAMES,
+	DVB_OPTION_STREAM_SINGLE_GROUP_BETWEEN_DISCONTINUITIES,
 
 #define DVB_OPTION_VALUE_PLAYOUT                                                    0
 #define DVB_OPTION_VALUE_DISCARD                                                    1
-    DVB_OPTION_PLAYOUT_ON_TERMINATE,
-    DVB_OPTION_PLAYOUT_ON_SWITCH,
-    DVB_OPTION_PLAYOUT_ON_DRAIN,
+	DVB_OPTION_PLAYOUT_ON_TERMINATE,
+	DVB_OPTION_PLAYOUT_ON_SWITCH,
+	DVB_OPTION_PLAYOUT_ON_DRAIN,
 
-    DVB_OPTION_VIDEO_ASPECT_RATIO,
-    DVB_OPTION_VIDEO_DISPLAY_FORMAT,
+	DVB_OPTION_VIDEO_ASPECT_RATIO,
+	DVB_OPTION_VIDEO_DISPLAY_FORMAT,
 
 #define DVB_OPTION_VALUE_TRICK_MODE_AUTO                                            0
 #define DVB_OPTION_VALUE_TRICK_MODE_DECODE_ALL                                      1
@@ -193,20 +203,20 @@ typedef enum {
 #define DVB_OPTION_VALUE_TRICK_MODE_DECODE_REFERENCE_FRAMES_DEGRADE_NON_KEY_FRAMES  4
 #define DVB_OPTION_VALUE_TRICK_MODE_DECODE_KEY_FRAMES                               5
 #define DVB_OPTION_VALUE_TRICK_MODE_DISCONTINUOUS_KEY_FRAMES                        6
-    DVB_OPTION_TRICK_MODE_DOMAIN,
+	DVB_OPTION_TRICK_MODE_DOMAIN,
 
 #define DVB_OPTION_VALUE_DISCARD_LATE_FRAMES_NEVER                                  0
 #define DVB_OPTION_VALUE_DISCARD_LATE_FRAMES_ALWAYS                                 1
 #define DVB_OPTION_VALUE_DISCARD_LATE_FRAMES_AFTER_SYNCHRONIZE                      2
-    DVB_OPTION_DISCARD_LATE_FRAMES,
-    DVB_OPTION_VIDEO_START_IMMEDIATE,
-    DVB_OPTION_REBASE_ON_DATA_DELIVERY_LATE,
-    DVB_OPTION_REBASE_ON_FRAME_DECODE_LATE,
-    DVB_OPTION_LOWER_CODEC_DECODE_LIMITS_ON_FRAME_DECODE_LATE,
-    DVB_OPTION_H264_ALLOW_NON_IDR_RESYNCHRONIZATION,
-    DVB_OPTION_MPEG2_IGNORE_PROGESSIVE_FRAME_FLAG,
-    DVB_OPTION_AUDIO_SPDIF_SOURCE,
-    DVB_OPTION_MAX
+	DVB_OPTION_DISCARD_LATE_FRAMES,
+	DVB_OPTION_VIDEO_START_IMMEDIATE,
+	DVB_OPTION_REBASE_ON_DATA_DELIVERY_LATE,
+	DVB_OPTION_REBASE_ON_FRAME_DECODE_LATE,
+	DVB_OPTION_LOWER_CODEC_DECODE_LIMITS_ON_FRAME_DECODE_LATE,
+	DVB_OPTION_H264_ALLOW_NON_IDR_RESYNCHRONIZATION,
+	DVB_OPTION_MPEG2_IGNORE_PROGESSIVE_FRAME_FLAG,
+	DVB_OPTION_AUDIO_SPDIF_SOURCE,
+	DVB_OPTION_MAX
 } dvb_option_t;
 
 typedef dvb_option_t                    video_option_t;

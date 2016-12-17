@@ -8,12 +8,12 @@
  *	This program is free software; you can redistribute it and/or modify it
  *	under the terms of the GNU General Public License as published by the
  *	Free Software Foundation version 2 of the License.
- * 
+ *
  *	This program is distributed in the hope that it will be useful, but
  *	WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *	General Public License for more details.
- * 
+ *
  *	You should have received a copy of the GNU General Public License along
  *	with this program; if not, write to the Free Software Foundation, Inc.,
  *	675 Mass Ave, Cambridge, MA 02139, USA.
@@ -41,24 +41,25 @@ int usb_add(void)
 	unsigned int interface_class;
 	unsigned int interface_subclass;
 	unsigned int interface_protocol;
-	
+
 	product_env = getenv("PRODUCT");
 	type_env = getenv("TYPE");
 	dbg("PRODUCT='%s', TYPE = '%s'", product_env, type_env);
 	if ((product_env == NULL) ||
-	    (type_env == NULL)) {
+			(type_env == NULL))
+	{
 		dbg("missing an environment variable, aborting.");
 		return 1;
 	}
 	strcpy(usb_string, "usb:");
-	
+
 	error = split_3values(product_env, 16, &idVendor, &idProduct, &bcdDevice);
 	if (error)
 		return error;
 	error = split_3values(type_env, 10, &device_class, &device_subclass, &device_protocol);
 	if (error)
 		return error;
-	
+
 	sprintf(usb_string + strlen(usb_string), "v%04X", idVendor);
 	sprintf(usb_string + strlen(usb_string), "p%04X", idProduct);
 	sprintf(usb_string + strlen(usb_string), "dl%04X", bcdDevice);
@@ -69,12 +70,15 @@ int usb_add(void)
 
 	/* we need to look at the interface too */
 	interface_env = getenv("INTERFACE");
-	if (interface_env == NULL) {
+	if (interface_env == NULL)
+	{
 		/* no interface, use default values here. */
 		sprintf(usb_string + strlen(usb_string), "ic*isc*ip*");
-	} else {
+	}
+	else
+	{
 		error = split_3values(interface_env, 10, &interface_class,
-				       &interface_subclass, &interface_protocol);
+				      &interface_subclass, &interface_protocol);
 		if (error)
 			return error;
 		sprintf(usb_string + strlen(usb_string), "ic%02X", (unsigned char)interface_class);

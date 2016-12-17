@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #ifdef __cplusplus
-extern "C" 
+extern "C"
 {
 #endif
 
@@ -22,7 +22,7 @@ LIBMMEIMG_ERROR decode_jpeg(FILE *fp, unsigned int original_width, unsigned int 
 // output is in BGR (3 bytes per pixel), but allocs no memory
 LIBMMEIMG_ERROR decode_jpeg_noalloc(FILE *fp, unsigned int original_width, unsigned int original_height, unsigned int dst_width, unsigned int dst_height, char *dest_data, int mem_is_hw_writeable);
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 }
 #endif
 

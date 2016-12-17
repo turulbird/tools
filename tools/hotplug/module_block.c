@@ -39,7 +39,8 @@
 #include "module_block.h"
 #include "udev.h"
 
-static const char *block_vars[] = {
+static const char *block_vars[] =
+{
 	"ACTION",
 	"DEVPATH",
 	"PHYSDEVPATH",
@@ -56,10 +57,13 @@ static int bdpoll_exec(const char devpath[], bool is_cdrom, bool support_media_c
 	unsigned int i = 0;
 
 	pid = fork();
-	if (pid == -1) {
+	if (pid == -1)
+	{
 		perror("fork");
 		return -1;
-	} else if (pid == 0) {
+	}
+	else if (pid == 0)
+	{
 		argv[i++] = "bdpoll";
 		argv[i++] = (char *)devpath;
 		if (is_cdrom)
@@ -70,7 +74,9 @@ static int bdpoll_exec(const char devpath[], bool is_cdrom, bool support_media_c
 		if (execvp(argv[0], argv) == -1)
 			perror(argv[0]);
 		return -1;
-	} else {
+	}
+	else
+	{
 		return pidfile_write(pid, "bdpoll.%s", hotplug_basename(devpath));
 	}
 }
@@ -83,23 +89,28 @@ static int bdpoll_kill(const char devpath[])
 	if (pidfile_read(&pid, "bdpoll.%s", hotplug_basename(devpath)) == -1)
 		return -1;
 
-	if (kill(pid, SIGTERM) == -1) {
+	if (kill(pid, SIGTERM) == -1)
+	{
 		perror("kill");
 		return -1;
 	}
 
 	timeout_init(&t, 1000);
-	do {
+	do
+	{
 		wpid = waitpid(pid, NULL, WNOHANG);
-		if (wpid == -1) {
+		if (wpid == -1)
+		{
 			perror("waitpid");
 			return -1;
 		}
 		if (wpid > 0)
 			goto exit;
-	} while (!timeout_exceeded(&t));
+	}
+	while (!timeout_exceeded(&t));
 
-	if (kill(pid, SIGKILL) == -1) {
+	if (kill(pid, SIGKILL) == -1)
+	{
 		perror("kill");
 		return -1;
 	}
@@ -121,7 +132,8 @@ static long sysfs_attr_get_long(const char *devpath, const char *attr_name)
 	char *value;
 
 	value = sysfs_attr_get_value(devpath, attr_name);
-	if (value == NULL) {
+	if (value == NULL)
+	{
 		errno = ERANGE;
 		return LONG_MAX;
 	}
@@ -179,16 +191,22 @@ static bool dev_is_cdrom(const char *devpath)
 		return 1;
 
 	if ((strlen(str) > 2) &&
-	    (str[0] == 'h') &&
-	    (str[1] == 'd')) {
+			(str[0] == 'h') &&
+			(str[1] == 'd'))
+	{
 		snprintf(pathname, sizeof(pathname), "/proc/ide/%s/media", str);
 
 		f = fopen(pathname, "r");
-		if (f == NULL) {
+		if (f == NULL)
+		{
 			dbg("can't open %s: %s", pathname, strerror(errno));
-		} else {
-		       	if (getline(&buf, &n, f) != -1) {
-				if (buf != NULL) {
+		}
+		else
+		{
+			if (getline(&buf, &n, f) != -1)
+			{
+				if (buf != NULL)
+				{
 					if (n >= 5)
 						ret = !strncmp(buf, "cdrom", 5);
 					free(buf);
@@ -207,8 +225,8 @@ int block_add(void)
 	const char *minor, *major;
 	char devnode[FILENAME_MAX];
 	bool is_removable;
-        bool is_cdrom;
- 	bool support_media_changed;
+	bool is_cdrom;
+	bool support_media_changed;
 
 	sysfs_init();
 
@@ -217,31 +235,36 @@ int block_add(void)
 	 * DEVPATH=/block/sda/sda1
 	 */
 	devpath = getenv("DEVPATH");
-	if (!devpath) {
+	if (!devpath)
+	{
 		dbg("missing DEVPATH environment variable, aborting.");
 		return EXIT_FAILURE;
 	}
 
 	minor = getenv("MINOR");
-	if (!minor) {
+	if (!minor)
+	{
 		dbg("missing MINOR environment variable, aborting.");
 		return EXIT_FAILURE;
 	}
 
 	major = getenv("MAJOR");
-	if (!major) {
+	if (!major)
+	{
 		dbg("missing MAJOR environment variable, aborting.");
 		return EXIT_FAILURE;
 	}
 
-	if (!hotplug_devpath_to_devnode(devpath, devnode, sizeof(devnode))) {
+	if (!hotplug_devpath_to_devnode(devpath, devnode, sizeof(devnode)))
+	{
 		dbg("could not get device node.");
 		return EXIT_FAILURE;
 	}
 
 	unlink(devnode);
 
-	if (do_mknod(devnode, major, minor) == -1) {
+	if (do_mknod(devnode, major, minor) == -1)
+	{
 		dbg("mknod: %s", strerror(errno));
 		return EXIT_FAILURE;
 	}
@@ -250,7 +273,8 @@ int block_add(void)
 	is_cdrom = is_removable && dev_is_cdrom(devpath);
 	support_media_changed = is_cdrom && dev_can_notify_media_change(devpath);
 
-	if (is_removable) {
+	if (is_removable)
+	{
 		if (bdpoll_exec(devpath, is_cdrom, support_media_changed) == -1)
 			dbg("could not exec bdpoll");
 	}
@@ -269,12 +293,14 @@ int block_remove(void)
 	char devnode[FILENAME_MAX];
 
 	devpath = getenv("DEVPATH");
-	if (!devpath) {
+	if (!devpath)
+	{
 		dbg("missing DEVPATH environment variable, aborting.");
 		return EXIT_FAILURE;
 	}
 
-	if (!hotplug_devpath_to_devnode(devpath, devnode, sizeof(devnode))) {
+	if (!hotplug_devpath_to_devnode(devpath, devnode, sizeof(devnode)))
+	{
 		dbg("could not get device node.");
 		return EXIT_FAILURE;
 	}

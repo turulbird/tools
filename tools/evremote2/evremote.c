@@ -273,8 +273,10 @@ int processComplex(Context_t *context, int argc, char *argv[])
 		if (countFlag)
 			waitTime += diffTime;
 
-		if (countFlag && newKey && gKeyCode == 0x74) {
-			if (waitTime < 10000) {				// reboot if pressing 5 times power within 10 seconds
+		if (countFlag && newKey && gKeyCode == 0x74)
+		{
+			if (waitTime < 10000)				// reboot if pressing 5 times power within 10 seconds
+			{
 				keyCount += 1;
 				printf("Power Count= %d\n", keyCount);
 				if (keyCount >= 5) {
@@ -288,7 +290,8 @@ int processComplex(Context_t *context, int argc, char *argv[])
 					reboot(LINUX_REBOOT_CMD_RESTART);
 				}
 			}
-			else {						// release reboot counter
+			else						// release reboot counter
+			{
 				countFlag = false;
 				keyCount = 0;
 				waitTime = 0;
@@ -299,7 +302,8 @@ int processComplex(Context_t *context, int argc, char *argv[])
 		else
 			countFlag = false;
 
-		if (startFlag && newKey && gKeyCode == 0x74 && diffTime < 1000) { //KEY_POWER > reboot counter enabled
+		if (startFlag && newKey && gKeyCode == 0x74 && diffTime < 1000)	//KEY_POWER > reboot counter enabled
+		{
 			countFlag = true;
 			waitTime = diffTime;
 			keyCount = 1;
@@ -456,15 +460,17 @@ int getModel()
 		else if (!strncasecmp(vName, "vip2-v1", 7))
 			vBoxType = Vip2;
 		else if ((!strncasecmp(vName, "hdbox", 5)) ||
-				 (!strncasecmp(vName, "atevio7500", 10)) ||
-				 (!strncasecmp(vName, "octagon1008", 11)) ||
-				 (!strncasecmp(vName, "hs7110", 6)) ||
-				 (!strncasecmp(vName, "hs7420", 6)) ||
-				 (!strncasecmp(vName, "hs7810a", 7)) ||
-				 (!strncasecmp(vName, "hs7119", 6)) ||
-				 (!strncasecmp(vName, "hs7429", 6)) ||
-				 (!strncasecmp(vName, "hs7819", 6)))
+			 (!strncasecmp(vName, "atevio7500", 10)) ||
+			 (!strncasecmp(vName, "octagon1008", 11)) ||
+			 (!strncasecmp(vName, "hs7110", 6)) ||
+			 (!strncasecmp(vName, "hs7420", 6)) ||
+			 (!strncasecmp(vName, "hs7810a", 7)) ||
+			 (!strncasecmp(vName, "hs7119", 6)) ||
+			 (!strncasecmp(vName, "hs7429", 6)) ||
+			 (!strncasecmp(vName, "hs7819", 6)))
+		{
 			vBoxType = Fortis;
+		}
 		else if (!strncasecmp(vName, "atemio520", 9))
 			vBoxType = CNBox;
 		else if (!strncasecmp(vName, "atemio530", 9))
@@ -472,11 +478,13 @@ int getModel()
 		else if (!strncasecmp(vName, "hs5101", 6))
 			vBoxType = Hs5101;
 		else if ((!strncasecmp(vName, "adb_box", 7)) ||
-				 (!strncasecmp(vName, "sagemcom88", 10)) ||
-				 (!strncasecmp(vName, "esi_88", 6)) ||
-				 (!strncasecmp(vName, "esi88", 5)) ||
-				 (!strncasecmp(vName, "dsi87", 5)))
+			 (!strncasecmp(vName, "sagemcom88", 10)) ||
+			 (!strncasecmp(vName, "esi_88", 6)) ||
+			 (!strncasecmp(vName, "esi88", 5)) ||
+			 (!strncasecmp(vName, "dsi87", 5)))
+		{
 			vBoxType = Adb_Box;
+		}
 		else if ((!strncasecmp(vName, "ipbox9900", 9)) || (!strncasecmp(vName, "ipbox99", 7)) || (!strncasecmp(vName, "ipbox55", 7)))
 			vBoxType = Ipbox;
 		else if (!strncasecmp(vName, "ufs912", 5))
@@ -488,13 +496,13 @@ int getModel()
 		else if (!strncasecmp(vName, "spark7162", 9))
 			vBoxType = Spark;
 		else if ((!strncasecmp(vName, "cuberevo", 8)) ||
-				 (!strncasecmp(vName, "cuberevo-mini", 13)) ||
-				 (!strncasecmp(vName, "cuberevo-mini2", 14)) ||
-				 (!strncasecmp(vName, "cuberevo-mini-fta", 17)) ||
-				 (!strncasecmp(vName, "cuberevo-250hd", 14)) ||
-				 (!strncasecmp(vName, "cuberevo-2000hd", 15)) ||
-				 (!strncasecmp(vName, "cuberevo-9500hd", 15)) ||
-				 (!strncasecmp(vName, "cuberevo-3000hd", 14)))
+			 (!strncasecmp(vName, "cuberevo-mini", 13)) ||
+			 (!strncasecmp(vName, "cuberevo-mini2", 14)) ||
+			 (!strncasecmp(vName, "cuberevo-mini-fta", 17)) ||
+			 (!strncasecmp(vName, "cuberevo-250hd", 14)) ||
+			 (!strncasecmp(vName, "cuberevo-2000hd", 15)) ||
+			 (!strncasecmp(vName, "cuberevo-9500hd", 15)) ||
+			 (!strncasecmp(vName, "cuberevo-3000hd", 14)))
 		{
 			vBoxType = Cuberevo;
 		}

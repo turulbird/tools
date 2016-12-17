@@ -33,16 +33,18 @@ extern "C" {
 #define LZO_INPUT_PADDING 8
 #define LZO_OUTPUT_PADDING 12
 
-typedef struct LZOContext {
-    uint8_t *in, *in_end;
-    uint8_t *out_start, *out, *out_end;
-    int error;
+typedef struct LZOContext
+{
+	uint8_t *in, *in_end;
+	uint8_t *out_start, *out, *out_end;
+	int error;
 } LZOContext;
-static inline int get_byte(LZOContext *c) {
-    if (c->in < c->in_end)
-        return *c->in++;
-    c->error |= LZO_INPUT_DEPLETED;
-    return 1;
+static inline int get_byte(LZOContext *c)
+{
+	if (c->in < c->in_end)
+		return *c->in++;
+	c->error |= LZO_INPUT_DEPLETED;
+	return 1;
 }
 
 #ifdef INBUF_PADDED
@@ -50,13 +52,15 @@ static inline int get_byte(LZOContext *c) {
 #else
 #define GETB(c) get_byte(&(c))
 #endif
-static inline int get_len(LZOContext *c, int x, int mask) {
-    int cnt = x & mask;
-    if (!cnt) {
-        while (!(x = get_byte(c))) cnt += 255;
-        cnt += mask + x;
-    }
-    return cnt;
+static inline int get_len(LZOContext *c, int x, int mask)
+{
+	int cnt = x & mask;
+	if (!cnt)
+	{
+		while (!(x = get_byte(c))) cnt += 255;
+		cnt += mask + x;
+	}
+	return cnt;
 }
 
 //#define UNALIGNED_LOADSTORE
@@ -76,27 +80,30 @@ static inline int get_len(LZOContext *c, int x, int mask) {
  * \brief copy bytes from input to output buffer with checking
  * \param cnt number of bytes to copy, must be >= 0
  */
-static inline void copy(LZOContext *c, int cnt) {
-    register uint8_t *src = c->in;
-    register uint8_t *dst = c->out;
-    if (cnt > c->in_end - src) {
-        cnt = FFMAX(c->in_end - src, 0);
-        c->error |= LZO_INPUT_DEPLETED;
-    }
-    if (cnt > c->out_end - dst) {
-        cnt = FFMAX(c->out_end - dst, 0);
-        c->error |= LZO_OUTPUT_FULL;
-    }
+static inline void copy(LZOContext *c, int cnt)
+{
+	register uint8_t *src = c->in;
+	register uint8_t *dst = c->out;
+	if (cnt > c->in_end - src)
+	{
+		cnt = FFMAX(c->in_end - src, 0);
+		c->error |= LZO_INPUT_DEPLETED;
+	}
+	if (cnt > c->out_end - dst)
+	{
+		cnt = FFMAX(c->out_end - dst, 0);
+		c->error |= LZO_OUTPUT_FULL;
+	}
 #if defined(INBUF_PADDED) && defined(OUTBUF_PADDED)
-    COPY4(dst, src);
-    src += 4;
-    dst += 4;
-    cnt -= 4;
-    if (cnt > 0)
+	COPY4(dst, src);
+	src += 4;
+	dst += 4;
+	cnt -= 4;
+	if (cnt > 0)
 #endif
-        memcpy(dst, src, cnt);
-    c->in = src + cnt;
-    c->out = dst + cnt;
+		memcpy(dst, src, cnt);
+	c->in = src + cnt;
+	c->out = dst + cnt;
 }
 
 /**
@@ -107,50 +114,59 @@ static inline void copy(LZOContext *c, int cnt) {
  * cnt > back is valid, this will copy the bytes we just copied,
  * thus creating a repeating pattern with a period length of back.
  */
-static inline void copy_backptr(LZOContext *c, int back, int cnt) {
-    register uint8_t *src = &c->out[-back];
-    register uint8_t *dst = c->out;
-    if (src < c->out_start || src > dst) {
-        c->error |= LZO_INVALID_BACKPTR;
-        return;
-    }
-    if (cnt > c->out_end - dst) {
-        cnt = FFMAX(c->out_end - dst, 0);
-        c->error |= LZO_OUTPUT_FULL;
-    }
-    if (back == 1) {
-        memset(dst, *src, cnt);
-        dst += cnt;
-    } else {
+static inline void copy_backptr(LZOContext *c, int back, int cnt)
+{
+	register uint8_t *src = &c->out[-back];
+	register uint8_t *dst = c->out;
+	if (src < c->out_start || src > dst)
+	{
+		c->error |= LZO_INVALID_BACKPTR;
+		return;
+	}
+	if (cnt > c->out_end - dst)
+	{
+		cnt = FFMAX(c->out_end - dst, 0);
+		c->error |= LZO_OUTPUT_FULL;
+	}
+	if (back == 1)
+	{
+		memset(dst, *src, cnt);
+		dst += cnt;
+	}
+	else
+	{
 #ifdef OUTBUF_PADDED
-        COPY2(dst, src);
-        COPY2(dst + 2, src + 2);
-        src += 4;
-        dst += 4;
-        cnt -= 4;
-        if (cnt > 0) {
-            COPY2(dst, src);
-            COPY2(dst + 2, src + 2);
-            COPY2(dst + 4, src + 4);
-            COPY2(dst + 6, src + 6);
-            src += 8;
-            dst += 8;
-            cnt -= 8;
-        }
+		COPY2(dst, src);
+		COPY2(dst + 2, src + 2);
+		src += 4;
+		dst += 4;
+		cnt -= 4;
+		if (cnt > 0)
+		{
+			COPY2(dst, src);
+			COPY2(dst + 2, src + 2);
+			COPY2(dst + 4, src + 4);
+			COPY2(dst + 6, src + 6);
+			src += 8;
+			dst += 8;
+			cnt -= 8;
+		}
 #endif
-        if (cnt > 0) {
-            int blocklen = back;
-            while (cnt > blocklen) {
-                memcpy(dst, src, blocklen);
-                dst += blocklen;
-                cnt -= blocklen;
-                blocklen <<= 1;
-            }
-            memcpy(dst, src, cnt);
-        }
-        dst += cnt;
-    }
-    c->out = dst;
+		if (cnt > 0)
+		{
+			int blocklen = back;
+			while (cnt > blocklen)
+			{
+				memcpy(dst, src, blocklen);
+				dst += blocklen;
+				cnt -= blocklen;
+				blocklen <<= 1;
+			}
+			memcpy(dst, src, cnt);
+		}
+		dst += cnt;
+	}
+	c->out = dst;
 }
 
 int lzo1x_decode(void *out, int *outlen, void *in, int *inlen);
@@ -256,9 +272,18 @@ float av_int2flt(int32_t v);
 
 #ifdef __GNUC__
 
-struct unaligned_64 { uint64_t l; } __attribute__((packed));
-struct unaligned_32 { uint32_t l; } __attribute__((packed));
-struct unaligned_16 { uint16_t l; } __attribute__((packed));
+struct unaligned_64
+{
+	uint64_t l;
+} __attribute__((packed));
+struct unaligned_32
+{
+	uint32_t l;
+} __attribute__((packed));
+struct unaligned_16
+{
+	uint16_t l;
+} __attribute__((packed));
 
 #define AV_RN16(a) (((const struct unaligned_16 *) (a))->l)
 #define AV_RN32(a) (((const struct unaligned_32 *) (a))->l)
@@ -304,31 +329,31 @@ struct unaligned_16 { uint16_t l; } __attribute__((packed));
 #else /* HAVE_FAST_UNALIGNED */
 #define AV_RB16(x)  ((((uint8_t*)(x))[0] << 8) | ((uint8_t*)(x))[1])
 #define AV_WB16(p, d) do { \
-                    ((uint8_t*)(p))[1] = (d); \
-                    ((uint8_t*)(p))[0] = (d)>>8; } while(0)
+		((uint8_t*)(p))[1] = (d); \
+		((uint8_t*)(p))[0] = (d)>>8; } while(0)
 
 #define AV_RL16(x)  ((((uint8_t*)(x))[1] << 8) | \
-                      ((uint8_t*)(x))[0])
+		     ((uint8_t*)(x))[0])
 #define AV_WL16(p, d) do { \
-                    ((uint8_t*)(p))[0] = (d); \
-                    ((uint8_t*)(p))[1] = (d)>>8; } while(0)
+		((uint8_t*)(p))[0] = (d); \
+		((uint8_t*)(p))[1] = (d)>>8; } while(0)
 #endif
 
 #define AV_RB24(x)  ((((uint8_t*)(x))[0] << 16) | \
-                     (((uint8_t*)(x))[1] <<  8) | \
-                      ((uint8_t*)(x))[2])
+		     (((uint8_t*)(x))[1] <<  8) | \
+		     ((uint8_t*)(x))[2])
 #define AV_WB24(p, d) do { \
-                    ((uint8_t*)(p))[2] = (d); \
-                    ((uint8_t*)(p))[1] = (d)>>8; \
-                    ((uint8_t*)(p))[0] = (d)>>16; } while(0)
+		((uint8_t*)(p))[2] = (d); \
+		((uint8_t*)(p))[1] = (d)>>8; \
+		((uint8_t*)(p))[0] = (d)>>16; } while(0)
 
 #define AV_RL24(x)  ((((uint8_t*)(x))[2] << 16) | \
-                     (((uint8_t*)(x))[1] <<  8) | \
-                      ((uint8_t*)(x))[0])
+		     (((uint8_t*)(x))[1] <<  8) | \
+		     ((uint8_t*)(x))[0])
 #define AV_WL24(p, d) do { \
-                    ((uint8_t*)(p))[0] = (d); \
-                    ((uint8_t*)(p))[1] = (d)>>8; \
-                    ((uint8_t*)(p))[2] = (d)>>16; } while(0)
+		((uint8_t*)(p))[0] = (d); \
+		((uint8_t*)(p))[1] = (d)>>8; \
+		((uint8_t*)(p))[2] = (d)>>16; } while(0)
 
 #ifdef HAVE_FAST_UNALIGNED
 # ifdef WORDS_BIGENDIAN
@@ -346,24 +371,24 @@ struct unaligned_16 { uint16_t l; } __attribute__((packed));
 # endif
 #else /* HAVE_FAST_UNALIGNED */
 #define AV_RB32(x)  ((((uint8_t*)(x))[0] << 24) | \
-                     (((uint8_t*)(x))[1] << 16) | \
-                     (((uint8_t*)(x))[2] <<  8) | \
-                      ((uint8_t*)(x))[3])
+		     (((uint8_t*)(x))[1] << 16) | \
+		     (((uint8_t*)(x))[2] <<  8) | \
+		     ((uint8_t*)(x))[3])
 #define AV_WB32(p, d) do { \
-                    ((uint8_t*)(p))[3] = (d); \
-                    ((uint8_t*)(p))[2] = (d)>>8; \
-                    ((uint8_t*)(p))[1] = (d)>>16; \
-                    ((uint8_t*)(p))[0] = (d)>>24; } while(0)
+		((uint8_t*)(p))[3] = (d); \
+		((uint8_t*)(p))[2] = (d)>>8; \
+		((uint8_t*)(p))[1] = (d)>>16; \
+		((uint8_t*)(p))[0] = (d)>>24; } while(0)
 
 #define AV_RL32(x) ((((uint8_t*)(x))[3] << 24) | \
-                    (((uint8_t*)(x))[2] << 16) | \
-                    (((uint8_t*)(x))[1] <<  8) | \
-                     ((uint8_t*)(x))[0])
+		    (((uint8_t*)(x))[2] << 16) | \
+		    (((uint8_t*)(x))[1] <<  8) | \
+		    ((uint8_t*)(x))[0])
 #define AV_WL32(p, d) do { \
-                    ((uint8_t*)(p))[0] = (d); \
-                    ((uint8_t*)(p))[1] = (d)>>8; \
-                    ((uint8_t*)(p))[2] = (d)>>16; \
-                    ((uint8_t*)(p))[3] = (d)>>24; } while(0)
+		((uint8_t*)(p))[0] = (d); \
+		((uint8_t*)(p))[1] = (d)>>8; \
+		((uint8_t*)(p))[2] = (d)>>16; \
+		((uint8_t*)(p))[3] = (d)>>24; } while(0)
 #endif
 
 #ifdef HAVE_FAST_UNALIGNED
@@ -382,46 +407,46 @@ struct unaligned_16 { uint16_t l; } __attribute__((packed));
 # endif
 #else /* HAVE_FAST_UNALIGNED */
 #define AV_RB64(x)  (((uint64_t)((uint8_t*)(x))[0] << 56) | \
-                     ((uint64_t)((uint8_t*)(x))[1] << 48) | \
-                     ((uint64_t)((uint8_t*)(x))[2] << 40) | \
-                     ((uint64_t)((uint8_t*)(x))[3] << 32) | \
-                     ((uint64_t)((uint8_t*)(x))[4] << 24) | \
-                     ((uint64_t)((uint8_t*)(x))[5] << 16) | \
-                     ((uint64_t)((uint8_t*)(x))[6] <<  8) | \
-                      (uint64_t)((uint8_t*)(x))[7])
+		     ((uint64_t)((uint8_t*)(x))[1] << 48) | \
+		     ((uint64_t)((uint8_t*)(x))[2] << 40) | \
+		     ((uint64_t)((uint8_t*)(x))[3] << 32) | \
+		     ((uint64_t)((uint8_t*)(x))[4] << 24) | \
+		     ((uint64_t)((uint8_t*)(x))[5] << 16) | \
+		     ((uint64_t)((uint8_t*)(x))[6] <<  8) | \
+		     (uint64_t)((uint8_t*)(x))[7])
 #define AV_WB64(p, d) do { \
-                    ((uint8_t*)(p))[7] = (d);     \
-                    ((uint8_t*)(p))[6] = (d)>>8;  \
-                    ((uint8_t*)(p))[5] = (d)>>16; \
-                    ((uint8_t*)(p))[4] = (d)>>24; \
-                    ((uint8_t*)(p))[3] = (d)>>32; \
-                    ((uint8_t*)(p))[2] = (d)>>40; \
-                    ((uint8_t*)(p))[1] = (d)>>48; \
-                    ((uint8_t*)(p))[0] = (d)>>56; } while(0)
+		((uint8_t*)(p))[7] = (d);     \
+		((uint8_t*)(p))[6] = (d)>>8;  \
+		((uint8_t*)(p))[5] = (d)>>16; \
+		((uint8_t*)(p))[4] = (d)>>24; \
+		((uint8_t*)(p))[3] = (d)>>32; \
+		((uint8_t*)(p))[2] = (d)>>40; \
+		((uint8_t*)(p))[1] = (d)>>48; \
+		((uint8_t*)(p))[0] = (d)>>56; } while(0)
 
 #define AV_RL64(x)  (((uint64_t)((uint8_t*)(x))[7] << 56) | \
-                     ((uint64_t)((uint8_t*)(x))[6] << 48) | \
-                     ((uint64_t)((uint8_t*)(x))[5] << 40) | \
-                     ((uint64_t)((uint8_t*)(x))[4] << 32) | \
-                     ((uint64_t)((uint8_t*)(x))[3] << 24) | \
-                     ((uint64_t)((uint8_t*)(x))[2] << 16) | \
-                     ((uint64_t)((uint8_t*)(x))[1] <<  8) | \
-                      (uint64_t)((uint8_t*)(x))[0])
+		     ((uint64_t)((uint8_t*)(x))[6] << 48) | \
+		     ((uint64_t)((uint8_t*)(x))[5] << 40) | \
+		     ((uint64_t)((uint8_t*)(x))[4] << 32) | \
+		     ((uint64_t)((uint8_t*)(x))[3] << 24) | \
+		     ((uint64_t)((uint8_t*)(x))[2] << 16) | \
+		     ((uint64_t)((uint8_t*)(x))[1] <<  8) | \
+		     (uint64_t)((uint8_t*)(x))[0])
 #define AV_WL64(p, d) do { \
-                    ((uint8_t*)(p))[0] = (d);     \
-                    ((uint8_t*)(p))[1] = (d)>>8;  \
-                    ((uint8_t*)(p))[2] = (d)>>16; \
-                    ((uint8_t*)(p))[3] = (d)>>24; \
-                    ((uint8_t*)(p))[4] = (d)>>32; \
-                    ((uint8_t*)(p))[5] = (d)>>40; \
-                    ((uint8_t*)(p))[6] = (d)>>48; \
-                    ((uint8_t*)(p))[7] = (d)>>56; } while(0)
+		((uint8_t*)(p))[0] = (d);     \
+		((uint8_t*)(p))[1] = (d)>>8;  \
+		((uint8_t*)(p))[2] = (d)>>16; \
+		((uint8_t*)(p))[3] = (d)>>24; \
+		((uint8_t*)(p))[4] = (d)>>32; \
+		((uint8_t*)(p))[5] = (d)>>40; \
+		((uint8_t*)(p))[6] = (d)>>48; \
+		((uint8_t*)(p))[7] = (d)>>56; } while(0)
 #endif
 
 static inline uint8_t av_clip_uint8(int a)
 {
-    if (a&(~255)) return (-a)>>31;
-    else          return a;
+	if (a & (~255)) return (-a) >> 31;
+	else          return a;
 }
 
-#endif /* UTILS_H */ 
+#endif /* UTILS_H */

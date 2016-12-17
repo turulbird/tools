@@ -61,14 +61,14 @@ static tButton cButtons_LircdName[] =
 	{"KEY_MUTE"     , "=>", KEY_MUTE},
 	{"KEY_PAGEUP"   , "=>", KEY_PAGEUP},
 	{"KEY_PAGEDOWN" , "=>", KEY_PAGEDOWN},
-	
+
 	{"KEY_MENU"     , "=>", KEY_MENU},
 	{"KEY_HOME"     , "=>", KEY_HOME},
 	{"KEY_OPTION"   , "=>", KEY_OPTION},
 	{"KEY_EPG"      , "=>", KEY_EPG},
 	{"KEY_GOTO"         , "=>", KEY_GOTO},
 
-	{"KEY_PROGRAM"  , "=>", KEY_PROGRAM}, 
+	{"KEY_PROGRAM"  , "=>", KEY_PROGRAM},
 	{"KEY_TEXT"     , "=>", KEY_TEXT},
 	{"KEY_HELP"         , "=>", KEY_HELP},
 	{"KEY_LIST"     , "=>", KEY_LIST},
@@ -79,7 +79,7 @@ static tButton cButtons_LircdName[] =
 	{"KEY_3"            , "=>", KEY_3},
 	{"KEY_4"            , "=>", KEY_4},
 	{"KEY_5"            , "=>", KEY_5},
-	
+
 	{"KEY_6"            , "=>", KEY_6},
 	{"KEY_7"            , "=>", KEY_7},
 	{"KEY_8"            , "=>", KEY_8},
@@ -99,25 +99,25 @@ static tButton cButtons_LircdName[] =
 	{"KEY_V"       , "=>", KEY_V},
 	{"KEY_AUX"         , "=>", KEY_AUX},
 	{"KEY_TIME"           , "=>", KEY_TIME},
-	
+
 	{"KEY_TV2"       , "=>", KEY_TV2},
 	{"KEY_BACK"         , "=>", KEY_BACK},
 	{"KEY_FIND"           , "=>", KEY_FIND},
 	{"KEY_ARCHIVE"         , "=>", KEY_ARCHIVE},
 	{"KEY_INFO"           , "=>", KEY_INFO},
-	
+
 	{"KEY_FAVORITES"            , "=>", KEY_FAVORITES},
 	{"KEY_SAT"            , "=>", KEY_SAT},
 	{"KEY_PREVIOUS"           , "=>", KEY_PREVIOUS},
 	{"KEY_NEXT"           , "=>", KEY_NEXT},
 	{"KEY_F"           , "=>", KEY_F},
-	
+
 	{"KEY_SLOW"           , "=>", KEY_SLOW},
 	{"KEY_P"      , "=>", KEY_P},
 	{"KEY_CLOSE"            , "=>", KEY_CLOSE},
 	{"KEY_T"            , "=>", KEY_T},
 	{"KEY_F1"             , "=>", KEY_F1},
-	
+
 	{"KEY_F2"             , "=>", KEY_F2},
 	{"KEY_F3"             , "=>", KEY_F3},
 	{"KEY_SELECT"      , "=>", KEY_SELECT},
@@ -129,9 +129,9 @@ static tButton cButtons_LircdName[] =
 	{"KEY_MHP"      , "=>", KEY_MHP},
 	{"KEY_LANGUAGE"      , "=>", KEY_LANGUAGE},
 	{"KEY_TITLE"      , "=>", KEY_TITLE},
-	
-	{"KEY_ANGLE"      , "=>", KEY_ANGLE},      
-	{"KEY_ZOOM"      , "=>", KEY_ZOOM},      
+
+	{"KEY_ANGLE"      , "=>", KEY_ANGLE},
+	{"KEY_ZOOM"      , "=>", KEY_ZOOM},
 	{"KEY_KEYBOARD"      , "=>", KEY_KEYBOARD},
 	{"KEY_SCREEN"      , "=>", KEY_SCREEN},
 	{"KEY_PC"      , "=>", KEY_PC},
@@ -148,11 +148,11 @@ static tButton cButtons_LircdName[] =
 	{"KEY_PLAYER"      , "=>", KEY_PLAYER},
 	{"KEY_DVD"      , "=>", KEY_DVD},
 
-	{"KEY_MP3"      , "=>", KEY_MP3},        
-	{"KEY_AUDIO"      , "=>", KEY_AUDIO},        
-	{"KEY_VIDEO"      , "=>", KEY_VIDEO},      
+	{"KEY_MP3"      , "=>", KEY_MP3},
+	{"KEY_AUDIO"      , "=>", KEY_AUDIO},
+	{"KEY_VIDEO"      , "=>", KEY_VIDEO},
 	{"KEY_DIRECTORY"      , "=>", KEY_DIRECTORY},
-	{"KEY_MEMO"      , "=>", KEY_MEMO},  
+	{"KEY_MEMO"      , "=>", KEY_MEMO},
 
 	{"KEY_CALENDAR"      , "=>", KEY_CALENDAR},
 	{"KEY_CHANNELUP"      , "=>", KEY_CHANNELUP},
@@ -168,7 +168,7 @@ static tButton cButtons_LircdName[] =
 
 	{"KEY_TWEN"      , "=>", KEY_TWEN},
 	{"KEY_BREAK"      , "=>", KEY_BREAK},
-	{"KEY_PLAYPAUSE"	, "=>"  , KEY_PLAYPAUSE}, 
+	{"KEY_PLAYPAUSE"	, "=>"  , KEY_PLAYPAUSE},
 	{"KEY_EXIT" , "=>", KEY_EXIT},
 	{""               	, ""  , KEY_NULL},
 };
@@ -246,14 +246,14 @@ static int pRead(Context_t *context)
 
 	//some RCUs send different codes for single click and long push. This breakes e2 LONG detection, because lircd counter starts from beginning
 	//workarround is to define names for long codes ending '&' in lircd.conf and using this marker to copunt data correctly
-	LastKeyNameChar = strlen(KeyName) -1 ;
+	LastKeyNameChar = strlen(KeyName) - 1 ;
 	if (KeyName[LastKeyNameChar] == 0x26) //&
 	{
 		//printf("[LircdName RCU] LONG detected\n");
 		count += 1;
 		KeyName[LastKeyNameChar] = 0;
 	}
-	
+
 	vCurrentCode = getInternalCodeLircKeyName(cButtons, KeyName);
 
 	return vCurrentCode;

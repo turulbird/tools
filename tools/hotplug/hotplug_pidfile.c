@@ -41,7 +41,8 @@ int pidfile_read(pid_t *pid, const char *fmt, ...)
 	va_end(ap);
 
 	f = fopen(filename, "r");
-	if (f == NULL) {
+	if (f == NULL)
+	{
 		perror(filename);
 		return -1;
 	}
@@ -63,7 +64,8 @@ int pidfile_write(pid_t pid, const char *fmt, ...)
 	va_end(ap);
 
 	f = fopen(filename, "w");
-	if (f == NULL) {
+	if (f == NULL)
+	{
 		perror(filename);
 		return -1;
 	}

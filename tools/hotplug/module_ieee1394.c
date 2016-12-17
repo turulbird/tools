@@ -8,12 +8,12 @@
  *	This program is free software; you can redistribute it and/or modify it
  *	under the terms of the GNU General Public License as published by the
  *	Free Software Foundation version 2 of the License.
- * 
+ *
  *	This program is distributed in the hope that it will be useful, but
  *	WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *	General Public License for more details.
- * 
+ *
  *	You should have received a copy of the GNU General Public License along
  *	with this program; if not, write to the Free Software Foundation, Inc.,
  *	675 Mass Ave, Cambridge, MA 02139, USA.
@@ -44,9 +44,10 @@ int ieee1394_add(void)
 	version_env = getenv("VERSION");
 	dbg("VENDOR_ID='%s', MODEL_ID='%s' SPECIFIER_ID='%s' VERSION='%s'", vendor_env, model_env, specifier_env, version_env);
 	if ((vendor_env == NULL) ||
-	    (model_env == NULL) ||
-	    (specifier_env == NULL) ||
-	    (version_env == NULL)) {
+			(model_env == NULL) ||
+			(specifier_env == NULL) ||
+			(version_env == NULL))
+	{
 		dbg("missing an environment variable, aborting.");
 		return 1;
 	}

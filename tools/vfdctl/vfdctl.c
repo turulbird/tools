@@ -42,22 +42,22 @@
 *		.. 27 = 1 horizontal bars filled from bottom of a total of 7
 */
 
-void setMessageToDisplay ( char* );
-void setMessageToDisplayEx ( char*, int len );
+void setMessageToDisplay(char *);
+void setMessageToDisplayEx(char *, int len);
 void show_help();
 void close_device_vfd();
-void scrollText(char* text);
-int iconOnOff(char* sym, unsigned char onoff);
-void centeredText(char* text);
-int writeCG (unsigned char adress, unsigned char pixeldata[5]);
+void scrollText(char *text);
+int iconOnOff(char *sym, unsigned char onoff);
+void centeredText(char *text);
+int writeCG(unsigned char adress, unsigned char pixeldata[5]);
 void demoMode(void);
 void sigfunc(int sig);
-void inputRemote(char* text);
+void inputRemote(char *text);
 void refreshDisp();
 void printState(int index);
 int getIconIndex(char *icon);
-void printBitmap(char* filename, int animationSpeed);
-void playVfdx(char* filename);
+void printBitmap(char *filename, int animationSpeed);
+void playVfdx(char *filename);
 
 #ifdef HAVE_SPARK7162_HARDWARE
 #define VFD_LEN    8
@@ -112,16 +112,18 @@ struct aotom_ioctl_data
 	} u;
 };
 
-const char *icons[46] = {
-"fr","plr","play","plf","ff","pause","rec","mute","cycle","dd","lock","ci","usb","hd","rec2","hd8","hd7",  /* 17 */ 
-"hd6","hd5","hd4","hd3","hdfull","hd2","hd1","mp3","ac3","tvl","music","alert","hdd","clockpm","clockam",  /* 32 */
-"clock","mail","bt","stby","ter","disk3","disk2","disk1","disk0","sat","ts","dot1","cab","all"};           /* 46 */
+const char *icons[46] =
+{
+	"fr", "plr", "play", "plf", "ff", "pause", "rec", "mute", "cycle", "dd", "lock", "ci", "usb", "hd", "rec2", "hd8", "hd7", /* 17 */
+	"hd6", "hd5", "hd4", "hd3", "hdfull", "hd2", "hd1", "mp3", "ac3", "tvl", "music", "alert", "hdd", "clockpm", "clockam", /* 32 */
+	"clock", "mail", "bt", "stby", "ter", "disk3", "disk2", "disk1", "disk0", "sat", "ts", "dot1", "cab", "all"
+};           /* 46 */
 
 static struct aotom_ioctl_data aotom_data;
 static char textOff = 100;
 #else
 #define VFD_LEN   16
-const char *icons[16] = {"usb","hd","hdd","lock","bt","mp3","music","dd","mail","mute","play","pause","ff","fr","rec","clock"};
+const char *icons[16] = {"usb", "hd", "hdd", "lock", "bt", "mp3", "music", "dd", "mail", "mute", "play", "pause", "ff", "fr", "rec", "clock"};
 #endif
 
 const char *states[3] = {"off", "on", "not inited"};
@@ -138,7 +140,8 @@ int offset = 0;
 int main(int argc, char **argv)
 {
 	// check command line argument count
-	if (argc == 1) {
+	if (argc == 1)
+	{
 		show_help();
 		return EXIT_FAILURE;
 	}
@@ -147,95 +150,141 @@ int main(int argc, char **argv)
 	signal(SIGINT, sigfunc);
 
 	// open display file
-	if ( (file_vfd = open ( "/dev/vfd", O_RDWR )) == -1 )
+	if ((file_vfd = open("/dev/vfd", O_RDWR)) == -1)
 	{
-		printf ( "vfdctl: could not open vfd-device!\n" );
+		printf("vfdctl: could not open vfd-device!\n");
 		return EXIT_FAILURE;
 	}
-	
+
 	int i;
 	unsigned char centerText = false;
-	char* output = 0;
+	char *output = 0;
 	int animationSpeed = 500000;	// default animation to 1/2 second
 
-	for (i = 1; i<argc; i++) {
-		char* cmd = argv[i];
+	for (i = 1; i < argc; i++)
+	{
+		char *cmd = argv[i];
 
-		if (strcmp(cmd,"-c") ==0 ) {
+		if (strcmp(cmd, "-c") == 0)
+		{
 			centerText = true;
 			if (verbose) printf("option centered text active\n");
-		} else if (strcmp(cmd,"-v") == 0) {
+		}
+		else if (strcmp(cmd, "-v") == 0)
+		{
 			verbose = true;
 #ifndef HAVE_SPARK7162_HARDWARE
-		} else if (strcmp(cmd,"-s") ==0) {
-			if (argc > 2) {
+		}
+		else if (strcmp(cmd, "-s") == 0)
+		{
+			if (argc > 2)
+			{
 				i++;
 				animationSpeed = atoi(argv[i]) * 1000;
 				continue;
-			} else {
-				fprintf(stderr,"vfdctl: please specify animationspeed in milliseconds as 2nd argument\n");
+			}
+			else
+			{
+				fprintf(stderr, "vfdctl: please specify animationspeed in milliseconds as 2nd argument\n");
 				break;
 			}
-		} else if (strcmp(cmd,"-b") == 0) {
-			if (argc > 2) {
+		}
+		else if (strcmp(cmd, "-b") == 0)
+		{
+			if (argc > 2)
+			{
 				printBitmap(argv[i + 1], animationSpeed);
-			} else {
-				fprintf(stderr,"vfdctl: please specify bitmap file as 2nd argument\n");
+			}
+			else
+			{
+				fprintf(stderr, "vfdctl: please specify bitmap file as 2nd argument\n");
 			}
 			break;
-		} else if (strcmp(cmd,"-x") == 0) {
-			if (argc > 2) {
+		}
+		else if (strcmp(cmd, "-x") == 0)
+		{
+			if (argc > 2)
+			{
 				playVfdx(argv[i + 1]);
-			} else {
-				fprintf(stderr,"vfdctl: please specify .vfdx file as 2nd argument\n");
+			}
+			else
+			{
+				fprintf(stderr, "vfdctl: please specify .vfdx file as 2nd argument\n");
 			}
 			break;
 #endif
-		} else if (cmd[0] == '+') {
-			iconOnOff(cmd+1,true);
-		} else if (cmd[0] == '-') {
-			iconOnOff(cmd+1,false);
+		}
+		else if (cmd[0] == '+')
+		{
+			iconOnOff(cmd + 1, true);
+		}
+		else if (cmd[0] == '-')
+		{
+			iconOnOff(cmd + 1, false);
 #ifdef HAVE_SPARK7162_HARDWARE
-		} else if (strcmp(cmd,"texton") == 0) {
+		}
+		else if (strcmp(cmd, "texton") == 0)
+		{
 			textOff = 101;
-			ioctl ( file_vfd, VFDDISPLAYWRITEONOFF, &textOff );
-		} else if (strcmp(cmd,"textoff") == 0) {
+			ioctl(file_vfd, VFDDISPLAYWRITEONOFF, &textOff);
+		}
+		else if (strcmp(cmd, "textoff") == 0)
+		{
 			textOff = 100;
-			ioctl ( file_vfd, VFDDISPLAYWRITEONOFF, &textOff );
+			ioctl(file_vfd, VFDDISPLAYWRITEONOFF, &textOff);
 #else
-		} else if (strcmp(cmd,"demomode") == 0) {
+		}
+		else if (strcmp(cmd, "demomode") == 0)
+		{
 			printf("vfdctl: starting demomode\n");
 			demoMode();
 			break;
-		} else if (strcmp(cmd,"input") == 0) {
-			fprintf(stderr,"vfdctl: starting remote control input mode\n");
-			if (argc == 3) {
+		}
+		else if (strcmp(cmd, "input") == 0)
+		{
+			fprintf(stderr, "vfdctl: starting remote control input mode\n");
+			if (argc == 3)
+			{
 				inputRemote(argv[2]);
-			} else {
+			}
+			else
+			{
 				inputRemote("");
 			}
 			break;
-		} else if (strcmp(cmd,"iconstate") == 0) {
-			if (argc == 3) {
+		}
+		else if (strcmp(cmd, "iconstate") == 0)
+		{
+			if (argc == 3)
+			{
 				printState(getIconIndex(argv[2]));
-			} else {
+			}
+			else
+			{
 				printState(-1);
 			}
 			break;
 #endif
-		} else {
+		}
+		else
+		{
 			output = cmd;
 		}
-		
+
 	}
 
-	if (output) {
-		if (strlen(output)>VFD_LEN)
+	if (output)
+	{
+		if (strlen(output) > VFD_LEN)
 			scrollText(output); // scroll text if >VFD_LEN
-		else {
-			if (centerText == true) {
+		else
+		{
+			if (centerText == true)
+			{
 				centeredText(output);
-			} else {
+			}
+			else
+			{
 				setMessageToDisplay(output);
 			}
 		}
@@ -246,19 +295,23 @@ int main(int argc, char **argv)
 	return EXIT_SUCCESS;
 }
 
-int getIconIndex(char* icon)
+int getIconIndex(char *icon)
 {
 	int i;
 
 #ifdef HAVE_SPARK7162_HARDWARE
-	for (i = 0; i < 46; i++) {
-		if (strcmp(icon, icons[i]) == 0) {
-			return i+1;
+	for (i = 0; i < 46; i++)
+	{
+		if (strcmp(icon, icons[i]) == 0)
+		{
+			return i + 1;
 		}
 	}
 #else
-	for (i = 0; i < 16; i++) {
-		if (strcmp(icon, icons[i]) == 0) {
+	for (i = 0; i < 16; i++)
+	{
+		if (strcmp(icon, icons[i]) == 0)
+		{
 			return i;
 		}
 	}
@@ -268,7 +321,7 @@ int getIconIndex(char* icon)
 }
 
 // CODE captaintrip
-void setMessageToDisplay(char* str)
+void setMessageToDisplay(char *str)
 {
 	int i;
 
@@ -280,27 +333,28 @@ void setMessageToDisplay(char* str)
 	}
 	writedisp_data;
 
-	memset ( writedisp_data.data, ' ', VFD_LEN );
+	memset(writedisp_data.data, ' ', VFD_LEN);
 
-	i = strlen ( str );
-	if ( i > VFD_LEN ) i = VFD_LEN;
-	memcpy ( writedisp_data.data, str, i );	
+	i = strlen(str);
+	if (i > VFD_LEN) i = VFD_LEN;
+	memcpy(writedisp_data.data, str, i);
 
 	writedisp_data.start = 0;
 	writedisp_data.length = VFD_LEN;
 
-	ioctl ( file_vfd, VFD_Display_Chars, &writedisp_data );
+	ioctl(file_vfd, VFD_Display_Chars, &writedisp_data);
 }
 
 void close_device_vfd()
 {
-	if ( file_vfd != -1 )
-		close ( file_vfd );
+	if (file_vfd != -1)
+		close(file_vfd);
 }
 
-void show_help() {
+void show_help()
+{
 #ifdef HAVE_SPARK7162_HARDWARE
-printf("vfdctl v0.7.1 Spark7162 - usage:\n\
+	printf("vfdctl v0.7.1 Spark7162 - usage:\n\
 \tvfdctl [[-c] text] [+sym] [-sym] ...\n\
 \t-c\tcentered output\n\
 \tto set symbols use e.g. +usb or -usb\n\
@@ -310,7 +364,7 @@ printf("vfdctl v0.7.1 Spark7162 - usage:\n\
 \ttexton\tactivate text showing on VFD\n\
 \ttextoff\tdeactivate text showing on VFD\n");
 #else
-printf("vfdctl v0.7.1 - usage:\n\
+	printf("vfdctl v0.7.1 - usage:\n\
 \tvfdctl [[-c] text] [-s speed] [-b file] [+sym] [-sym] ...\n\
 \t-c\tcentered output\n\
 \t-s\tset animation speed in milliseconds for -b output\n\
@@ -325,47 +379,49 @@ printf("vfdctl v0.7.1 - usage:\n\
 #endif
 }
 
-void centeredText(char* text)
+void centeredText(char *text)
 {
 	if (verbose) printf("centering text\n");
 
 	int ws = 0; // needed whitespace for centering
-	if (strlen(text)<VFD_LEN)
-		ws = (VFD_LEN-strlen(text)) / 2;
+	if (strlen(text) < VFD_LEN)
+		ws = (VFD_LEN - strlen(text)) / 2;
 	else
 		ws = 0;
 
 	char *textout = malloc(VFD_LEN);
 	memset(textout, ' ', VFD_LEN);
-	memcpy(textout+ws, text, VFD_LEN-ws);
+	memcpy(textout + ws, text, VFD_LEN - ws);
 	setMessageToDisplay(textout);
 	free(textout);
 }
 
-void scrollText(char* text)
+void scrollText(char *text)
 {
 	int i, len = strlen(text);
-	char* out = malloc(VFD_LEN);
+	char *out = malloc(VFD_LEN);
 
-	for (i = 0; i <= (len-VFD_LEN); i++) { // scroll text till end
+	for (i = 0; i <= (len - VFD_LEN); i++) // scroll text till end
+	{
 		memset(out, ' ', VFD_LEN);
 		memcpy(out, text + i, VFD_LEN);
 		setMessageToDisplay(out);
 		usleep(SLEEPTIME);
 	}
-	for (i = 1; i < VFD_LEN; i++) { // scroll text with whitespaces from right
+	for (i = 1; i < VFD_LEN; i++)   // scroll text with whitespaces from right
+	{
 		memset(out, ' ', VFD_LEN);
-		memcpy(out, text+len+i-VFD_LEN, VFD_LEN-i);
+		memcpy(out, text + len + i - VFD_LEN, VFD_LEN - i);
 		setMessageToDisplay(out);
 		usleep(SLEEPTIME);
 	}
 
 	memcpy(out, text, VFD_LEN); // display first 16 chars after scrolling
 	setMessageToDisplay(out);
-	free (out);
+	free(out);
 }
 
-int iconOnOff(char* sym, unsigned char onoff)
+int iconOnOff(char *sym, unsigned char onoff)
 {
 	char icon = getIconIndex(sym);
 #ifdef HAVE_SPARK7162_HARDWARE
@@ -373,7 +429,8 @@ int iconOnOff(char* sym, unsigned char onoff)
 	aotom_data.u.icon.on = onoff;
 	ioctl(file_vfd, VFDICONDISPLAYONOFF, &aotom_data);
 #else
-	struct {
+	struct
+	{
 		unsigned char start;
 		unsigned char data[64];
 		unsigned char length;
@@ -387,18 +444,18 @@ int iconOnOff(char* sym, unsigned char onoff)
 #endif
 
 	if (verbose)
-		printf("set icon %s(%x) %d \n",sym,icon,onoff);
+		printf("set icon %s(%x) %d \n", sym, icon, onoff);
 	return 0;
 }
 
-int writeCG (unsigned char adress, unsigned char pixeldata[5])
+int writeCG(unsigned char adress, unsigned char pixeldata[5])
 {
-	struct {
+	struct
+	{
 		unsigned char start;
 		unsigned char data[64];
 		unsigned char length;
 	} data;
-//	int i;
 
 	data.start = adress & 0x07;
 	data.data[0] = pixeldata[0];
@@ -410,7 +467,7 @@ int writeCG (unsigned char adress, unsigned char pixeldata[5])
 	return ioctl(file_vfd, VFDWRITECGRAM, &data);
 }
 
-void demoMode (void)
+void demoMode(void)
 {
 	char man1[5] = {0x02, 0x64, 0x1D, 0x64, 0x02};
 	char man2[5] = {0x04, 0x64, 0x1D, 0x64, 0x04};
@@ -421,36 +478,37 @@ void demoMode (void)
 	char eins[5] = {0x00, 0x00, 0x3E, 0x00, 0x00};
 	char nul[5] = {0x1C, 0x22, 0x22, 0x1C, 0x00};
 
-	char* writechars[7] = {man1, u, f, s, neun, eins, nul };
-	char* writechars_ani[7] = {man2, u, f, s, neun, eins, nul };
-	
+	char *writechars[7] = {man1, u, f, s, neun, eins, nul };
+	char *writechars_ani[7] = {man2, u, f, s, neun, eins, nul };
+
 	int i;
-	for (i = 0; i < 7; i++) {
-		writeCG(i, (unsigned char *)(writechars+i));
+	for (i = 0; i < 7; i++)
+	{
+		writeCG(i, (unsigned char *)(writechars + i));
 	}
 
 	char test[9] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x00};
 	setMessageToDisplay(test);
 
 	//animation
-	while (1) {
+	while (1)
+	{
 		usleep(750000);
-		writeCG(0, (unsigned char *)writechars_ani+0);
+		writeCG(0, (unsigned char *)writechars_ani + 0);
 		setMessageToDisplay(test);
 
 		usleep(750000);
-		writeCG(0, (unsigned char *)writechars+0);
+		writeCG(0, (unsigned char *)writechars + 0);
 		setMessageToDisplay(test);
 	}
 }
 
 void sigfunc(int sig)
 {
-//	int c;
-
-	if(sig != SIGINT)
+	if (sig != SIGINT)
 		return;
-	else {
+	else
+	{
 		exit(-1);
 	}
 }
@@ -461,7 +519,7 @@ void appendToOutput(char c)
 	if (c == 0) return;
 
 	input[position] = c;
-	if (position == MAX_INPUT) 
+	if (position == MAX_INPUT)
 		return;
 	position++;
 
@@ -471,13 +529,16 @@ void appendToOutput(char c)
 
 void refreshDisp()
 {
-	memset(&outbuffer[offset], ' ', 16-offset);
-	if (position > 15 - offset) {
+	memset(&outbuffer[offset], ' ', 16 - offset);
+	if (position > 15 - offset)
+	{
 		memcpy(&outbuffer[offset], &input[position - 15 + offset], 15 - offset);
 		outbuffer[15] = IN_CHAR;
-	} else {
+	}
+	else
+	{
 		memcpy(&outbuffer[offset], &input, position);
-		outbuffer[position+offset]=IN_CHAR;
+		outbuffer[position + offset] = IN_CHAR;
 	}
 	setMessageToDisplay(outbuffer);
 }
@@ -486,57 +547,67 @@ char decodeToChar(char in, char in2)
 {
 	//fprintf(stderr,"< decodeToChar\n");
 
-	if (in == 48 && in2 >= 48 && in2 <= 57) {
+	if (in == 48 && in2 >= 48 && in2 <= 57)
+	{
 		return '0' + in2 - 48;
-	} else if (in == 48 && in2 == 68) {
+	}
+	else if (in == 48 && in2 == 68)
+	{
 		return '.';
 	}
 	return 0;
 }
 
-void inputRemote(char* text)
+void inputRemote(char *text)
 {
 	//fprintf(stderr, "< inputRemote(%s)\n", text);
 
-	char* out = malloc(16);
+	char *out = malloc(16);
 	memset(out, 0x10, 16);
 	memset(input, 0, MAX_INPUT);
 	memset(outbuffer, ' ', 16);
 
-	if (text!=(void*)0) {
-		offset=strlen(text);
-		if (offset>10) offset=10;
+	if (text != (void *)0)
+	{
+		offset = strlen(text);
+		if (offset > 10) offset = 10;
 		memcpy(outbuffer, text, offset);
 	}
 
 	outbuffer[offset] = IN_CHAR;
 
-	FILE* fd = fopen("/dev/ttyAS1", "r");
+	FILE *fd = fopen("/dev/ttyAS1", "r");
 	if (fd)
 	{
-		fprintf(stderr,"opened remote control\n");
+		fprintf(stderr, "opened remote control\n");
 	}
 
 	setMessageToDisplay(outbuffer);
-	int in,in2,in3;
+	int in, in2, in3;
 	char dec_in;
 
-	while ((in=fgetc(fd)) > 0)
+	while ((in = fgetc(fd)) > 0)
 	{
-		in2=fgetc(fd);
-		in3=fgetc(fd);
+		in2 = fgetc(fd);
+		in3 = fgetc(fd);
 
-		if (in3 == 10) {
+		if (in3 == 10)
+		{
 			//fprintf(stderr,"we have input: %d %d\n", in, in2);
-			if (in == 53 && in2 == 53) {
+			if (in == 53 && in2 == 53)
+			{
 				break;
-			} else if (in == 53 && in2 == 67) {
-				char* out = (char*)malloc(position + 1);
+			}
+			else if (in == 53 && in2 == 67)
+			{
+				char *out = (char *)malloc(position + 1);
 				memcpy(out, &input, position);
-				*(out+position) = 0x00;
-				printf("%s",out);
+				*(out + position) = 0x00;
+				printf("%s", out);
 				break;
-			} else if (in == 53 && in2 == 65) {
+			}
+			else if (in == 53 && in2 == 65)
+			{
 				//fprintf(stderr,"del\n");
 				position--;
 				if (position < 0) position = 0;
@@ -555,7 +626,8 @@ void inputRemote(char* text)
 
 void printState(int index)
 {
-	struct {
+	struct
+	{
 		unsigned char start;
 		unsigned char data[64];
 		unsigned char length;
@@ -565,22 +637,27 @@ void printState(int index)
 	ioctl(file_vfd, VFDICONGETSTATE, &data);
 
 	data.data[16] = 0x00;
-	if (data.data[17] != 0x1F) {
+	if (data.data[17] != 0x1F)
+	{
 		printf("Failed to get icon state! Kernel not patched?\n");
 		return;
 	}
 
-	if (index == -1) {
+	if (index == -1)
+	{
 		int i;
-		for (i = 0; i < 16; i++) {
+		for (i = 0; i < 16; i++)
+		{
 			printf("%s: %s\n", icons[i], states[data.data[i]]);
 		}
-	} else {
+	}
+	else
+	{
 		printf("%s: %s\n", icons[index], states[data.data[index]]);
 	}
 }
 
-void setMessageToDisplayEx(char* str, int len)
+void setMessageToDisplayEx(char *str, int len)
 {
 	struct ioctl_data
 	{
@@ -590,23 +667,23 @@ void setMessageToDisplayEx(char* str, int len)
 	}
 	writedisp_data;
 
-	memset ( writedisp_data.data, ' ', 16 );
+	memset(writedisp_data.data, ' ', 16);
 
-	if ( len > 16 ) len = 16;
-	memcpy ( writedisp_data.data, str, len );
+	if (len > 16) len = 16;
+	memcpy(writedisp_data.data, str, len);
 
 	writedisp_data.start = 0;
 	writedisp_data.length = 16;
 
-	ioctl ( file_vfd, VFD_Display_Chars, &writedisp_data );
+	ioctl(file_vfd, VFD_Display_Chars, &writedisp_data);
 }
 
-void printBitmap(char* filename, int animationTime)
+void printBitmap(char *filename, int animationTime)
 {
-	FILE* fd;
+	FILE *fd;
 	int i, x;
-	unsigned char* buf;
-	unsigned char* tx;
+	unsigned char *buf;
+	unsigned char *tx;
 
 	buf = malloc(35);
 	tx = malloc(17);
@@ -632,22 +709,23 @@ void printBitmap(char* filename, int animationTime)
 	}
 	else
 	{
-		fprintf(stderr,"cannot open file\n");
+		fprintf(stderr, "cannot open file\n");
 	}
 	free(tx);
 	free(buf);
 }
 
-void playVfdx(char* filename)
+void playVfdx(char *filename)
 {
-	FILE* fd;
+	FILE *fd;
 	int i, x;
-	unsigned char* buf;
+	unsigned char *buf;
 	char endless = 0;
 	char currentCharSet = 255;
 
 #pragma pack(1)
-	struct {
+	struct
+	{
 		char charSet;
 		char text[16];
 		unsigned short sleepTime;
@@ -656,19 +734,24 @@ void playVfdx(char* filename)
 
 	buf = malloc(10 * 35);
 	fd = fopen(filename, "r");
-	if (fd) {
+	if (fd)
+	{
 		fread(&endless, 1, 1, fd);		// read character bitmaps
 		fread(buf, 10 * 35, 1, fd);		// read character bitmaps
 
-		for (;;) {
+		for (;;)
+		{
 			fseek(fd, 351L, SEEK_SET);
 
-			while (fread(&line, sizeof(line), 1, fd) > 0) {		// read string to display
-				if (line.charSet != currentCharSet) {
+			while (fread(&line, sizeof(line), 1, fd) > 0)  		// read string to display
+			{
+				if (line.charSet != currentCharSet)
+				{
 					currentCharSet = line.charSet;
 					x = 0;
 					int start = line.charSet * 35;
-					for (i = start; i < start + 35; i += 5) {
+					for (i = start; i < start + 35; i += 5)
+					{
 						writeCG(x++, &buf[i]);
 					}
 				}
@@ -676,15 +759,18 @@ void playVfdx(char* filename)
 				usleep(line.sleepTime * 1000);
 			}
 
-			if (endless == 0) {
+			if (endless == 0)
+			{
 				break;
 			}
 		}
 
 		fclose(fd);
 
-	} else {
-		fprintf(stderr,"cannot open file\n");
+	}
+	else
+	{
+		fprintf(stderr, "cannot open file\n");
 	}
 
 	free(buf);

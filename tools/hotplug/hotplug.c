@@ -35,19 +35,22 @@
 #include "module_usb.h"
 #include "udev.h"
 
-struct command {
+struct command
+{
 	const char *name;
 	int (*cmd)(int argc, char *argv[], char *envp[]);
 };
 
-struct subsys {
+struct subsys
+{
 	const char *name;
 	int (*add)(void);
 	int (*remove)(void);
 };
 
-static struct subsys subsystems[] = {
-       	{
+static struct subsys subsystems[] =
+{
+	{
 		.name = "block",
 		.add = block_add,
 		.remove = block_remove,
@@ -86,7 +89,8 @@ static void redirect_io(void)
 	int fd;
 
 	fd = open("/dev/null", O_RDWR);
-	if (fd == -1) {
+	if (fd == -1)
+	{
 		perror("/dev/null");
 		return;
 	}
@@ -110,35 +114,44 @@ static int hotplug(int argc, char *argv[], char *envp[])
 
 	/* dbg("starting hotplug version %s", UDEV_VERSION); */
 
-	if (argc < 2) {
+	if (argc < 2)
+	{
 		err("hotplug expects a parameter, aborting.");
 		return EXIT_FAILURE;
 	}
 	sysname = argv[1];
 
 	action = getenv("ACTION");
-	if (action == NULL) {
+	if (action == NULL)
+	{
 		err("missing ACTION environment variable, aborting.");
 		return EXIT_FAILURE;
 	}
 
 	modalias = getenv("MODALIAS");
-	if (modalias != NULL) {
+	if (modalias != NULL)
+	{
 		if (!strcmp(ADD_STRING, action))
 			modprobe(modalias, true);
 		else if (!strcmp(REMOVE_STRING, action))
 			modprobe(modalias, false);
 	}
 
-	for (i = 0; i < sizeof(subsystems) / sizeof(subsystems[0]); i++) {
+	for (i = 0; i < sizeof(subsystems) / sizeof(subsystems[0]); i++)
+	{
 		s = &subsystems[i];
 		if (strcmp(s->name, sysname))
 			continue;
-		if (!strcmp(ADD_STRING, action) && s->add) {
+		if (!strcmp(ADD_STRING, action) && s->add)
+		{
 			return s->add();
-		} else if (!strcmp(REMOVE_STRING, action) && s->remove) {
+		}
+		else if (!strcmp(REMOVE_STRING, action) && s->remove)
+		{
 			return s->remove();
-		} else {
+		}
+		else
+		{
 			dbg("we do not handle %s for %s", action, sysname);
 			return EXIT_SUCCESS;
 		}
@@ -147,7 +160,8 @@ static int hotplug(int argc, char *argv[], char *envp[])
 	return EXIT_FAILURE;
 }
 
-static const struct command cmds[] = {
+static const struct command cmds[] =
+{
 	{
 		.name = "bdpoll",
 		.cmd = bdpoll,
@@ -157,13 +171,13 @@ static const struct command cmds[] = {
 		.cmd = hotplug,
 	},
 #if defined(UDEVMONITOR)
-       	{
+	{
 		.name = "udevmonitor",
 		.cmd = udevmonitor,
 	},
 #endif
 #if defined(UDEVTRIGGER)
-       	{
+	{
 		.name = "udevtrigger",
 		.cmd = udevtrigger,
 	},
@@ -181,8 +195,10 @@ int main(int argc, char *argv[], char *envp[])
 
 	logging_init(command);
 
-	for (cmd = cmds; cmd->name != NULL; cmd++) {
-		if (strcmp(cmd->name, command) == 0) {
+	for (cmd = cmds; cmd->name != NULL; cmd++)
+	{
+		if (strcmp(cmd->name, command) == 0)
+		{
 			ret = cmd->cmd(argc, argv, envp);
 			break;
 		}

@@ -6,7 +6,7 @@
 #define MAX_VIDEO_PACKET_SIZE (224*1024+4)
 #define VIDEOBUFFER_SIZE 0x100000
 
-extern unsigned char* videobuffer;
+extern unsigned char *videobuffer;
 extern int videobuf_len;
 extern unsigned char videobuf_code[4];
 extern int videobuf_code_len;

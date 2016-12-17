@@ -1,7 +1,8 @@
 #ifndef HOTPLUG_TIMEOUT_H
 #define HOTPLUG_TIMEOUT_H
 
-struct timeout {
+struct timeout
+{
 	unsigned long val;
 };
 

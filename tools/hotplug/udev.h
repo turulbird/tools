@@ -5,12 +5,12 @@
  *	This program is free software; you can redistribute it and/or modify it
  *	under the terms of the GNU General Public License as published by the
  *	Free Software Foundation version 2 of the License.
- * 
+ *
  *	This program is distributed in the hope that it will be useful, but
  *	WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *	General Public License for more details.
- * 
+ *
  *	You should have received a copy of the GNU General Public License along
  *	with this program; if not, write to the Free Software Foundation, Inc.,
  *	51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -53,7 +53,8 @@
 
 struct udev_rules;
 
-struct sysfs_device {
+struct sysfs_device
+{
 	struct list_head node;			/* for device cache */
 	struct sysfs_device *parent;		/* already cached parent*/
 	char devpath[PATH_SIZE];
@@ -63,7 +64,8 @@ struct sysfs_device {
 	char driver[NAME_SIZE];			/* device driver name */
 };
 
-struct udevice {
+struct udevice
+{
 	/* device event */
 	struct sysfs_device *dev;		/* points to dev_local by default */
 	struct sysfs_device dev_local;
@@ -138,10 +140,11 @@ extern int udev_db_get_devices_by_name(const char *name, struct list_head *name_
 extern int udev_db_get_all_entries(struct list_head *name_list);
 
 /* udev_utils.c */
-struct name_entry {
+struct name_entry
+{
 	struct list_head node;
 	char name[PATH_SIZE];
-	unsigned int ignore_error:1;
+	unsigned int ignore_error: 1;
 };
 
 extern int log_priority(const char *priority);

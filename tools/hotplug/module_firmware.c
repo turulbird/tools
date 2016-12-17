@@ -38,7 +38,8 @@ static int fw_open(const char *fmt, const char *str, int flags)
 	path[sizeof(path) - 1] = '\0';
 
 	fd = open(path, flags);
-	if (fd == -1) {
+	if (fd == -1)
+	{
 		dbg("can't open '%s': %s", path, strerror(errno));
 		return -1;
 	}
@@ -51,9 +52,11 @@ static int fw_write(int fd, const char *buf, size_t count)
 	size_t off;
 	ssize_t ret;
 
-	for (off = 0; off < count; off += ret) {
+	for (off = 0; off < count; off += ret)
+	{
 		ret = write(fd, &buf[off], count - off);
-		if (ret < 0) {
+		if (ret < 0)
+		{
 			dbg("write failed: %s", strerror(errno));
 			return -1;
 		}
@@ -77,7 +80,8 @@ int firmware_add(void)
 	firmware_env = getenv("FIRMWARE");
 	dbg("DEVPATH='%s', FIRMWARE = '%s'", devpath_env, firmware_env);
 	if ((devpath_env == NULL) ||
-	    (firmware_env == NULL)) {
+			(firmware_env == NULL))
+	{
 		dbg("missing an environment variable, aborting.");
 		return 1;
 	}
@@ -88,13 +92,15 @@ int firmware_add(void)
 	if ((load_fd == -1) || (src_fd == -1) || (dst_fd == -1))
 		goto err;
 
-	if (fstat(src_fd, &st) == -1) {
+	if (fstat(src_fd, &st) == -1)
+	{
 		dbg("stat failed: %s", strerror(errno));
 		goto err;
 	}
 
 	src_ptr = mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, src_fd, 0);
-	if (src_ptr == MAP_FAILED) {
+	if (src_ptr == MAP_FAILED)
+	{
 		dbg("mmap failed: %s", strerror(errno));
 		goto err;
 	}

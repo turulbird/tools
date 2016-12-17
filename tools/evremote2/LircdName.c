@@ -204,7 +204,7 @@ static tButton cButtons_LircdName[] =
 	{"KEY_AUDIO"        , "=>", KEY_AUDIO},
 	{"KEY_VIDEO"        , "=>", KEY_VIDEO},
 	{"KEY_DIRECTORY"    , "=>", KEY_DIRECTORY},
-	{"KEY_MEMO"         , "=>", KEY_MEMO},  
+	{"KEY_MEMO"         , "=>", KEY_MEMO},
 
 	{"KEY_CALENDAR"     , "=>", KEY_CALENDAR},
 	{"KEY_CHANNELUP"    , "=>", KEY_CHANNELUP},
@@ -314,14 +314,14 @@ static int pRead(Context_t *context)
 
 	//some RCUs send different codes for single click and long push. This breakes e2 LONG detection, because lircd counter starts from beginning
 	//workarround is to define names for long codes ending '&' in lircd.conf and using this marker to copunt data correctly
-	LastKeyNameChar = strlen(KeyName) -1 ;
+	LastKeyNameChar = strlen(KeyName) - 1 ;
 	if (KeyName[LastKeyNameChar] == 0x26) //&
 	{
 		//printf("[LircdName RCU] LONG detected\n");
 		count += 1;
 		KeyName[LastKeyNameChar] = 0;
 	}
-	
+
 	vCurrentCode = getInternalCodeLircKeyName(cButtons, KeyName);
 
 	if (vCurrentCode != 0)
@@ -329,24 +329,24 @@ static int pRead(Context_t *context)
 		static int nextflag = 0;
 		if (count == 0)
 		{
-		//Emergency reboot after 5xPOWER, we count only presses within 2 seconds, not lONGs
-		if (!strncasecmp(LastKeyName, "KEY_POWER", 9) && !strncasecmp(KeyName, "KEY_POWER", 9)  && (GetNow() - LastKeyPressedTime < 2000))
-		{
-			KeyPowerCounter += 1;
-			printf("[LircdName RCU] KEY_POWER pressed %d time(s)\n", KeyPowerCounter);
-			if (KeyPowerCounter >= 5)
+			//Emergency reboot after 5xPOWER, we count only presses within 2 seconds, not lONGs
+			if (!strncasecmp(LastKeyName, "KEY_POWER", 9) && !strncasecmp(KeyName, "KEY_POWER", 9)  && (GetNow() - LastKeyPressedTime < 2000))
 			{
-				printf("[LircdName RCU] EMERGENCY REBOOT !!!\n");
-				fflush(stdout);
-				system("init 6");
-				sleep(4);
-				reboot(LINUX_REBOOT_CMD_RESTART);
-				return -1;
+				KeyPowerCounter += 1;
+				printf("[LircdName RCU] KEY_POWER pressed %d time(s)\n", KeyPowerCounter);
+				if (KeyPowerCounter >= 5)
+				{
+					printf("[LircdName RCU] EMERGENCY REBOOT !!!\n");
+					fflush(stdout);
+					system("init 6");
+					sleep(4);
+					reboot(LINUX_REBOOT_CMD_RESTART);
+					return -1;
+				}
 			}
-		}
-		else
-			KeyPowerCounter = 0;
-		//time checking
+			else
+				KeyPowerCounter = 0;
+			//time checking
 			if ((LastKeyCode == vCurrentCode) && (GetNow() - LastKeyPressedTime < LircdBtnDelay))   // (diffMilli(LastKeyPressedTime, CurrKeyPressedTime) <= REPEATDELAY) )
 			{
 				printf("[LircdName RCU] skiping next press of same key coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
@@ -362,7 +362,7 @@ static int pRead(Context_t *context)
 				printf("[RCU LircdName] new KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
 			}
 			nextflag++;
-			
+
 		}
 		else
 			printf("[RCU LircdName] same KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
@@ -388,14 +388,15 @@ static int pNotification(Context_t *context, const int cOn)
 		printf("[LircdName RCU] << end\n");
 		return 0;
 	}
-	  
+
 	//printf("[LircdName RCU] ICON %i %i\n", BlinkingIcon, cOn);
 
 	int file_vfd = -1;
 	char icon = BlinkingIcon;
 
-	
-	struct {
+
+	struct
+	{
 		unsigned char start;
 		unsigned char data[64];
 		unsigned char length;
@@ -415,15 +416,15 @@ static int pNotification(Context_t *context, const int cOn)
 	vfd_icon.icon_nr = icon;
 	vfd_icon.on = cOn;
 
-	if ( (file_vfd = open ( "/dev/vfd", O_RDWR )) == -1 )
+	if ((file_vfd = open("/dev/vfd", O_RDWR)) == -1)
 	{
-		printf ( "[LircdName]: could not open vfd-device!\n" );
+		printf("[LircdName]: could not open vfd-device!\n");
 	}
 	else
 	{
 		ioctl(file_vfd, 0xc0425a0a, &data); //0xc0425a0a = VFDICONDISPLAYONOFF
 		ioctl(file_vfd, 0xc0425a0a, &vfd_icon); //0xc0425a0a = VFDICONDISPLAYONOFF
-		close ( file_vfd );
+		close(file_vfd);
 	}
 	return 0;
 }

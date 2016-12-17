@@ -335,11 +335,11 @@ int main(int argc, char **argv)
 	}
 
 	printf("Input driver version is %d.%d.%d\n",
-		   version >> 16, (version >> 8) & 0xff, version & 0xff);
+	       version >> 16, (version >> 8) & 0xff, version & 0xff);
 
 	ioctl(fd, EVIOCGID, id);
 	printf("Input device ID: bus 0x%x vendor 0x%x product 0x%x version 0x%x\n",
-		   id[ID_BUS], id[ID_VENDOR], id[ID_PRODUCT], id[ID_VERSION]);
+	       id[ID_BUS], id[ID_VENDOR], id[ID_PRODUCT], id[ID_VERSION]);
 
 	ioctl(fd, EVIOCGNAME(sizeof(name)), name);
 	printf("Input device name: \"%s\"\n", name);
@@ -392,25 +392,25 @@ int main(int argc, char **argv)
 			if (ev[i].type == EV_SYN)
 			{
 				printf("Event: time %ld.%06ld, -------------- %s ------------\n",
-					   ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].code ? "Config Sync" : "Report Sync");
+				       ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].code ? "Config Sync" : "Report Sync");
 			}
 			else if (ev[i].type == EV_MSC && (ev[i].code == MSC_RAW || ev[i].code == MSC_SCAN))
 			{
 				printf("Event: time %ld.%06ld, type %d (%s), code %d (%s), value %02x\n",
-					   ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].type,
-					   events[ev[i].type] ? events[ev[i].type] : "?",
-					   ev[i].code,
-					   names[ev[i].type] ? (names[ev[i].type][ev[i].code] ? names[ev[i].type][ev[i].code] : "?") : "?",
-					   ev[i].value);
+				       ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].type,
+				       events[ev[i].type] ? events[ev[i].type] : "?",
+				       ev[i].code,
+				       names[ev[i].type] ? (names[ev[i].type][ev[i].code] ? names[ev[i].type][ev[i].code] : "?") : "?",
+				       ev[i].value);
 			}
 			else
 			{
 				printf("Event: time %ld.%06ld, type %d (%s), code %d (%s), value %d\n",
-					   ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].type,
-					   events[ev[i].type] ? events[ev[i].type] : "?",
-					   ev[i].code,
-					   names[ev[i].type] ? (names[ev[i].type][ev[i].code] ? names[ev[i].type][ev[i].code] : "?") : "?",
-					   ev[i].value);
+				       ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].type,
+				       events[ev[i].type] ? events[ev[i].type] : "?",
+				       ev[i].code,
+				       names[ev[i].type] ? (names[ev[i].type][ev[i].code] ? names[ev[i].type][ev[i].code] : "?") : "?",
+				       ev[i].value);
 			}
 
 	}

@@ -5,12 +5,12 @@
  *	This program is free software; you can redistribute it and/or modify it
  *	under the terms of the GNU General Public License as published by the
  *	Free Software Foundation version 2 of the License.
- * 
+ *
  *	This program is distributed in the hope that it will be useful, but
  *	WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *	General Public License for more details.
- * 
+ *
  *	You should have received a copy of the GNU General Public License along
  *	with this program; if not, write to the Free Software Foundation, Inc.,
  *	51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -38,7 +38,8 @@
 #define UDEVD_CTRL_SOCK_PATH		"/org/kernel/udev/udevd"
 #define UDEVD_CTRL_MAGIC		"udevd_" UDEV_VERSION
 
-enum udevd_ctrl_msg_type {
+enum udevd_ctrl_msg_type
+{
 	UDEVD_CTRL_UNKNOWN,
 	UDEVD_CTRL_STOP_EXEC_QUEUE,
 	UDEVD_CTRL_START_EXEC_QUEUE,
@@ -49,13 +50,15 @@ enum udevd_ctrl_msg_type {
 	UDEVD_CTRL_ENV,
 };
 
-struct udevd_ctrl_msg {
+struct udevd_ctrl_msg
+{
 	char magic[32];
 	enum udevd_ctrl_msg_type type;
 	char buf[256];
 };
 
-struct udevd_uevent_msg {
+struct udevd_uevent_msg
+{
 	struct list_head node;
 	pid_t pid;
 	int exitstatus;
@@ -69,6 +72,6 @@ struct udevd_uevent_msg {
 	char *devpath_old;
 	char *physdevpath;
 	unsigned int timeout;
-	char *envp[UEVENT_NUM_ENVP+1];
+	char *envp[UEVENT_NUM_ENVP + 1];
 	char envbuf[];
 };

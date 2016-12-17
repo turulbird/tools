@@ -28,7 +28,6 @@ static RemoteControl_t *AvailableRemoteControls[] =
 	NULL
 };
 
-
 int selectRemote(Context_t  *context, eBoxType type)
 {
 	int i;

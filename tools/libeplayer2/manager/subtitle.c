@@ -7,23 +7,28 @@
 static const char FILENAME[] = "subtitle.c";
 
 #define TRACKWRAP 20
-static Track_t * Tracks;
+static Track_t *Tracks;
 static int TrackCount = 0;
 static int CurrentTrack = -1; //no as default.
 
-static void ManagerAdd(Context_t  *context, Track_t track) {
+static void ManagerAdd(Context_t  *context, Track_t track)
+{
 	printf("%s::%s %s %s %d\n", FILENAME, __FUNCTION__, track.Name, track.Encoding, track.Id);
 
-	if (Tracks == NULL) {
+	if (Tracks == NULL)
+	{
 		Tracks = malloc(sizeof(Track_t) * TRACKWRAP);
 	}
-	
-	if (TrackCount < TRACKWRAP) {
+
+	if (TrackCount < TRACKWRAP)
+	{
 		Tracks[TrackCount].Name       = strdup(track.Name);
-        	Tracks[TrackCount].Encoding   = strdup(track.Encoding);
-        	Tracks[TrackCount].Id         = track.Id;
-        	TrackCount++;
-	} else {
+		Tracks[TrackCount].Encoding   = strdup(track.Encoding);
+		Tracks[TrackCount].Id         = track.Id;
+		TrackCount++;
+	}
+	else
+	{
 		//Track_t * tmp_Tracks = realoc(sizeof(Tracks));
 	}
 
@@ -31,83 +36,98 @@ static void ManagerAdd(Context_t  *context, Track_t track) {
 		context->playback->isSubtitle = 1;
 }
 
-static char ** ManagerList(Context_t  *context) {
-	char ** tracklist = NULL;
+static char **ManagerList(Context_t  *context)
+{
+	char **tracklist = NULL;
 	printf("%s::%s\n", FILENAME, __FUNCTION__);
-	if (Tracks != NULL) {
+	if (Tracks != NULL)
+	{
 		int i = 0, j = 0;
-		tracklist = malloc(sizeof(char *) * ((TrackCount*2) + 1));
-		for (i = 0, j = 0; i < TrackCount; i++, j+=2) {
+		tracklist = malloc(sizeof(char *) * ((TrackCount * 2) + 1));
+		for (i = 0, j = 0; i < TrackCount; i++, j += 2)
+		{
 			tracklist[j]    = strdup(Tracks[i].Name);
-            		tracklist[j+1]  = strdup(Tracks[i].Encoding);
+			tracklist[j + 1]  = strdup(Tracks[i].Encoding);
 		}
-        tracklist[j] = NULL;
+		tracklist[j] = NULL;
 	}
 
 	return tracklist;
 }
 
-static void ManagerDel(Context_t * context) {
+static void ManagerDel(Context_t *context)
+{
 
-    int i = 0;
-    if(Tracks != NULL) {
-        for (i = 0; i < TrackCount; i++) {
-		    free(Tracks[i].Name);
-            free(Tracks[i].Encoding);
-            Tracks[i].Name = NULL;
-            Tracks[i].Encoding = NULL;
-	    }
-	    free(Tracks);
-        Tracks = NULL;
-    }
+	int i = 0;
+	if (Tracks != NULL)
+	{
+		for (i = 0; i < TrackCount; i++)
+		{
+			free(Tracks[i].Name);
+			free(Tracks[i].Encoding);
+			Tracks[i].Name = NULL;
+			Tracks[i].Encoding = NULL;
+		}
+		free(Tracks);
+		Tracks = NULL;
+	}
 
-    TrackCount = 0;
-    CurrentTrack = -1;
-    context->playback->isSubtitle = 0;
+	TrackCount = 0;
+	CurrentTrack = -1;
+	context->playback->isSubtitle = 0;
 }
 
-static int Command(Context_t  *context, ManagerCmd_t command, void * argument) {
+static int Command(Context_t  *context, ManagerCmd_t command, void *argument)
+{
 	//printf("%s::%s %d\n", FILENAME, __FUNCTION__, command);
 
-	switch(command) {
-		case MANAGER_ADD: {
-			Track_t * track = argument;
+	switch (command)
+	{
+		case MANAGER_ADD:
+		{
+			Track_t *track = argument;
 			ManagerAdd(context, *track);
 			break;
 		}
-		case MANAGER_LIST: {
-			*((char***)argument) = (char **)ManagerList(context);
+		case MANAGER_LIST:
+		{
+			*((char ** *)argument) = (char **)ManagerList(context);
 			break;
 		}
-		case MANAGER_GET: {
+		case MANAGER_GET:
+		{
 			if (TrackCount > 0 && CurrentTrack >= 0)
-				*((int*)argument) = (int)Tracks[CurrentTrack].Id;
-			else 
-				*((int*)argument) = (int)-1;
+				*((int *)argument) = (int)Tracks[CurrentTrack].Id;
+			else
+				*((int *)argument) = (int) - 1;
 			break;
 		}
-		case MANAGER_GETENCODING: {
+		case MANAGER_GETENCODING:
+		{
 			if (TrackCount > 0 && CurrentTrack >= 0)
-				*((char**)argument) = (char *)strdup(Tracks[CurrentTrack].Encoding);
-			else 
-				*((char**)argument) = (char *)strdup("");
+				*((char **)argument) = (char *)strdup(Tracks[CurrentTrack].Encoding);
+			else
+				*((char **)argument) = (char *)strdup("");
 			break;
 		}
-		case MANAGER_GETNAME: {
+		case MANAGER_GETNAME:
+		{
 			if (TrackCount > 0 && CurrentTrack >= 0)
-				*((char**)argument) = (char *)strdup(Tracks[CurrentTrack].Name);
-			else 
-				*((char**)argument) = (char *)strdup("");
+				*((char **)argument) = (char *)strdup(Tracks[CurrentTrack].Name);
+			else
+				*((char **)argument) = (char *)strdup("");
 			break;
 		}
-		case MANAGER_SET: {
-			int id = *((int*)argument);
-            printf("%s::%s MANAGER_SET id=%d\n", FILENAME, __FUNCTION__, id);
+		case MANAGER_SET:
+		{
+			int id = *((int *)argument);
+			printf("%s::%s MANAGER_SET id=%d\n", FILENAME, __FUNCTION__, id);
 			if (id < TrackCount)
 				CurrentTrack = id;
 			break;
 		}
-		case MANAGER_DEL: {
+		case MANAGER_DEL:
+		{
 			ManagerDel(context);
 			break;
 		}
@@ -120,7 +140,8 @@ static int Command(Context_t  *context, ManagerCmd_t command, void * argument) {
 }
 
 
-struct Manager_s SubtitleManager = {
+struct Manager_s SubtitleManager =
+{
 	"Subtitle",
 	&Command,
 	NULL,

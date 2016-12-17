@@ -95,10 +95,13 @@ int printKeyMap(tButton *cButtons)
 	int column = 0;
 
 	for (vLoop = 0; cButtons[vLoop].KeyCode != KEY_NULL; vLoop++)
-		if (!column) {
+		if (!column)
+		{
 			printf("%20s %2s %3d\t", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode);
 			column = 1;
-		} else {
+		}
+		else
+		{
 			printf("%20s %2s %3d\n", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode);
 			column = 0;
 		}

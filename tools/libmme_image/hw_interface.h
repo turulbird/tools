@@ -21,33 +21,33 @@ typedef struct
 	unsigned int		decode_width;
 	unsigned int		decode_height;
 	MME_TransformerHandle_t	transformer_handle;
-	
+
 	// provide input/output buffer and request transform
-	MME_Command_t		*transform_command; 
+	MME_Command_t		*transform_command;
 
 	// wait for coproc to finish decode
 	sem_t			decode_event;
-	
+
 	int			decode_success;
 } MMEData;
 
 #define ARRAY_SIZE(array) ((int)(sizeof(array) / sizeof((array)[0])))
 
-typedef MME_ERROR (*MME_Init_func) (void);
-typedef MME_ERROR (*MME_Term_func) (void);
-typedef MME_ERROR (*MME_SendCommand_func) (MME_TransformerHandle_t  Handle,
-                                           MME_Command_t           *CmdInfo_p);
-typedef MME_ERROR (*MME_AbortCommand_func) (MME_TransformerHandle_t Handle,
-                                            MME_CommandId_t         CmdId);
-typedef MME_ERROR (*MME_AllocDataBuffer_func) (MME_TransformerHandle_t  handle,
-                                               MME_UINT                 size,
-                                               MME_AllocationFlags_t    flags,
-                                               MME_DataBuffer_t        **dataBuffer_p);
-typedef MME_ERROR (*MME_FreeDataBuffer_func)  (MME_DataBuffer_t         *DataBuffer_p);
-typedef MME_ERROR (*MME_InitTransformer_func) (const char *Name,
-                                               MME_TransformerInitParams_t *Params_p, 
-                                               MME_TransformerHandle_t     *Handle_p);
-typedef MME_ERROR (*MME_TermTransformer_func) (MME_TransformerHandle_t handle);
+typedef MME_ERROR(*MME_Init_func)(void);
+typedef MME_ERROR(*MME_Term_func)(void);
+typedef MME_ERROR(*MME_SendCommand_func)(MME_TransformerHandle_t  Handle,
+					 MME_Command_t           *CmdInfo_p);
+typedef MME_ERROR(*MME_AbortCommand_func)(MME_TransformerHandle_t Handle,
+					  MME_CommandId_t         CmdId);
+typedef MME_ERROR(*MME_AllocDataBuffer_func)(MME_TransformerHandle_t  handle,
+					     MME_UINT                 size,
+					     MME_AllocationFlags_t    flags,
+					     MME_DataBuffer_t        **dataBuffer_p);
+typedef MME_ERROR(*MME_FreeDataBuffer_func)(MME_DataBuffer_t         *DataBuffer_p);
+typedef MME_ERROR(*MME_InitTransformer_func)(const char *Name,
+					     MME_TransformerInitParams_t *Params_p,
+					     MME_TransformerHandle_t     *Handle_p);
+typedef MME_ERROR(*MME_TermTransformer_func)(MME_TransformerHandle_t handle);
 
 MME_ERROR _mme_default_func(void);
 
@@ -68,9 +68,9 @@ extern MME_TermTransformer_func _MME_TermTransformer;
 #define MME_InitTransformer _MME_InitTransformer
 #define MME_TermTransformer _MME_TermTransformer
 
-const char *get_mme_event_string (MME_Event_t ev);
+const char *get_mme_event_string(MME_Event_t ev);
 
-const char *get_mme_error_string (MME_ERROR e);
+const char *get_mme_error_string(MME_ERROR e);
 
 inline void print_mme_error(MME_ERROR e);
 

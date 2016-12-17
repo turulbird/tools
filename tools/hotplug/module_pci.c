@@ -8,12 +8,12 @@
  *	This program is free software; you can redistribute it and/or modify it
  *	under the terms of the GNU General Public License as published by the
  *	Free Software Foundation version 2 of the License.
- * 
+ *
  *	This program is distributed in the hope that it will be useful, but
  *	WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *	General Public License for more details.
- * 
+ *
  *	You should have received a copy of the GNU General Public License along
  *	with this program; if not, write to the Free Software Foundation, Inc.,
  *	675 Mass Ave, Cambridge, MA 02139, USA.
@@ -38,17 +38,18 @@ int pci_add(void)
 	unsigned int subdevice;
 	unsigned int class;
 	unsigned char baseclass, subclass, interface;
-	
+
 	id_env = getenv("PCI_ID");
 	subsys_env = getenv("PCI_SUBSYS_ID");
 	class_env = getenv("PCI_CLASS");
 	if ((id_env == NULL) ||
-	    (subsys_env == NULL) ||
-	    (class_env == NULL)) {
+			(subsys_env == NULL) ||
+			(class_env == NULL))
+	{
 		dbg("missing an environment variable, aborting.");
 		return 1;
 	}
-	
+
 	error = split_2values(id_env, 16, &vendor, &device);
 	if (error)
 		return error;
@@ -60,7 +61,7 @@ int pci_add(void)
 	baseclass = (unsigned char)(class >> 16);
 	subclass = (unsigned char)(class >> 8);
 	interface = (unsigned char)class;
-	
+
 	strcpy(pci_string, "pci:");
 	sprintf(pci_string + strlen(pci_string), "v%08X", vendor);
 	sprintf(pci_string + strlen(pci_string), "d%08X", device);

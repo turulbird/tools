@@ -35,7 +35,7 @@
  * Be warned that this function on many systems is in no way thread-safe
  * since it modifies global data
  */
-char* get_term_charset(void);
+char *get_term_charset(void);
 #endif
 
 #ifndef __sh__
@@ -63,193 +63,206 @@ static char *old_charset = NULL;
 static iconv_t msgiconv;
 #endif
 
-const char* filename_recode(const char* filename)
+const char *filename_recode(const char *filename)
 {
 #if !defined(CONFIG_ICONV) || !defined(MSG_CHARSET)
-    return filename;
+	return filename;
 #else
-    static iconv_t inv_msgiconv = (iconv_t)(-1);
-    static char recoded_filename[MSGSIZE_MAX];
-    size_t filename_len, max_path;
-    char* precoded;
-    if (!mp_msg_charset ||
-        !strcasecmp(mp_msg_charset, MSG_CHARSET) ||
-        !strcasecmp(mp_msg_charset, "noconv"))
-        return filename;
-    if (inv_msgiconv == (iconv_t)(-1)) {
-        inv_msgiconv = iconv_open(MSG_CHARSET, mp_msg_charset);
-        if (inv_msgiconv == (iconv_t)(-1))
-            return filename;
-    }
-    filename_len = strlen(filename);
-    max_path = MSGSIZE_MAX - 4;
-    precoded = recoded_filename;
-    if (iconv(inv_msgiconv, &filename, &filename_len,
-              &precoded, &max_path) == (size_t)(-1) && errno == E2BIG) {
-        precoded[0] = precoded[1] = precoded[2] = '.';
-        precoded += 3;
-    }
-    *precoded = '\0';
-    return recoded_filename;
+	static iconv_t inv_msgiconv = (iconv_t)(-1);
+	static char recoded_filename[MSGSIZE_MAX];
+	size_t filename_len, max_path;
+	char *precoded;
+	if (!mp_msg_charset ||
+			!strcasecmp(mp_msg_charset, MSG_CHARSET) ||
+			!strcasecmp(mp_msg_charset, "noconv"))
+		return filename;
+	if (inv_msgiconv == (iconv_t)(-1))
+	{
+		inv_msgiconv = iconv_open(MSG_CHARSET, mp_msg_charset);
+		if (inv_msgiconv == (iconv_t)(-1))
+			return filename;
+	}
+	filename_len = strlen(filename);
+	max_path = MSGSIZE_MAX - 4;
+	precoded = recoded_filename;
+	if (iconv(inv_msgiconv, &filename, &filename_len,
+			&precoded, &max_path) == (size_t)(-1) && errno == E2BIG)
+	{
+		precoded[0] = precoded[1] = precoded[2] = '.';
+		precoded += 3;
+	}
+	*precoded = '\0';
+	return recoded_filename;
 #endif
 }
 
-void mp_msg_init(void){
-    int i;
-    char *env = getenv("MPLAYER_VERBOSE");
-    if (env)
-        verbose = atoi(env);
-    for(i=0;i<MSGT_MAX;i++) mp_msg_levels[i] = -2;
-    mp_msg_levels[MSGT_IDENTIFY] = -1; // no -identify output by default
+void mp_msg_init(void)
+{
+	int i;
+	char *env = getenv("MPLAYER_VERBOSE");
+	if (env)
+		verbose = atoi(env);
+	for (i = 0; i < MSGT_MAX; i++) mp_msg_levels[i] = -2;
+	mp_msg_levels[MSGT_IDENTIFY] = -1; // no -identify output by default
 #ifdef CONFIG_ICONV
-    mp_msg_charset = getenv("MPLAYER_CHARSET");
-    if (!mp_msg_charset)
-      mp_msg_charset = get_term_charset();
+	mp_msg_charset = getenv("MPLAYER_CHARSET");
+	if (!mp_msg_charset)
+		mp_msg_charset = get_term_charset();
 #endif
 }
 
 int mp_msg_test(int mod, int lev)
 {
-    return lev <= (mp_msg_levels[mod] == -2 ? mp_msg_level_all + verbose : mp_msg_levels[mod]);
+	return lev <= (mp_msg_levels[mod] == -2 ? mp_msg_level_all + verbose : mp_msg_levels[mod]);
 }
 
-static void set_msg_color(FILE* stream, int lev)
+static void set_msg_color(FILE *stream, int lev)
 {
-    static const unsigned char v_colors[10] = {9, 1, 3, 15, 7, 2, 2, 8, 8, 8};
-    int c = v_colors[lev];
+	static const unsigned char v_colors[10] = {9, 1, 3, 15, 7, 2, 2, 8, 8, 8};
+	int c = v_colors[lev];
 #ifdef MP_ANNOY_ME
-    /* that's only a silly color test */
-    {
-        int c;
-        static int flag = 1;
-        if (flag)
-            for(c = 0; c < 24; c++)
-                printf("\033[%d;3%dm***  COLOR TEST %d  ***\n", c>7, c&7, c);
-        flag = 0;
-    }
+	/* that's only a silly color test */
+	{
+		int c;
+		static int flag = 1;
+		if (flag)
+			for (c = 0; c < 24; c++)
+				printf("\033[%d;3%dm***  COLOR TEST %d  ***\n", c > 7, c & 7, c);
+		flag = 0;
+	}
 #endif
-    if (mp_msg_color)
-        fprintf(stream, "\033[%d;3%dm", c >> 3, c & 7);
+	if (mp_msg_color)
+		fprintf(stream, "\033[%d;3%dm", c >> 3, c & 7);
 }
 
-static void print_msg_module(FILE* stream, int mod)
+static void print_msg_module(FILE *stream, int mod)
 {
-    static const char *module_text[MSGT_MAX] = {
-        "GLOBAL",
-        "CPLAYER",
-        "GPLAYER",
-        "VIDEOOUT",
-        "AUDIOOUT",
-        "DEMUXER",
-        "DS",
-        "DEMUX",
-        "HEADER",
-        "AVSYNC",
-        "AUTOQ",
-        "CFGPARSER",
-        "DECAUDIO",
-        "DECVIDEO",
-        "SEEK",
-        "WIN32",
-        "OPEN",
-        "DVD",
-        "PARSEES",
-        "LIRC",
-        "STREAM",
-        "CACHE",
-        "MENCODER",
-        "XACODEC",
-        "TV",
-        "OSDEP",
-        "SPUDEC",
-        "PLAYTREE",
-        "INPUT",
-        "VFILTER",
-        "OSD",
-        "NETWORK",
-        "CPUDETECT",
-        "CODECCFG",
-        "SWS",
-        "VOBSUB",
-        "SUBREADER",
-        "AFILTER",
-        "NETST",
-        "MUXER",
-        "OSDMENU",
-        "IDENTIFY",
-        "RADIO",
-        "ASS",
-        "LOADER",
-        "STATUSLINE",
-    };
-    int c2 = (mod + 1) % 15 + 1;
+	static const char *module_text[MSGT_MAX] =
+	{
+		"GLOBAL",
+		"CPLAYER",
+		"GPLAYER",
+		"VIDEOOUT",
+		"AUDIOOUT",
+		"DEMUXER",
+		"DS",
+		"DEMUX",
+		"HEADER",
+		"AVSYNC",
+		"AUTOQ",
+		"CFGPARSER",
+		"DECAUDIO",
+		"DECVIDEO",
+		"SEEK",
+		"WIN32",
+		"OPEN",
+		"DVD",
+		"PARSEES",
+		"LIRC",
+		"STREAM",
+		"CACHE",
+		"MENCODER",
+		"XACODEC",
+		"TV",
+		"OSDEP",
+		"SPUDEC",
+		"PLAYTREE",
+		"INPUT",
+		"VFILTER",
+		"OSD",
+		"NETWORK",
+		"CPUDETECT",
+		"CODECCFG",
+		"SWS",
+		"VOBSUB",
+		"SUBREADER",
+		"AFILTER",
+		"NETST",
+		"MUXER",
+		"OSDMENU",
+		"IDENTIFY",
+		"RADIO",
+		"ASS",
+		"LOADER",
+		"STATUSLINE",
+	};
+	int c2 = (mod + 1) % 15 + 1;
 
-    if (!mp_msg_module)
-        return;
-    if (mp_msg_color)
-        fprintf(stream, "\033[%d;3%dm", c2 >> 3, c2 & 7);
-    fprintf(stream, "%9s", module_text[mod]);
-    if (mp_msg_color)
-        fprintf(stream, "\033[0;37m");
-    fprintf(stream, ": ");
+	if (!mp_msg_module)
+		return;
+	if (mp_msg_color)
+		fprintf(stream, "\033[%d;3%dm", c2 >> 3, c2 & 7);
+	fprintf(stream, "%9s", module_text[mod]);
+	if (mp_msg_color)
+		fprintf(stream, "\033[0;37m");
+	fprintf(stream, ": ");
 }
 
-void mp_msg(int mod, int lev, const char *format, ... ){
-    va_list va;
-    char tmp[MSGSIZE_MAX];
-    FILE *stream = lev <= MSGL_WARN ? stderr : stdout;
-    static int header = 1;
+void mp_msg(int mod, int lev, const char *format, ...)
+{
+	va_list va;
+	char tmp[MSGSIZE_MAX];
+	FILE *stream = lev <= MSGL_WARN ? stderr : stdout;
+	static int header = 1;
 
 #ifndef __sh__
-    if (!mp_msg_test(mod, lev)) return; // do not display
+	if (!mp_msg_test(mod, lev)) return; // do not display
 #endif
-    va_start(va, format);
-    vsnprintf(tmp, MSGSIZE_MAX, format, va);
-    va_end(va);
-    tmp[MSGSIZE_MAX-2] = '\n';
-    tmp[MSGSIZE_MAX-1] = 0;
+	va_start(va, format);
+	vsnprintf(tmp, MSGSIZE_MAX, format, va);
+	va_end(va);
+	tmp[MSGSIZE_MAX - 2] = '\n';
+	tmp[MSGSIZE_MAX - 1] = 0;
 
 #ifdef CONFIG_GUI
-    if(use_gui)
-        guiMessageBox(lev, tmp);
+	if (use_gui)
+		guiMessageBox(lev, tmp);
 #endif
 
 #if defined(CONFIG_ICONV) && defined(MSG_CHARSET)
-    if (mp_msg_charset && strcasecmp(mp_msg_charset, "noconv")) {
-      char tmp2[MSGSIZE_MAX];
-      size_t inlen = strlen(tmp), outlen = MSGSIZE_MAX;
-      char *in = tmp, *out = tmp2;
-      if (!old_charset || strcmp(old_charset, mp_msg_charset)) {
-        if (old_charset) {
-          free(old_charset);
-          iconv_close(msgiconv);
-        }
-        msgiconv = iconv_open(mp_msg_charset, MSG_CHARSET);
-        old_charset = strdup(mp_msg_charset);
-      }
-      if (msgiconv == (iconv_t)(-1)) {
-        fprintf(stderr,"iconv: conversion from %s to %s unsupported\n"
-               ,MSG_CHARSET,mp_msg_charset);
-      }else{
-      memset(tmp2, 0, MSGSIZE_MAX);
-      while (iconv(msgiconv, &in, &inlen, &out, &outlen) == -1) {
-        if (!inlen || !outlen)
-          break;
-        *out++ = *in++;
-        outlen--; inlen--;
-      }
-      strncpy(tmp, tmp2, MSGSIZE_MAX);
-      tmp[MSGSIZE_MAX-1] = 0;
-      tmp[MSGSIZE_MAX-2] = '\n';
-      }
-    }
+	if (mp_msg_charset && strcasecmp(mp_msg_charset, "noconv"))
+	{
+		char tmp2[MSGSIZE_MAX];
+		size_t inlen = strlen(tmp), outlen = MSGSIZE_MAX;
+		char *in = tmp, *out = tmp2;
+		if (!old_charset || strcmp(old_charset, mp_msg_charset))
+		{
+			if (old_charset)
+			{
+				free(old_charset);
+				iconv_close(msgiconv);
+			}
+			msgiconv = iconv_open(mp_msg_charset, MSG_CHARSET);
+			old_charset = strdup(mp_msg_charset);
+		}
+		if (msgiconv == (iconv_t)(-1))
+		{
+			fprintf(stderr, "iconv: conversion from %s to %s unsupported\n"
+				, MSG_CHARSET, mp_msg_charset);
+		}
+		else
+		{
+			memset(tmp2, 0, MSGSIZE_MAX);
+			while (iconv(msgiconv, &in, &inlen, &out, &outlen) == -1)
+			{
+				if (!inlen || !outlen)
+					break;
+				*out++ = *in++;
+				outlen--;
+				inlen--;
+			}
+			strncpy(tmp, tmp2, MSGSIZE_MAX);
+			tmp[MSGSIZE_MAX - 1] = 0;
+			tmp[MSGSIZE_MAX - 2] = '\n';
+		}
+	}
 #endif
 
-    if (header)
-        print_msg_module(stream, mod);
-    set_msg_color(stream, lev);
-    header = tmp[strlen(tmp)-1] == '\n' || tmp[strlen(tmp)-1] == '\r';
+	if (header)
+		print_msg_module(stream, mod);
+	set_msg_color(stream, lev);
+	header = tmp[strlen(tmp) - 1] == '\n' || tmp[strlen(tmp) - 1] == '\r';
 
-    fprintf(stream, "%s", tmp);
-    fflush(stream);
+	fprintf(stream, "%s", tmp);
+	fflush(stream);
 }

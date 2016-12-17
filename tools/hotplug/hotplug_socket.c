@@ -33,18 +33,22 @@ void hotplug_socket_send_env(const char *vars[])
 	addr.sun_family = AF_LOCAL;
 	strcpy(addr.sun_path, "/tmp/hotplug.socket");
 
-	if ((s = socket(PF_LOCAL, SOCK_STREAM, 0)) == -1) {
+	if ((s = socket(PF_LOCAL, SOCK_STREAM, 0)) == -1)
+	{
 		err("socket: %s", strerror(errno));
 		return;
 	}
 
-	if (connect(s, (const struct sockaddr *)&addr, SUN_LEN(&addr)) == -1) {
+	if (connect(s, (const struct sockaddr *)&addr, SUN_LEN(&addr)) == -1)
+	{
 		err("connect: %s", strerror(errno));
 		goto exit;
 	}
 
-	while (*vars != NULL) {
-		if ((var = getenv(*vars))) {
+	while (*vars != NULL)
+	{
+		if ((var = getenv(*vars)))
+		{
 			write(s, *vars, strlen(*vars));
 			write(s, "=", 1);
 			write(s, var, strlen(var) + 1);

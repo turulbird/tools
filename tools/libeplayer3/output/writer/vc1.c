@@ -20,7 +20,7 @@
  */
 
 /* ***************************** */
-/* Includes                   */
+/* Includes                      */
 /* ***************************** */
 
 #include <stdio.h>
@@ -48,18 +48,18 @@
 #include "writer.h"
 
 /* ***************************** */
-/* Makros/Constants           */
+/* Makros/Constants              */
 /* ***************************** */
 
-#define WMV3_PRIVATE_DATA_LENGTH                        4
+#define WMV3_PRIVATE_DATA_LENGTH                  4
 
-#define METADATA_STRUCT_A_START      12
-#define METADATA_STRUCT_B_START      24
-#define METADATA_STRUCT_B_FRAMERATE_START   32
-#define METADATA_STRUCT_C_START      8
+#define METADATA_STRUCT_A_START                   12
+#define METADATA_STRUCT_B_START                   24
+#define METADATA_STRUCT_B_FRAMERATE_START         32
+#define METADATA_STRUCT_C_START                   8
 
 #define VC1_SEQUENCE_LAYER_METADATA_START_CODE    0x80
-#define VC1_FRAME_START_CODE                        0x0d
+#define VC1_FRAME_START_CODE                      0x0d
 
 #define VC1_DEBUG
 
@@ -99,7 +99,7 @@ static const unsigned char  Metadata[]    =
 };
 
 /* ***************************** */
-/* Varaibles                     */
+/* Variables                     */
 /* ***************************** */
 static int initialHeader = 1;
 static unsigned char FrameHeaderSeen = 0;
@@ -198,15 +198,15 @@ static int writeData(void *_call)
 			int Remaining = call->len - Position - PacketLength;
 			vc1_printf(20, "PacketLength=%d, Remaining=%d, Position=%d\n", PacketLength, Remaining, Position);
 			unsigned char       PesHeader[PES_MAX_HEADER_SIZE];
-			int          HeaderLength = InsertPesHeader(PesHeader, PacketLength, VC1_VIDEO_PES_START_CODE, call->Pts, 0);
+			int HeaderLength = InsertPesHeader(PesHeader, PacketLength, VC1_VIDEO_PES_START_CODE, call->Pts, 0);
 			if (insertSampleHeader)
 			{
 				const unsigned char  Vc1FrameStartCode[]     = {0, 0, 1, VC1_FRAME_START_CODE};
 				/*
-				                    vc1_printf(10, "Data Start: {00 00 01 0d} - ");
-				                    int i;
-				                    for (i = 0; i < 4; i++) vc1_printf(10, "%02x ", call->data[i]);
-				                    vc1_printf(10, "\n");
+				vc1_printf(10, "Data Start: {00 00 01 0d} - ");
+				int i;
+				for (i = 0; i < 4; i++) vc1_printf(10, "%02x ", call->data[i]);
+				vc1_printf(10, "\n");
 				*/
 				if (!FrameHeaderSeen && (call->len > 3) && (memcmp(call->data, Vc1FrameStartCode, 4) == 0))
 					FrameHeaderSeen  = 1;

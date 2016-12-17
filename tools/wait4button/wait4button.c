@@ -120,7 +120,8 @@ int main(int argc, char *argv[])
 	{
 		wait4KeyCode = atoi(argv[1]);
 		printf("Waiting for %i on %s\n", wait4KeyCode, ((RemoteControl_t *)context.r)->Name);
-	} else
+	}
+	else
 		printf("Using %s\n", ((RemoteControl_t *)context.r)->Name);
 
 	if (((RemoteControl_t *)context.r)->RemoteControl != NULL)

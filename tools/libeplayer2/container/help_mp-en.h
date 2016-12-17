@@ -13,45 +13,45 @@
 // ========================= MPlayer help ===========================
 
 #ifdef HELP_MP_DEFINE_STATIC
-static const char help_text[]=
-"Usage:   mplayer [options] [url|path/]filename\n"
-"\n"
-"Basic options: (complete list in the man page)\n"
-" -vo <drv>        select video output driver ('-vo help' for a list)\n"
-" -ao <drv>        select audio output driver ('-ao help' for a list)\n"
+static const char help_text[] =
+	"Usage:   mplayer [options] [url|path/]filename\n"
+	"\n"
+	"Basic options: (complete list in the man page)\n"
+	" -vo <drv>        select video output driver ('-vo help' for a list)\n"
+	" -ao <drv>        select audio output driver ('-ao help' for a list)\n"
 #ifdef CONFIG_VCD
-" vcd://<trackno>  play (S)VCD (Super Video CD) track (raw device, no mount)\n"
+	" vcd://<trackno>  play (S)VCD (Super Video CD) track (raw device, no mount)\n"
 #endif
 #ifdef CONFIG_DVDREAD
-" dvd://<titleno>  play DVD title from device instead of plain file\n"
+	" dvd://<titleno>  play DVD title from device instead of plain file\n"
 #endif
-" -alang/-slang    select DVD audio/subtitle language (by 2-char country code)\n"
-" -ss <position>   seek to given (seconds or hh:mm:ss) position\n"
-" -nosound         do not play sound\n"
-" -fs              fullscreen playback (or -vm, -zoom, details in the man page)\n"
-" -x <x> -y <y>    set display resolution (for use with -vm or -zoom)\n"
-" -sub <file>      specify subtitle file to use (also see -subfps, -subdelay)\n"
-" -playlist <file> specify playlist file\n"
-" -vid x -aid y    select video (x) and audio (y) stream to play\n"
-" -fps x -srate y  change video (x fps) and audio (y Hz) rate\n"
-" -pp <quality>    enable postprocessing filter (details in the man page)\n"
-" -framedrop       enable frame dropping (for slow machines)\n"
-"\n"
-"Basic keys: (complete list in the man page, also check input.conf)\n"
-" <-  or  ->       seek backward/forward 10 seconds\n"
-" down or up       seek backward/forward  1 minute\n"
-" pgdown or pgup   seek backward/forward 10 minutes\n"
-" < or >           step backward/forward in playlist\n"
-" p or SPACE       pause movie (press any key to continue)\n"
-" q or ESC         stop playing and quit program\n"
-" + or -           adjust audio delay by +/- 0.1 second\n"
-" o                cycle OSD mode:  none / seekbar / seekbar + timer\n"
-" * or /           increase or decrease PCM volume\n"
-" x or z           adjust subtitle delay by +/- 0.1 second\n"
-" r or t           adjust subtitle position up/down, also see -vf expand\n"
-"\n"
-" * * * SEE THE MAN PAGE FOR DETAILS, FURTHER (ADVANCED) OPTIONS AND KEYS * * *\n"
-"\n";
+	" -alang/-slang    select DVD audio/subtitle language (by 2-char country code)\n"
+	" -ss <position>   seek to given (seconds or hh:mm:ss) position\n"
+	" -nosound         do not play sound\n"
+	" -fs              fullscreen playback (or -vm, -zoom, details in the man page)\n"
+	" -x <x> -y <y>    set display resolution (for use with -vm or -zoom)\n"
+	" -sub <file>      specify subtitle file to use (also see -subfps, -subdelay)\n"
+	" -playlist <file> specify playlist file\n"
+	" -vid x -aid y    select video (x) and audio (y) stream to play\n"
+	" -fps x -srate y  change video (x fps) and audio (y Hz) rate\n"
+	" -pp <quality>    enable postprocessing filter (details in the man page)\n"
+	" -framedrop       enable frame dropping (for slow machines)\n"
+	"\n"
+	"Basic keys: (complete list in the man page, also check input.conf)\n"
+	" <-  or  ->       seek backward/forward 10 seconds\n"
+	" down or up       seek backward/forward  1 minute\n"
+	" pgdown or pgup   seek backward/forward 10 minutes\n"
+	" < or >           step backward/forward in playlist\n"
+	" p or SPACE       pause movie (press any key to continue)\n"
+	" q or ESC         stop playing and quit program\n"
+	" + or -           adjust audio delay by +/- 0.1 second\n"
+	" o                cycle OSD mode:  none / seekbar / seekbar + timer\n"
+	" * or /           increase or decrease PCM volume\n"
+	" x or z           adjust subtitle delay by +/- 0.1 second\n"
+	" r or t           adjust subtitle position up/down, also see -vf expand\n"
+	"\n"
+	" * * * SEE THE MAN PAGE FOR DETAILS, FURTHER (ADVANCED) OPTIONS AND KEYS * * *\n"
+	"\n";
 #endif
 
 // ========================= MPlayer messages ===========================
@@ -82,26 +82,26 @@ static const char help_text[]=
 #define MSGTR_StartPlaying "Starting playback...\n"
 
 #define MSGTR_SystemTooSlow "\n\n"\
-"           ************************************************\n"\
-"           **** Your system is too SLOW to play this!  ****\n"\
-"           ************************************************\n\n"\
-"Possible reasons, problems, workarounds:\n"\
-"- Most common: broken/buggy _audio_ driver\n"\
-"  - Try -ao sdl or use the OSS emulation of ALSA.\n"\
-"  - Experiment with different values for -autosync, 30 is a good start.\n"\
-"- Slow video output\n"\
-"  - Try a different -vo driver (-vo help for a list) or try -framedrop!\n"\
-"- Slow CPU\n"\
-"  - Don't try to play a big DVD/DivX on a slow CPU! Try some of the lavdopts,\n"\
-"    e.g. -vfm ffmpeg -lavdopts lowres=1:fast:skiploopfilter=all.\n"\
-"- Broken file\n"\
-"  - Try various combinations of -nobps -ni -forceidx -mc 0.\n"\
-"- Slow media (NFS/SMB mounts, DVD, VCD etc)\n"\
-"  - Try -cache 8192.\n"\
-"- Are you using -cache to play a non-interleaved AVI file?\n"\
-"  - Try -nocache.\n"\
-"Read DOCS/HTML/en/video.html for tuning/speedup tips.\n"\
-"If none of this helps you, read DOCS/HTML/en/bugreports.html.\n\n"
+	"           ************************************************\n"\
+	"           **** Your system is too SLOW to play this!  ****\n"\
+	"           ************************************************\n\n"\
+	"Possible reasons, problems, workarounds:\n"\
+	"- Most common: broken/buggy _audio_ driver\n"\
+	"  - Try -ao sdl or use the OSS emulation of ALSA.\n"\
+	"  - Experiment with different values for -autosync, 30 is a good start.\n"\
+	"- Slow video output\n"\
+	"  - Try a different -vo driver (-vo help for a list) or try -framedrop!\n"\
+	"- Slow CPU\n"\
+	"  - Don't try to play a big DVD/DivX on a slow CPU! Try some of the lavdopts,\n"\
+	"    e.g. -vfm ffmpeg -lavdopts lowres=1:fast:skiploopfilter=all.\n"\
+	"- Broken file\n"\
+	"  - Try various combinations of -nobps -ni -forceidx -mc 0.\n"\
+	"- Slow media (NFS/SMB mounts, DVD, VCD etc)\n"\
+	"  - Try -cache 8192.\n"\
+	"- Are you using -cache to play a non-interleaved AVI file?\n"\
+	"  - Try -nocache.\n"\
+	"Read DOCS/HTML/en/video.html for tuning/speedup tips.\n"\
+	"If none of this helps you, read DOCS/HTML/en/bugreports.html.\n\n"
 
 #define MSGTR_NoGui "MPlayer was compiled WITHOUT GUI support.\n"
 #define MSGTR_GuiNeedsX "MPlayer GUI requires X11.\n"
@@ -128,24 +128,24 @@ static const char help_text[]=
 #define MSGTR_Paused "\n  =====  PAUSE  =====\r" // no more than 23 characters (status line for audio files)
 #define MSGTR_PlaylistLoadUnable "\nUnable to load playlist %s.\n"
 #define MSGTR_Exit_SIGILL_RTCpuSel \
-"- MPlayer crashed by an 'Illegal Instruction'.\n"\
-"  It may be a bug in our new runtime CPU-detection code...\n"\
-"  Please read DOCS/HTML/en/bugreports.html.\n"
+	"- MPlayer crashed by an 'Illegal Instruction'.\n"\
+	"  It may be a bug in our new runtime CPU-detection code...\n"\
+	"  Please read DOCS/HTML/en/bugreports.html.\n"
 #define MSGTR_Exit_SIGILL \
-"- MPlayer crashed by an 'Illegal Instruction'.\n"\
-"  It usually happens when you run it on a CPU different than the one it was\n"\
-"  compiled/optimized for.\n"\
-"  Verify this!\n"
+	"- MPlayer crashed by an 'Illegal Instruction'.\n"\
+	"  It usually happens when you run it on a CPU different than the one it was\n"\
+	"  compiled/optimized for.\n"\
+	"  Verify this!\n"
 #define MSGTR_Exit_SIGSEGV_SIGFPE \
-"- MPlayer crashed by bad usage of CPU/FPU/RAM.\n"\
-"  Recompile MPlayer with --enable-debug and make a 'gdb' backtrace and\n"\
-"  disassembly. Details in DOCS/HTML/en/bugreports_what.html#bugreports_crash.\n"
+	"- MPlayer crashed by bad usage of CPU/FPU/RAM.\n"\
+	"  Recompile MPlayer with --enable-debug and make a 'gdb' backtrace and\n"\
+	"  disassembly. Details in DOCS/HTML/en/bugreports_what.html#bugreports_crash.\n"
 #define MSGTR_Exit_SIGCRASH \
-"- MPlayer crashed. This shouldn't happen.\n"\
-"  It can be a bug in the MPlayer code _or_ in your drivers _or_ in your\n"\
-"  gcc version. If you think it's MPlayer's fault, please read\n"\
-"  DOCS/HTML/en/bugreports.html and follow the instructions there. We can't and\n"\
-"  won't help unless you provide this information when reporting a possible bug.\n"
+	"- MPlayer crashed. This shouldn't happen.\n"\
+	"  It can be a bug in the MPlayer code _or_ in your drivers _or_ in your\n"\
+	"  gcc version. If you think it's MPlayer's fault, please read\n"\
+	"  DOCS/HTML/en/bugreports.html and follow the instructions there. We can't and\n"\
+	"  won't help unless you provide this information when reporting a possible bug.\n"
 #define MSGTR_LoadingConfig "Loading config '%s'\n"
 #define MSGTR_LoadingProtocolProfile "Loading protocol-related profile '%s'\n"
 #define MSGTR_LoadingExtensionProfile "Loading extension-related profile '%s'\n"
@@ -193,7 +193,7 @@ static const char help_text[]=
 #define MSGTR_EdlNOValidLine "Invalid EDL line: %s\n"
 #define MSGTR_EdlBadlyFormattedLine "Badly formatted EDL line [%d], discarding.\n"
 #define MSGTR_EdlBadLineOverlap "Last stop position was [%f]; next start is [%f].\n"\
-"Entries must be in chronological order, cannot overlap. Discarding.\n"
+	"Entries must be in chronological order, cannot overlap. Discarding.\n"
 #define MSGTR_EdlBadLineBadStop "Stop time has to be after start time.\n"
 #define MSGTR_EdloutBadStop "EDL skip canceled, last start > stop\n"
 #define MSGTR_EdloutStartSkip "EDL skip start, press 'i' again to end block.\n"
@@ -275,7 +275,7 @@ static const char help_text[]=
 #define MSGTR_AudioCopyFileMismatch "\nAll files must have identical audio codec and format for -oac copy.\n"
 #define MSGTR_NoAudioFileMismatch "\nCannot mix video-only files with audio and video files. Try -nosound.\n"
 #define MSGTR_NoSpeedWithFrameCopy "WARNING: -speed is not guaranteed to work correctly with -oac copy!\n"\
-"Your encode might be broken!\n"
+	"Your encode might be broken!\n"
 #define MSGTR_ErrorWritingFile "%s: Error writing file.\n"
 #define MSGTR_FlushingVideoFrames "\nFlushing video frames.\n"
 #define MSGTR_FiltersHaveNotBeenConfiguredEmptyFile "Filters have not been configured! Empty file?\n"
@@ -299,111 +299,111 @@ static const char help_text[]=
 #define MSGTR_CBRAudioByterate "\n\nCBR audio: %d bytes/sec, %d bytes/block\n"
 #define MSGTR_LameVersion "LAME version %s (%s)\n\n"
 #define MSGTR_InvalidBitrateForLamePreset "Error: The bitrate specified is out of the valid range for this preset.\n"\
-"\n"\
-"When using this mode you must enter a value between \"8\" and \"320\".\n"\
-"\n"\
-"For further information try: \"-lameopts preset=help\"\n"
+	"\n"\
+	"When using this mode you must enter a value between \"8\" and \"320\".\n"\
+	"\n"\
+	"For further information try: \"-lameopts preset=help\"\n"
 #define MSGTR_InvalidLamePresetOptions "Error: You did not enter a valid profile and/or options with preset.\n"\
-"\n"\
-"Available profiles are:\n"\
-"\n"\
-"   <fast>        standard\n"\
-"   <fast>        extreme\n"\
-"                 insane\n"\
-"   <cbr> (ABR Mode) - The ABR Mode is implied. To use it,\n"\
-"                      simply specify a bitrate. For example:\n"\
-"                      \"preset=185\" activates this\n"\
-"                      preset and uses 185 as an average kbps.\n"\
-"\n"\
-"    Some examples:\n"\
-"\n"\
-"    \"-lameopts fast:preset=standard  \"\n"\
-" or \"-lameopts  cbr:preset=192       \"\n"\
-" or \"-lameopts      preset=172       \"\n"\
-" or \"-lameopts      preset=extreme   \"\n"\
-"\n"\
-"For further information try: \"-lameopts preset=help\"\n"
+	"\n"\
+	"Available profiles are:\n"\
+	"\n"\
+	"   <fast>        standard\n"\
+	"   <fast>        extreme\n"\
+	"                 insane\n"\
+	"   <cbr> (ABR Mode) - The ABR Mode is implied. To use it,\n"\
+	"                      simply specify a bitrate. For example:\n"\
+	"                      \"preset=185\" activates this\n"\
+	"                      preset and uses 185 as an average kbps.\n"\
+	"\n"\
+	"    Some examples:\n"\
+	"\n"\
+	"    \"-lameopts fast:preset=standard  \"\n"\
+	" or \"-lameopts  cbr:preset=192       \"\n"\
+	" or \"-lameopts      preset=172       \"\n"\
+	" or \"-lameopts      preset=extreme   \"\n"\
+	"\n"\
+	"For further information try: \"-lameopts preset=help\"\n"
 #define MSGTR_LamePresetsLongInfo "\n"\
-"The preset switches are designed to provide the highest possible quality.\n"\
-"\n"\
-"They have for the most part been subjected to and tuned via rigorous double\n"\
-"blind listening tests to verify and achieve this objective.\n"\
-"\n"\
-"These are continually updated to coincide with the latest developments that\n"\
-"occur and as a result should provide you with nearly the best quality\n"\
-"currently possible from LAME.\n"\
-"\n"\
-"To activate these presets:\n"\
-"\n"\
-"   For VBR modes (generally highest quality):\n"\
-"\n"\
-"     \"preset=standard\" This preset should generally be transparent\n"\
-"                             to most people on most music and is already\n"\
-"                             quite high in quality.\n"\
-"\n"\
-"     \"preset=extreme\" If you have extremely good hearing and similar\n"\
-"                             equipment, this preset will generally provide\n"\
-"                             slightly higher quality than the \"standard\"\n"\
-"                             mode.\n"\
-"\n"\
-"   For CBR 320kbps (highest quality possible from the preset switches):\n"\
-"\n"\
-"     \"preset=insane\"  This preset will usually be overkill for most\n"\
-"                             people and most situations, but if you must\n"\
-"                             have the absolute highest quality with no\n"\
-"                             regard to filesize, this is the way to go.\n"\
-"\n"\
-"   For ABR modes (high quality per given bitrate but not as high as VBR):\n"\
-"\n"\
-"     \"preset=<kbps>\"  Using this preset will usually give you good\n"\
-"                             quality at a specified bitrate. Depending on the\n"\
-"                             bitrate entered, this preset will determine the\n"\
-"                             optimal settings for that particular situation.\n"\
-"                             While this approach works, it is not nearly as\n"\
-"                             flexible as VBR, and usually will not attain the\n"\
-"                             same level of quality as VBR at higher bitrates.\n"\
-"\n"\
-"The following options are also available for the corresponding profiles:\n"\
-"\n"\
-"   <fast>        standard\n"\
-"   <fast>        extreme\n"\
-"                 insane\n"\
-"   <cbr> (ABR Mode) - The ABR Mode is implied. To use it,\n"\
-"                      simply specify a bitrate. For example:\n"\
-"                      \"preset=185\" activates this\n"\
-"                      preset and uses 185 as an average kbps.\n"\
-"\n"\
-"   \"fast\" - Enables the new fast VBR for a particular profile. The\n"\
-"            disadvantage to the speed switch is that often times the\n"\
-"            bitrate will be slightly higher than with the normal mode\n"\
-"            and quality may be slightly lower also.\n"\
-"   Warning: with the current version fast presets might result in too\n"\
-"            high bitrate compared to regular presets.\n"\
-"\n"\
-"   \"cbr\"  - If you use the ABR mode (read above) with a significant\n"\
-"            bitrate such as 80, 96, 112, 128, 160, 192, 224, 256, 320,\n"\
-"            you can use the \"cbr\" option to force CBR mode encoding\n"\
-"            instead of the standard abr mode. ABR does provide higher\n"\
-"            quality but CBR may be useful in situations such as when\n"\
-"            streaming an MP3 over the internet may be important.\n"\
-"\n"\
-"    For example:\n"\
-"\n"\
-"    \"-lameopts fast:preset=standard  \"\n"\
-" or \"-lameopts  cbr:preset=192       \"\n"\
-" or \"-lameopts      preset=172       \"\n"\
-" or \"-lameopts      preset=extreme   \"\n"\
-"\n"\
-"\n"\
-"A few aliases are available for ABR mode:\n"\
-"phone => 16kbps/mono        phon+/lw/mw-eu/sw => 24kbps/mono\n"\
-"mw-us => 40kbps/mono        voice => 56kbps/mono\n"\
-"fm/radio/tape => 112kbps    hifi => 160kbps\n"\
-"cd => 192kbps               studio => 256kbps"
+	"The preset switches are designed to provide the highest possible quality.\n"\
+	"\n"\
+	"They have for the most part been subjected to and tuned via rigorous double\n"\
+	"blind listening tests to verify and achieve this objective.\n"\
+	"\n"\
+	"These are continually updated to coincide with the latest developments that\n"\
+	"occur and as a result should provide you with nearly the best quality\n"\
+	"currently possible from LAME.\n"\
+	"\n"\
+	"To activate these presets:\n"\
+	"\n"\
+	"   For VBR modes (generally highest quality):\n"\
+	"\n"\
+	"     \"preset=standard\" This preset should generally be transparent\n"\
+	"                             to most people on most music and is already\n"\
+	"                             quite high in quality.\n"\
+	"\n"\
+	"     \"preset=extreme\" If you have extremely good hearing and similar\n"\
+	"                             equipment, this preset will generally provide\n"\
+	"                             slightly higher quality than the \"standard\"\n"\
+	"                             mode.\n"\
+	"\n"\
+	"   For CBR 320kbps (highest quality possible from the preset switches):\n"\
+	"\n"\
+	"     \"preset=insane\"  This preset will usually be overkill for most\n"\
+	"                             people and most situations, but if you must\n"\
+	"                             have the absolute highest quality with no\n"\
+	"                             regard to filesize, this is the way to go.\n"\
+	"\n"\
+	"   For ABR modes (high quality per given bitrate but not as high as VBR):\n"\
+	"\n"\
+	"     \"preset=<kbps>\"  Using this preset will usually give you good\n"\
+	"                             quality at a specified bitrate. Depending on the\n"\
+	"                             bitrate entered, this preset will determine the\n"\
+	"                             optimal settings for that particular situation.\n"\
+	"                             While this approach works, it is not nearly as\n"\
+	"                             flexible as VBR, and usually will not attain the\n"\
+	"                             same level of quality as VBR at higher bitrates.\n"\
+	"\n"\
+	"The following options are also available for the corresponding profiles:\n"\
+	"\n"\
+	"   <fast>        standard\n"\
+	"   <fast>        extreme\n"\
+	"                 insane\n"\
+	"   <cbr> (ABR Mode) - The ABR Mode is implied. To use it,\n"\
+	"                      simply specify a bitrate. For example:\n"\
+	"                      \"preset=185\" activates this\n"\
+	"                      preset and uses 185 as an average kbps.\n"\
+	"\n"\
+	"   \"fast\" - Enables the new fast VBR for a particular profile. The\n"\
+	"            disadvantage to the speed switch is that often times the\n"\
+	"            bitrate will be slightly higher than with the normal mode\n"\
+	"            and quality may be slightly lower also.\n"\
+	"   Warning: with the current version fast presets might result in too\n"\
+	"            high bitrate compared to regular presets.\n"\
+	"\n"\
+	"   \"cbr\"  - If you use the ABR mode (read above) with a significant\n"\
+	"            bitrate such as 80, 96, 112, 128, 160, 192, 224, 256, 320,\n"\
+	"            you can use the \"cbr\" option to force CBR mode encoding\n"\
+	"            instead of the standard abr mode. ABR does provide higher\n"\
+	"            quality but CBR may be useful in situations such as when\n"\
+	"            streaming an MP3 over the internet may be important.\n"\
+	"\n"\
+	"    For example:\n"\
+	"\n"\
+	"    \"-lameopts fast:preset=standard  \"\n"\
+	" or \"-lameopts  cbr:preset=192       \"\n"\
+	" or \"-lameopts      preset=172       \"\n"\
+	" or \"-lameopts      preset=extreme   \"\n"\
+	"\n"\
+	"\n"\
+	"A few aliases are available for ABR mode:\n"\
+	"phone => 16kbps/mono        phon+/lw/mw-eu/sw => 24kbps/mono\n"\
+	"mw-us => 40kbps/mono        voice => 56kbps/mono\n"\
+	"fm/radio/tape => 112kbps    hifi => 160kbps\n"\
+	"cd => 192kbps               studio => 256kbps"
 #define MSGTR_LameCantInit \
-"Cannot set LAME options, check bitrate/samplerate, some very low bitrates\n"\
-"(<32) need lower samplerates (i.e. -srate 8000).\n"\
-"If everything else fails, try a preset."
+	"Cannot set LAME options, check bitrate/samplerate, some very low bitrates\n"\
+	"(<32) need lower samplerates (i.e. -srate 8000).\n"\
+	"If everything else fails, try a preset."
 #define MSGTR_ConfigFileError "config file error"
 #define MSGTR_ErrorParsingCommandLine "error parsing command line"
 #define MSGTR_VideoStreamRequired "Video stream is mandatory!\n"
@@ -421,52 +421,52 @@ static const char help_text[]=
 
 // cfg-mencoder.h
 #define MSGTR_MEncoderMP3LameHelp "\n\n"\
-" vbr=<0-4>     variable bitrate method\n"\
-"                0: cbr (constant bitrate)\n"\
-"                1: mt (Mark Taylor VBR algorithm)\n"\
-"                2: rh (Robert Hegemann VBR algorithm - default)\n"\
-"                3: abr (average bitrate)\n"\
-"                4: mtrh (Mark Taylor Robert Hegemann VBR algorithm)\n"\
-"\n"\
-" abr           average bitrate\n"\
-"\n"\
-" cbr           constant bitrate\n"\
-"               Also forces CBR mode encoding on subsequent ABR presets modes.\n"\
-"\n"\
-" br=<0-1024>   specify bitrate in kBit (CBR and ABR only)\n"\
-"\n"\
-" q=<0-9>       quality (0-highest, 9-lowest) (only for VBR)\n"\
-"\n"\
-" aq=<0-9>      algorithmic quality (0-best/slowest, 9-worst/fastest)\n"\
-"\n"\
-" ratio=<1-100> compression ratio\n"\
-"\n"\
-" vol=<0-10>    set audio input gain\n"\
-"\n"\
-" mode=<0-3>    (default: auto)\n"\
-"                0: stereo\n"\
-"                1: joint-stereo\n"\
-"                2: dualchannel\n"\
-"                3: mono\n"\
-"\n"\
-" padding=<0-2>\n"\
-"                0: no\n"\
-"                1: all\n"\
-"                2: adjust\n"\
-"\n"\
-" fast          Switch on faster encoding on subsequent VBR presets modes,\n"\
-"               slightly lower quality and higher bitrates.\n"\
-"\n"\
-" preset=<value> Provide the highest possible quality settings.\n"\
-"                 medium: VBR  encoding,  good  quality\n"\
-"                 (150-180 kbps bitrate range)\n"\
-"                 standard:  VBR encoding, high quality\n"\
-"                 (170-210 kbps bitrate range)\n"\
-"                 extreme: VBR encoding, very high quality\n"\
-"                 (200-240 kbps bitrate range)\n"\
-"                 insane:  CBR  encoding, highest preset quality\n"\
-"                 (320 kbps bitrate)\n"\
-"                 <8-320>: ABR encoding at average given kbps bitrate.\n\n"
+	" vbr=<0-4>     variable bitrate method\n"\
+	"                0: cbr (constant bitrate)\n"\
+	"                1: mt (Mark Taylor VBR algorithm)\n"\
+	"                2: rh (Robert Hegemann VBR algorithm - default)\n"\
+	"                3: abr (average bitrate)\n"\
+	"                4: mtrh (Mark Taylor Robert Hegemann VBR algorithm)\n"\
+	"\n"\
+	" abr           average bitrate\n"\
+	"\n"\
+	" cbr           constant bitrate\n"\
+	"               Also forces CBR mode encoding on subsequent ABR presets modes.\n"\
+	"\n"\
+	" br=<0-1024>   specify bitrate in kBit (CBR and ABR only)\n"\
+	"\n"\
+	" q=<0-9>       quality (0-highest, 9-lowest) (only for VBR)\n"\
+	"\n"\
+	" aq=<0-9>      algorithmic quality (0-best/slowest, 9-worst/fastest)\n"\
+	"\n"\
+	" ratio=<1-100> compression ratio\n"\
+	"\n"\
+	" vol=<0-10>    set audio input gain\n"\
+	"\n"\
+	" mode=<0-3>    (default: auto)\n"\
+	"                0: stereo\n"\
+	"                1: joint-stereo\n"\
+	"                2: dualchannel\n"\
+	"                3: mono\n"\
+	"\n"\
+	" padding=<0-2>\n"\
+	"                0: no\n"\
+	"                1: all\n"\
+	"                2: adjust\n"\
+	"\n"\
+	" fast          Switch on faster encoding on subsequent VBR presets modes,\n"\
+	"               slightly lower quality and higher bitrates.\n"\
+	"\n"\
+	" preset=<value> Provide the highest possible quality settings.\n"\
+	"                 medium: VBR  encoding,  good  quality\n"\
+	"                 (150-180 kbps bitrate range)\n"\
+	"                 standard:  VBR encoding, high quality\n"\
+	"                 (170-210 kbps bitrate range)\n"\
+	"                 extreme: VBR encoding, very high quality\n"\
+	"                 (200-240 kbps bitrate range)\n"\
+	"                 insane:  CBR  encoding, highest preset quality\n"\
+	"                 (320 kbps bitrate)\n"\
+	"                 <8-320>: ABR encoding at average given kbps bitrate.\n\n"
 
 // codec-cfg.c
 #define MSGTR_DuplicateFourcc "duplicated FourCC"
@@ -777,7 +777,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FPS "Movie FPS:"
 #define MSGTR_PREFERENCES_ShowVideoWindow "Show video window when inactive"
 #define MSGTR_PREFERENCES_ArtsBroken "Newer aRts versions are incompatible "\
-           "with GTK 1.x and will crash GMPlayer!"
+	"with GTK 1.x and will crash GMPlayer!"
 
 // -- aboutbox
 #define MSGTR_ABOUT_UHU "GUI development sponsored by UHU Linux\n"
@@ -827,8 +827,8 @@ static const char help_text[]=
 // ======================= video output drivers ========================
 
 #define MSGTR_VOincompCodec "The selected video_out device is incompatible with this codec.\n"\
-                "Try appending the scale filter to your filter list,\n"\
-                "e.g. -vf spp,scale instead of -vf spp.\n"
+	"Try appending the scale filter to your filter list,\n"\
+	"e.g. -vf spp,scale instead of -vf spp.\n"
 #define MSGTR_VO_GenericError "This error has occurred"
 #define MSGTR_VO_UnableToAccess "Unable to access"
 #define MSGTR_VO_ExistsButNoDirectory "already exists, but is not a directory."
@@ -885,11 +885,11 @@ static const char help_text[]=
 // vo_aa.c
 #define MSGTR_VO_AA_HelpHeader "\n\nHere are the aalib vo_aa suboptions:\n"
 #define MSGTR_VO_AA_AdditionalOptions "Additional options vo_aa provides:\n" \
-"  help        print this help message\n" \
-"  osdcolor    set OSD color\n  subcolor    set subtitle color\n" \
-"        the color parameters are:\n           0 : normal\n" \
-"           1 : dim\n           2 : bold\n           3 : boldfont\n" \
-"           4 : reverse\n           5 : special\n\n\n"
+	"  help        print this help message\n" \
+	"  osdcolor    set OSD color\n  subcolor    set subtitle color\n" \
+	"        the color parameters are:\n           0 : normal\n" \
+	"           1 : dim\n           2 : bold\n           3 : boldfont\n" \
+	"           4 : reverse\n           5 : special\n\n\n"
 
 // vo_dxr3.c
 #define MSGTR_LIBVO_DXR3_UnableToLoadNewSPUPalette "[VO_DXR3] Unable to load new SPU palette!\n"
@@ -1061,7 +1061,7 @@ static const char help_text[]=
 #define MSGTR_LIBVO_VESA_OemProductName "[VO_VESA] OEM Product Name: %s.\n"
 #define MSGTR_LIBVO_VESA_OemProductRev "[VO_VESA] OEM Product Rev: %s.\n"
 #define MSGTR_LIBVO_VESA_Hint "[VO_VESA] Hint: For working TV-Out you should have plugged in the TV connector\n"\
-"[VO_VESA] before booting since VESA BIOS initializes itself only during POST.\n"
+	"[VO_VESA] before booting since VESA BIOS initializes itself only during POST.\n"
 #define MSGTR_LIBVO_VESA_UsingVesaMode "[VO_VESA] Using VESA mode (%u) = %x [%ux%u@%u]\n"
 #define MSGTR_LIBVO_VESA_CantInitializeSwscaler "[VO_VESA] Can't initialize software scaler.\n"
 #define MSGTR_LIBVO_VESA_CantUseDga "[VO_VESA] Can't use DGA. Force bank switching mode. :(\n"
@@ -1098,13 +1098,13 @@ static const char help_text[]=
 #define MSGTR_LIBVO_XV_InvalidPortParameter "[VO_XV] Invalid port parameter, overriding with port 0.\n"
 #define MSGTR_LIBVO_XV_CouldNotGrabPort "[VO_XV] Could not grab port %i.\n"
 #define MSGTR_LIBVO_XV_CouldNotFindFreePort "[VO_XV] Could not find free Xvideo port - maybe another process is already\n"\
-"[VO_XV] using it. Close all video applications, and try again. If that does\n"\
-"[VO_XV] not help, see 'mplayer -vo help' for other (non-xv) video out drivers.\n"
+	"[VO_XV] using it. Close all video applications, and try again. If that does\n"\
+	"[VO_XV] not help, see 'mplayer -vo help' for other (non-xv) video out drivers.\n"
 #define MSGTR_LIBVO_XV_NoXvideoSupport "[VO_XV] It seems there is no Xvideo support for your video card available.\n"\
-"[VO_XV] Run 'xvinfo' to verify its Xv support and read\n"\
-"[VO_XV] DOCS/HTML/en/video.html#xv!\n"\
-"[VO_XV] See 'mplayer -vo help' for other (non-xv) video out drivers.\n"\
-"[VO_XV] Try -vo x11.\n"
+	"[VO_XV] Run 'xvinfo' to verify its Xv support and read\n"\
+	"[VO_XV] DOCS/HTML/en/video.html#xv!\n"\
+	"[VO_XV] See 'mplayer -vo help' for other (non-xv) video out drivers.\n"\
+	"[VO_XV] Try -vo x11.\n"
 #define MSGTR_VO_XV_ImagedimTooHigh "Source image dimensions are too high: %ux%u (maximum is %ux%u)\n"
 
 // vo_yuv4mpeg.c
@@ -1261,13 +1261,13 @@ static const char help_text[]=
 #define MSGTR_AO_ALSA_ErrorSettingLeftChannel "[AO_ALSA] Error setting left channel, %s\n"
 #define MSGTR_AO_ALSA_ErrorSettingRightChannel "[AO_ALSA] Error setting right channel, %s\n"
 #define MSGTR_AO_ALSA_CommandlineHelp "\n[AO_ALSA] -ao alsa commandline help:\n"\
-"[AO_ALSA] Example: mplayer -ao alsa:device=hw=0.3\n"\
-"[AO_ALSA]   Sets first card fourth hardware device.\n\n"\
-"[AO_ALSA] Options:\n"\
-"[AO_ALSA]   noblock\n"\
-"[AO_ALSA]     Opens device in non-blocking mode.\n"\
-"[AO_ALSA]   device=<device-name>\n"\
-"[AO_ALSA]     Sets device (change , to . and : to =)\n"
+	"[AO_ALSA] Example: mplayer -ao alsa:device=hw=0.3\n"\
+	"[AO_ALSA]   Sets first card fourth hardware device.\n\n"\
+	"[AO_ALSA] Options:\n"\
+	"[AO_ALSA]   noblock\n"\
+	"[AO_ALSA]     Opens device in non-blocking mode.\n"\
+	"[AO_ALSA]   device=<device-name>\n"\
+	"[AO_ALSA]     Sets device (change , to . and : to =)\n"
 #define MSGTR_AO_ALSA_ChannelsNotSupported "[AO_ALSA] %d channels are not supported.\n"
 #define MSGTR_AO_ALSA_OpenInNonblockModeFailed "[AO_ALSA] Open in nonblock-mode failed, trying to open in block-mode.\n"
 #define MSGTR_AO_ALSA_PlaybackOpenError "[AO_ALSA] Playback open error: %s\n"
@@ -1400,7 +1400,7 @@ static const char help_text[]=
 #define MSGTR_TooManyAudioInBuffer "\nToo many audio packets in the buffer: (%d in %d bytes).\n"
 #define MSGTR_TooManyVideoInBuffer "\nToo many video packets in the buffer: (%d in %d bytes).\n"
 #define MSGTR_MaybeNI "Maybe you are playing a non-interleaved stream/file or the codec failed?\n" \
-		      "For AVI files, try to force non-interleaved mode with the -ni option.\n"
+	"For AVI files, try to force non-interleaved mode with the -ni option.\n"
 #define MSGTR_WorkAroundBlockAlignHeaderBug "AVI: Working around CBR-MP3 nBlockAlign header bug!\n"
 #define MSGTR_SwitchToNi "\nBadly interleaved AVI file detected - switching to -ni mode...\n"
 #define MSGTR_InvalidAudioStreamNosound "AVI: invalid audio stream ID: %d - ignoring (nosound)\n"
@@ -1411,7 +1411,7 @@ static const char help_text[]=
 #define MSGTR_NotSystemStream "Not MPEG System Stream format... (maybe Transport Stream?)\n"
 #define MSGTR_InvalidMPEGES "Invalid MPEG-ES stream??? Contact the author, it may be a bug :(\n"
 #define MSGTR_FormatNotRecognized "============ Sorry, this file format is not recognized/supported =============\n"\
-				  "=== If this file is an AVI, ASF or MPEG stream, please contact the author! ===\n"
+	"=== If this file is an AVI, ASF or MPEG stream, please contact the author! ===\n"
 #define MSGTR_SettingProcessPriority "Setting process priority: %s\n"
 #define MSGTR_FilefmtFourccSizeFpsFtime "[V] filefmt:%d  fourcc:0x%X  size:%dx%d  fps:%5.3f  ftime:=%6.4f\n"
 #define MSGTR_CannotInitializeMuxer "Cannot initialize muxer."
@@ -1881,8 +1881,8 @@ static const char help_text[]=
 #define MSGTR_MPDEMUX_NW_ReadFailed "Read failed.\n"
 #define MSGTR_MPDEMUX_NW_Read0CouldBeEOF "http_read_response read 0 (i.e. EOF).\n"
 #define MSGTR_MPDEMUX_NW_AuthFailed "Authentication failed. Please use the -user and -passwd options to provide your\n"\
-"username/password for a list of URLs, or form an URL like:\n"\
-"http://username:password@hostname/file\n"
+	"username/password for a list of URLs, or form an URL like:\n"\
+	"http://username:password@hostname/file\n"
 #define MSGTR_MPDEMUX_NW_AuthRequiredFor "Authentication required for %s\n"
 #define MSGTR_MPDEMUX_NW_AuthRequired "Authentication required.\n"
 #define MSGTR_MPDEMUX_NW_NoPasswdProvidedTryingBlank "No password provided, trying blank password.\n"
@@ -2020,12 +2020,12 @@ static const char help_text[]=
 #define MSGTR_TV_BogusNormParameter "tv.c: norm_from_string(%s): Bogus norm parameter, setting %s.\n"
 #define MSGTR_TV_NoVideoInputPresent "Error: No video input present!\n"
 #define MSGTR_TV_UnknownImageFormat ""\
-"==================================================================\n"\
-" WARNING: UNTESTED OR UNKNOWN OUTPUT IMAGE FORMAT REQUESTED (0x%x)\n"\
-" This may cause buggy playback or program crash! Bug reports will\n"\
-" be ignored! You should try again with YV12 (which is the default\n"\
-" colorspace) and read the documentation!\n"\
-"==================================================================\n"
+	"==================================================================\n"\
+	" WARNING: UNTESTED OR UNKNOWN OUTPUT IMAGE FORMAT REQUESTED (0x%x)\n"\
+	" This may cause buggy playback or program crash! Bug reports will\n"\
+	" be ignored! You should try again with YV12 (which is the default\n"\
+	" colorspace) and read the documentation!\n"\
+	"==================================================================\n"
 #define MSGTR_TV_SelectedNormId "Selected norm id: %d\n"
 #define MSGTR_TV_SelectedNorm "Selected norm : %s\n"
 #define MSGTR_TV_CannotSetNorm "Error: Cannot set norm!\n"

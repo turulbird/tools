@@ -4,12 +4,12 @@
  *	This program is free software; you can redistribute it and/or modify it
  *	under the terms of the GNU General Public License as published by the
  *	Free Software Foundation version 2 of the License.
- * 
+ *
  *	This program is distributed in the hope that it will be useful, but
  *	WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *	General Public License for more details.
- * 
+ *
  *	You should have received a copy of the GNU General Public License along
  *	with this program; if not, write to the Free Software Foundation, Inc.,
  *	51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -46,24 +46,30 @@ void remove_trailing_chars(char *path, char c)
 	size_t len;
 
 	len = strlen(path);
-	while (len > 0 && path[len-1] == c)
+	while (len > 0 && path[len - 1] == c)
 		path[--len] = '\0';
 }
 
 size_t path_encode(char *s, size_t len)
 {
-	char t[(len * 3)+1];
+	char t[(len * 3) + 1];
 	size_t i, j;
 
 	t[0] = '\0';
-	for (i = 0, j = 0; s[i] != '\0'; i++) {
-		if (s[i] == '/') {
+	for (i = 0, j = 0; s[i] != '\0'; i++)
+	{
+		if (s[i] == '/')
+		{
 			memcpy(&t[j], "\\x2f", 4);
 			j += 4;
-		} else if (s[i] == '\\') {
+		}
+		else if (s[i] == '\\')
+		{
 			memcpy(&t[j], "\\x5c", 4);
 			j += 4;
-		} else {
+		}
+		else
+		{
 			t[j] = s[i];
 			j++;
 		}
@@ -77,14 +83,20 @@ size_t path_decode(char *s)
 {
 	size_t i, j;
 
-	for (i = 0, j = 0; s[i] != '\0'; j++) {
-		if (memcmp(&s[i], "\\x2f", 4) == 0) {
+	for (i = 0, j = 0; s[i] != '\0'; j++)
+	{
+		if (memcmp(&s[i], "\\x2f", 4) == 0)
+		{
 			s[j] = '/';
 			i += 4;
-		}else if (memcmp(&s[i], "\\x5c", 4) == 0) {
+		}
+		else if (memcmp(&s[i], "\\x5c", 4) == 0)
+		{
 			s[j] = '\\';
 			i += 4;
-		} else {
+		}
+		else
+		{
 			s[j] = s[i];
 			i++;
 		}
@@ -121,29 +133,31 @@ static int utf8_encoded_to_unichar(const char *str)
 	int i;
 
 	len = utf8_encoded_expected_len(str);
-	switch (len) {
-	case 1:
-		return (int)str[0];
-	case 2:
-		unichar = str[0] & 0x1f;
-		break;
-	case 3:
-		unichar = (int)str[0] & 0x0f;
-		break;
-	case 4:
-		unichar = (int)str[0] & 0x07;
-		break;
-	case 5:
-		unichar = (int)str[0] & 0x03;
-		break;
-	case 6:
-		unichar = (int)str[0] & 0x01;
-		break;
-	default:
-		return -1;
+	switch (len)
+	{
+		case 1:
+			return (int)str[0];
+		case 2:
+			unichar = str[0] & 0x1f;
+			break;
+		case 3:
+			unichar = (int)str[0] & 0x0f;
+			break;
+		case 4:
+			unichar = (int)str[0] & 0x07;
+			break;
+		case 5:
+			unichar = (int)str[0] & 0x03;
+			break;
+		case 6:
+			unichar = (int)str[0] & 0x01;
+			break;
+		default:
+			return -1;
 	}
 
-	for (i = 1; i < len; i++) {
+	for (i = 1; i < len; i++)
+	{
 		if (((int)str[i] & 0xc0) != 0x80)
 			return -1;
 		unichar <<= 6;
@@ -222,38 +236,44 @@ int replace_chars(char *str, const char *white)
 	size_t i = 0;
 	int replaced = 0;
 
-	while (str[i] != '\0') {
+	while (str[i] != '\0')
+	{
 		int len;
 
 		/* accept whitelist */
-		if (white != NULL && strchr(white, str[i]) != NULL) {
+		if (white != NULL && strchr(white, str[i]) != NULL)
+		{
 			i++;
 			continue;
 		}
 
 		/* accept plain ascii char */
 		if ((str[i] >= '0' && str[i] <= '9') ||
-		    (str[i] >= 'A' && str[i] <= 'Z') ||
-		    (str[i] >= 'a' && str[i] <= 'z')) {
+				(str[i] >= 'A' && str[i] <= 'Z') ||
+				(str[i] >= 'a' && str[i] <= 'z'))
+		{
 			i++;
 			continue;
 		}
 
 		/* accept hex encoding */
-		if (str[i] == '\\' && str[i+1] == 'x') {
+		if (str[i] == '\\' && str[i + 1] == 'x')
+		{
 			i += 2;
 			continue;
 		}
 
 		/* accept valid utf8 */
 		len = utf8_encoded_valid_unichar(&str[i]);
-		if (len > 1) {
+		if (len > 1)
+		{
 			i += len;
 			continue;
 		}
 
 		/* if space is allowed, replace whitespace with ordinary space */
-		if (isspace(str[i]) && strchr(white, ' ') != NULL) {
+		if (isspace(str[i]) && strchr(white, ' ') != NULL)
+		{
 			str[i] = ' ';
 			i++;
 			replaced++;

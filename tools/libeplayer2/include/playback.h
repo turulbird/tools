@@ -4,9 +4,10 @@
 
 typedef enum {PLAYBACK_OPEN, PLAYBACK_CLOSE, PLAYBACK_PLAY, PLAYBACK_STOP, PLAYBACK_PAUSE, PLAYBACK_CONTINUE, PLAYBACK_FLUSH, PLAYBACK_TERM, PLAYBACK_FASTFORWARD, PLAYBACK_SEEK, PLAYBACK_PTS, PLAYBACK_LENGTH, PLAYBACK_SWITCH_AUDIO, PLAYBACK_SWITCH_SUBTITLE, PLAYBACK_INFO, PLAYBACK_SLOWMOTION, PLAYBACK_FASTBACKWARD} PlaybackCmd_t;
 
-typedef struct PlaybackHandler_s {
-	char * Name;
-	
+typedef struct PlaybackHandler_s
+{
+	char *Name;
+
 	int fd;
 
 	unsigned char isFile;
@@ -28,8 +29,8 @@ typedef struct PlaybackHandler_s {
 	unsigned char isAudio;
 	unsigned char isSubtitle;
 
-	int (* Command) (/*Context_t*/void  *, PlaybackCmd_t, void *);
-	char * uri;
+	int (* Command)(/*Context_t*/void *, PlaybackCmd_t, void *);
+	char *uri;
 	off_t size;
 } PlaybackHandler_t;
 

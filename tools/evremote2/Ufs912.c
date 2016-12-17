@@ -47,7 +47,7 @@
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
-	10, 120,
+	10, 120, 1
 };
 
 static tButton cButtonUFS912[] =
@@ -106,6 +106,30 @@ static tButton cButtonUFS912Frontpanel[] =
 	{""			, ""  , KEY_NULL}
 };
 
+static int ufs912SetRemote(unsigned int code)
+{
+	#define VFDSETRCCODE 0xc0425af6
+	int vfd_fd = -1;
+	struct
+	{
+		unsigned char start;
+		unsigned char data[64];
+		unsigned char length;
+	} data;
+
+	data.start = 0x00;
+	data.data[0] = code & 0x07;
+	data.length = 1;
+
+	vfd_fd = open("/dev/vfd", O_RDWR);
+	if (vfd_fd)
+	{
+		ioctl(vfd_fd, VFDSETRCCODE, &data);
+		close(vfd_fd);
+	}
+	return 0;
+}
+
 static int pInit(Context_t *context, int argc, char *argv[])
 {
 	int vFd;
@@ -121,7 +145,29 @@ static int pInit(Context_t *context, int argc, char *argv[])
 		cLongKeyPressSupport.delay = atoi(argv[2]);
 	}
 
-	printf("period %d, delay %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
+	if (!access("/etc/.rccode", F_OK))
+	{
+		char buf[10];
+		int val;
+		FILE* fd;
+		fd = fopen("/etc/.rccode", "r");
+		if (fd != NULL)
+		{
+			if (fgets (buf , sizeof(buf), fd) != NULL)
+			{
+				val = atoi(buf);
+				if (val > 0 && val < 5)
+				{
+					cLongKeyPressSupport.rc_code = val;
+					printf("Selected RC Code: %d\n", cLongKeyPressSupport.rc_code);
+					ufs912SetRemote(cLongKeyPressSupport.rc_code);
+				}
+			}
+			fclose(fd);
+		}
+	}
+
+	printf("period %d, delay %d, rc_code %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay, cLongKeyPressSupport.rc_code);
 
 	return vFd;
 }
@@ -132,6 +178,7 @@ static int pRead(Context_t *context)
 	unsigned char   vData[cUFS912CommandLen];
 	eKeyType        vKeyType = RemoteControl;
 	int             vCurrentCode = -1;
+	int             rc = 1;
 
 	//printf("%s >\n", __func__);
 
@@ -148,7 +195,17 @@ static int pRead(Context_t *context)
 
 		if (vKeyType == RemoteControl)
 		{
-			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData[1]);
+			/* mask out for rc codes
+			 * possible 0 to 3 for remote controls 1 to 4
+			 * given in /etc for example via console: echo 2 > /etc/.rccode
+			 * will be read and rc_code = 2 is used ( press then back + 2 simultanessly on remote to fit it there)
+			 * default is rc_code = 1 ( like back + 1 on remote )	*/
+			rc = ((vData[4] & 0x30) >> 4) + 1;
+			printf("RC code: %d\n", rc);
+			if (rc == ((RemoteControl_t *)context->r)->LongKeyPressSupport->rc_code)
+				vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData[1]);
+			else
+				break;
 		}
 		else
 		{
