@@ -8,21 +8,21 @@
 #endif
 
 #define VFDDISPLAYCHARS         0xc0425a00
-#define VFDTESTONE              0xc0425a01
-#define VFDTESTTWO              0xc0425a02
+//#define VFDTESTONE              0xc0425a01
+//#define VFDTESTTWO              0xc0425a02
 #define VFDBRIGHTNESS           0xc0425a03
 #define VFDPWRLED               0xc0425a04 /* added by zeroone, also used in nuvoton.h; set PowerLed Brightness on Fortis*/
 #define VFDDISPLAYWRITEONOFF    0xc0425a05
-#define VFDTESTSIX              0xc0425a06
-#define VFDTESTSEVEN            0xc0425a07
-#define VFDTESTEIGHT            0xc0425a08
-#define VFDTESTNINE             0xc0425a09
+//#define VFDTESTSIX              0xc0425a06
+//#define VFDTESTSEVEN            0xc0425a07
+//#define VFDTESTEIGHT            0xc0425a08
+//#define VFDTESTNINE             0xc0425a09
 #define VFDICONDISPLAYONOFF     0xc0425a0a
-#define VFDTESTELEVEN           0xc0425a0b
-#define VFDTESTTWELVE           0xc0425a0c
-#define VFDTESTTHIRTEEN         0xc0425a0d
-#define VFDTESTFOURTEEN         0xc0425a0e
-#define VFDTESTFIFTEEN          0xc0425a0f
+//#define VFDTESTELEVEN           0xc0425a0b
+//#define VFDTESTTWELVE           0xc0425a0c
+//#define VFDTESTTHIRTEEN         0xc0425a0d
+//#define VFDTESTFOURTEEN         0xc0425a0e
+//#define VFDTESTFIFTEEN          0xc0425a0f
 
 #define VFDTEST                 0xc0425af0
 #define VFDGETBLUEKEY           0xc0425af1 /* Spark specific */
@@ -31,6 +31,7 @@
 #define VFDSETSTBYKEY           0xc0425af4 /* Spark specific */
 #define VFDPOWEROFF             0xc0425af5 /* Spark specific */
 #define VFDSETPOWERONTIME       0xc0425af6 /* Spark specific */
+#define VFDGETVERSION           0xc0425af7
 #define VFDGETSTARTUPSTATE      0xc0425af8 /* Spark specific */
 #define VFDLEDBRIGHTNESS        0xc0425af8 /* ufs912 */
 #define VFDGETWAKEUPMODE        0xc0425af9 /* Fortis, does the same as spark VFDGETSTARTUPSTATE */
@@ -46,6 +47,10 @@
 #define VFDSETLOOPSTATE         0xc0425b02 /* Spark specific */
 #define VFDSETTIMEFORMAT        0xc0425b04 /* Fortis specific */
 #define VFDGETTIMEFORMAT        0xc0425b05 /* Fortis specific */
+
+//Comment next line if you do not want the -ms option
+#define MODEL_SPECIFIC 1
+
 struct vfd_ioctl_data
 {
 	unsigned char start;
@@ -95,7 +100,9 @@ typedef struct Model_s
 	int	(*GetWakeupTime)    (Context_t *context, time_t *theGMTTime);
 	int	(*SetDisplayTime)   (Context_t *context, int on);
 	int	(*SetTimeMode)      (Context_t *context, int twentyFour);
-	int	(*ModelSpecific)    (Context_t *context, int len, int *testdata); /* added by audioniek */
+#if defined MODEL_SPECIFIC
+	int	(*ModelSpecific)    (Context_t *context, char len, char *testdata); /* added by audioniek */
+#endif
 	void	*private;
 } Model_t;
 
@@ -125,7 +132,7 @@ int syncWasTimerWakeup(eWakeupReason reason);
 int	disp; //controls screen output
 int	Vdisplay;
 int	Vdisplay_custom;
-char *VtimeFormat;
+char	*VtimeFormat;
 int	Vwakeup;
 
 #endif

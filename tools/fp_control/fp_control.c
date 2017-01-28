@@ -51,7 +51,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Software version of fp_control, please increase on every change */
-static const char *sw_version = "1.08Audioniek 20160608.1";
+static const char *sw_version = "1.08Audioniek 20170127.1";
 
 typedef struct
 {
@@ -98,6 +98,9 @@ tArgs vArgs[] =
 	{ "-dt", " --display_time       ", "Arg : 0/1\n\tSet time display on/off" },
 	{ "-tm", " --time_mode          ", "Arg : 0/1\n\tSet 12 or 24 hour time mode" },
 	{ "-V", "  --verbose            ", "Args: None\n\tVerbose operation" },
+#if defined MODEL_SPECIFIC
+	{ "-ms", " --set_model_specific ", "Args: int\n\tModel specific set function (note: hex input)" },
+#endif
 	{ NULL, NULL, NULL }
 };
 
@@ -476,7 +479,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				if (ret == 0)
 				{
 					printf("Wakeup reason = %d (%s)\n\n", reason & 0x03, wakeupreason[reason & 0x03]);
-					syncWasTimerWakeup(reason);
+					syncWasTimerWakeup((eWakeupReason)reason);
 				}
 			}
 			else if ((strcmp(argv[i], "-L") == 0) || (strcmp(argv[i], "--setLight") == 0))
@@ -551,11 +554,11 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				}
 				if (version == -1)
 				{
-					printf("Error: FP version is unknown\n");
+					printf("Remark: FP version is unknown\n");
 				}
 				else
 				{
-					printf("FP version is %d.%d\n", version / 100, version % 100);
+					printf("FP version is %d.%02d\n", (version / 100) & 0xff, (version % 100) & 0xff);
 				}
 			}
 			else if ((strcmp(argv[i], "-sf") == 0) || (strcmp(argv[i], "--setFan") == 0))
@@ -634,6 +637,63 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				}
 				i += 1;
 			}
+#if defined MODEL_SPECIFIC
+			else if ((strcmp(argv[i], "-ms") == 0) || (strcmp(argv[i], "--model_specific") == 0))
+			{
+				int j;
+				char len;
+				char testdata[16];
+
+				len = argc - 2;
+
+				if ((len > 0) && (len <= 16))
+				{
+					if (i + len <= argc)
+					{
+						memset(testdata, 0, 18);						
+
+						for (j = 1; j <= len; j++)
+						{
+							sscanf(argv[j + 1], "%x", (unsigned int *)&testdata[j - 1]); 
+						}
+
+
+						/* do model specific function */
+						if (((Model_t *)context->m)->ModelSpecific)
+						{
+							j = ((Model_t *)context->m)->ModelSpecific(context, len, testdata);
+						}
+						if (j != 0)
+						{
+							printf("Error occurred.\n");
+						}
+						else
+						{
+							printf("Command executed OK, ");
+							if (testdata[1] == 1)
+							{
+								printf("data returned:\n");
+								for (j = 0; j <= 8; j++)
+								{
+									printf("Byte #%1d = 0x%02x\n", j, testdata[j + 2] & 0xff);
+								}
+//								printf("\n");
+							}
+							else
+							{
+								printf("no return data.\n");
+							}
+						}
+					}
+				}
+				else
+				{
+					printf("Wrong number of arguments, minimum is 1, maximum is 16.\n");
+					usage(context, argv[0], argv[1]);
+				}
+				i += len;
+			}
+#endif
 			else
 			{
 				printf("\nUnknown option [ %s ]\n", argv[i]);

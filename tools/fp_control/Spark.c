@@ -99,6 +99,9 @@ tArgs vHArgs[] =
 	{ "-c", "  --clear              ", "Args: None        Clear display, all icons and LEDs off" },
 	{ "-v", "  --version            ", "Args: None        Get version info from frontprocessor" },
 	{ "-V", "  --verbose            ", "Args: None        Verbose operation" },
+#if defined MODEL_SPECIFIC
+	{ "-ms ", "--set_model_specific ", "Args: long long   Model specific set function" },
+#endif
 	{ NULL, NULL, NULL }
 };
 
@@ -904,6 +907,8 @@ Model_t Spark_model =
 	.GetWakeupTime    = NULL,
 	.SetDisplayTime   = Spark_setDisplayTime,
 	.SetTimeMode      = Spark_setTimeMode,
+#if defined MODEL_SPECIFIC
 	.ModelSpecific    = NULL,
+#endif
 	.Exit             = Spark_exit
 };

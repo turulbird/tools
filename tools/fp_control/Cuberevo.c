@@ -550,7 +550,7 @@ static int getVersion(Context_t *context, int *version)
 	struct micom_ioctl_data micom;
 	fprintf(stderr, "waiting on version from fp ...\n");
 	/* front controller time */
-	if (ioctl(context->fd, VFDGETVERSION, &micom) < 0)
+	if (ioctl(context->fd, VFDGETVERSION_1, &micom) < 0)
 	{
 		perror("getVersion: ");
 		return -1;
@@ -643,6 +643,8 @@ Model_t Cuberevo_model =
 	.GetWakeupTime    = getWakeupTime,
 	.SetDisplayTime   = setDisplayTime,
 	.SetTimeMode      = setTimeMode,
+#if defined MODEL_SPECIFIC
 	.ModelSpecific    = NULL,
+#endif
 	.Exit             = Exit
 };

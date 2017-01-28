@@ -604,6 +604,8 @@ Model_t Ufs910_14W_model =
 	.GetWakeupTime    = NULL,
 	.SetDisplayTime   = NULL,
 	.SetTimeMode      = NULL,
+#if defined MODEL_SPECIFIC
 	.ModelSpecific    = NULL,
+#endif
 	.Exit             = Exit
 };

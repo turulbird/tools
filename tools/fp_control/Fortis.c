@@ -23,7 +23,9 @@
  *
  * Date     By              Description
  * --------------------------------------------------------------------------
- * 20130930 Audioniek       Fortis specific usage added
+ * 20130930 Audioniek       Fortis specific usage added.
+ * 20170103 Audioniek       VFDTEST (-ms command) fixed.
+ * 20170127 Audioniek       Get version fixed.
  *
  ****************************************************************************/
 
@@ -56,7 +58,6 @@ static int setIcon(Context_t *context, int which, int on);
 
 #define cMAXCharsFortis 12
 #define VFDGETWAKEUPTIME        0xc0425b03 // added by audioniek
-#define VFDGETVERSION           0xc0425af7
 
 typedef struct
 {
@@ -99,8 +100,10 @@ tArgs vSArgs[] =
 	{ "-c", "  --clear              ", "Args: None        Clear display, all icons and LEDs off" },
 	{ "-v", "  --version            ", "Args: None        Get version info from frontprocessor" },
 	{ "-tm", " --time_mode          ", "Args: 0/1         Set time mode" },
-//	{ "-ms", " --model_specific     ", "Args: int1 [int2] [int3] [int4]" },
-	{ "", "                         ", "                  Model specific function" },
+#if defined MODEL_SPECIFIC
+	{ "-ms", " --model_specific     ", "Args: int1 [int2] [int3] ... [int16]   (note: input in hex)" },
+	{ "", "                         ", "                  Model specific test function" },
+#endif
 	{ NULL, NULL, NULL }
 };
 
@@ -228,7 +231,7 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 	ts = localtime(&curTime);  // get local time
 	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts->tm_hour, ts->tm_min, ts->tm_sec,
 		ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
-	setTime(context, &curTime);
+	setTime(context, &curTime); //set fp clock to local time
 
 	/* Read fp time back */
 	if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
@@ -246,14 +249,12 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 	proc_fs_file = fopen(cRTC_OFFSET_FILE, "w");
 	if (proc_fs_file == NULL)
 	{
-//		fprintf(stderr, "Cannot open %s\n", cRTC_OFFSET_FILE);
 		perror("Open rtc_offset");
 		return -1;
 	}
 	proc_fs = fprintf(proc_fs_file, "%d", (int)ts->tm_gmtoff);
 	if (proc_fs < 0)
 	{
-//		fprintf(stderr, "Cannot write %s\n", cRTC_OFFSET_FILE);
 		perror("Write rtc_offset");
 		return -1;
 	}
@@ -670,24 +671,45 @@ static int setLight(Context_t *context, int on)
 	return 0;
 }
 
+static int getWakeupReason(Context_t *context, int *reason)
+{
+	//-w command, OK
+	int mode = -1;
+
+	if (ioctl(context->fd, VFDGETWAKEUPMODE, &mode) < 0)
+	{
+		perror("Get wakeup reason");
+		return -1;
+	}
+	if (mode != '\0')  /* if we get a fp wake up reason */
+	{
+		*reason = mode & 0xff; //get LS byte
+	}
+	else
+	{
+		fprintf(stderr, "Error reading wakeup mode from frontprocessor\n");
+		*reason = 0;  //echo unknown
+	}
+	return 0;
+}
+
 static int getVersion(Context_t *context, int *version)
 {
 	//-v command
-	int strVersion;
+	int fp_version;
+	int resellerID;
 
-	if (ioctl(context->fd, VFDGETVERSION, &strVersion) < 0) // get version info (1x u32)
+	if (ioctl(context->fd, VFDGETVERSION, &fp_version) < 0) // get version info (1x u32)
 	{
 		perror("Get version info");
 		return -1;
 	}
-	if (strVersion != '\0')  /* if the version info is OK */
+	if (fp_version != '\0')  /* if the version info is OK */
 	{
-		*version = strVersion;
-//		printf("Bootloader/front processor version: %d.%d\n", (int)(strVersion / 100), (int)(strVersion % 100));
+		*version = fp_version;
 	}
 	else
 	{
-		fprintf(stderr, "Error reading version from fp\n");
 		*version = -1;
 	}
 	return 0;
@@ -708,50 +730,29 @@ static int setTimeMode(Context_t *context, int timemode)
 	return 0;
 }
 
-static int getWakeupReason(Context_t *context, int *reason)
-{
-	//-w command, OK
-	int mode = 0;
-
-	if (ioctl(context->fd, VFDGETWAKEUPMODE, mode) < 0)
-	{
-		perror("Get wakeup reason");
-		return -1;
-	}
-	if (mode != '\0')  /* if we get a fp wake up reason */
-	{
-		*reason = mode & 0xff; //get first byte
-	}
-	else
-	{
-		fprintf(stderr, "Error reading wakeup mode from frontprocessor\n");
-		*reason = 0;  //echo unknown
-	}
-	return 0;
-}
-
-#if 0
-static int modelSpecific(Context_t *context, int len, int *testdata)
+#if defined MODEL_SPECIFIC
+static int modelSpecific(Context_t *context, char len, char *data)
 {
 	//-ms command
 	int i, res;
-	int vData[18];
+	char testdata[18];
 
-	vData[1] = len;
-	printf("nuvoton ioctl: VFDTEST (0x%08x) SOP, CMD=", VFDTEST);
-	for (i = 1; i <= len; i++)
+	testdata[0] = len; // set length
+	
+	printf("nuvoton ioctl: VFDTEST (0x%08x) SOP CMD=", VFDTEST);
+	for (i = 0; i < len; i++)
 	{
-		vData[i + 1] = testdata[i];
-		printf("0x%02x, ", vData[i + 1] & 0xff);
+		testdata[i + 1] = data[i];
+		printf("0x%02x ", data[i] & 0xff);
 	}
 	printf("EOP\n");
-	vData[len + 2] = '\0';
+
+	memset(data, 0, 9);
+
 //	setMode(context->fd); //set mode 1
-	for (i = 0; i < 16; i++)
-	{
-		testdata[i] = 0;
-	}
-	res = (ioctl(context->fd, VFDTEST, &vData) < 0);
+
+	res = (ioctl(context->fd, VFDTEST, &testdata) < 0);
+
 	if (res < 0)
 	{
 		perror("Model specific");
@@ -759,12 +760,9 @@ static int modelSpecific(Context_t *context, int len, int *testdata)
 	}
 	else
 	{
-		printf("Status result : 0x%02X\n", res);
-		testdata[0] = res; //status
-		for (i = 0; i < 16; i++)
+		for (i = 0; i < ((testdata[1] == 1) ? 11 : 2); i++)
 		{
-			testdata[i] = vData[i]; //return values
-			printf("Return byte %02d: 0x%02X\n", i, vData[i] & 0xff);
+				data[i] = testdata[i]; //return values
 		}
 	}
 	return testdata[0];
@@ -811,7 +809,8 @@ Model_t Fortis_model =
 	.GetWakeupTime    = getWTime,
 	.SetDisplayTime   = NULL,
 	.SetTimeMode      = setTimeMode,
-//	.ModelSpecific    = modelSpecific,
-	.ModelSpecific    = NULL,
+#if defined MODEL_SPECIFIC
+	.ModelSpecific    = modelSpecific,
+#endif
 	.Exit             = Exit
 };

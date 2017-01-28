@@ -528,6 +528,8 @@ Model_t Hs5101_model =
 	.GetWakeupTime    = NULL,
 	.SetDisplayTime   = NULL,
 	.SetTimeMode      = NULL,
+#if defined MODEL_SPECIFIC
 	.ModelSpecific    = NULL,
+#endif
 	.Exit             = Exit
 };

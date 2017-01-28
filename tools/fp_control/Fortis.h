@@ -1,13 +1,6 @@
 #ifndef __fortis__
 #define __fortis__
 
-#if 0
-struct set_test_s
-{
-	int len, one, two, three, four, five, six;
-};
-#endif
-
 struct set_brightness_s
 {
 	int level;
@@ -61,11 +54,12 @@ struct set_timemode_s
 	char timemode;
 };
 
+#if defined MODEL_SPECIFIC
 struct modelspecific_s
 {
-	int return_size;
-	int return_data[16];
+	char data[19]; //the bytes to send, and returned
 };
+#endif
 
 struct nuvoton_ioctl_data
 {
@@ -79,7 +73,9 @@ struct nuvoton_ioctl_data
 		struct set_standby_s standby;
 		struct set_time_s time;
 		struct set_timemode_s timemode;
+#if defined MODEL_SPECIFIC
 		struct modelspecific_s modelspecific;
+#endif
 	} u;
 };
 

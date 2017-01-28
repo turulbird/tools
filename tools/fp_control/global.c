@@ -210,7 +210,9 @@ int getWakeupReasonPseudo(int *reason)
 {
 	time_t curTime    = 0;
 	time_t wakeupTime = LONG_MAX;
-	printf("getWakeupReasonPseudo: IMPORTANT: Valid Linux System Time is mandatory\n");
+
+	printf("%s: IMPORTANT: Valid Linux System Time is mandatory\n", __func__);
+
 	time(&curTime);
 	wakeupTime = read_wakeup_file();
 	if ((curTime - FIVE_MIN) < wakeupTime && (curTime + FIVE_MIN) > wakeupTime)

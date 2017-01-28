@@ -21,7 +21,7 @@
 #define VFDSETMODE            0xc0425aff
 
 #define VFDGETWAKEUPTIME      0xc0425b00
-#define VFDGETVERSION         0xc0425b01
+#define VFDGETVERSION_1       0xc0425b01
 #define VFDSETDISPLAYTIME     0xc0425b02
 #define VFDSETTIMEMODE        0xc0425b03
 
