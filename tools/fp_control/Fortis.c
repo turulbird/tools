@@ -699,7 +699,7 @@ static int getVersion(Context_t *context, int *version)
 	int fp_version;
 	int resellerID;
 
-	if (ioctl(context->fd, VFDGETVERSION, &fp_version) < 0) // get version info (1x u32)
+	if (ioctl(context->fd, VFDGETVERSION, &fp_version, &resellerID) < 0) // get version info
 	{
 		perror("Get version info");
 		return -1;
@@ -711,6 +711,14 @@ static int getVersion(Context_t *context, int *version)
 	else
 	{
 		*version = -1;
+	}
+	if (resellerID != '\0')  /* if the reseller info is OK */
+	{
+		printf("Reseller ID is %08X\n", resellerID);
+	}
+	else
+	{
+		printf("Reseller ID is unknown\n");
 	}
 	return 0;
 }
@@ -762,7 +770,7 @@ static int modelSpecific(Context_t *context, char len, char *data)
 	{
 		for (i = 0; i < ((testdata[1] == 1) ? 11 : 2); i++)
 		{
-				data[i] = testdata[i]; //return values
+			data[i] = testdata[i]; //return values
 		}
 	}
 	return testdata[0];
