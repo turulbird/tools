@@ -83,7 +83,7 @@ tArgs vSArgs[] =
 	{ "-gs", " --getTimeAndSet      ", "Args: None" },
 	{ "", "                         ", "      Set system time to current frontprocessor time" },
 	{ "", "                         ", "      WARNING: system date will be 01-01-1970!" },
-	{ "-gt", " --getWTime           ", "Args: None        Get the current frontcontroller wake up time" },
+	{ "-gw", " --getWTime           ", "Args: None        Get the current frontcontroller wake up time" },
 	{ "-st", " --setWakeTime        ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
 	{ "", "                         ", "      Set the frontcontroller wake up time" },
 	{ "-s", "  --setTime            ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
@@ -370,7 +370,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 
 static int getWTime(Context_t *context, time_t *theGMTTime)
 {
-	//-gt command: VFDGETWAKEUPTIME not supported by older nuvotons
+	//-gw command: VFDGETWAKEUPTIME not supported by older nuvotons
 	char fp_time[5];
 	time_t iTime;
 

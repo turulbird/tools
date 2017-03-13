@@ -51,7 +51,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Software version of fp_control, please increase on every change */
-static const char *sw_version = "1.08Audioniek 20170127.1";
+static const char *sw_version = "1.08Audioniek 20170313.1";
 
 typedef struct
 {
