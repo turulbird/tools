@@ -196,9 +196,9 @@ static int setTime(Context_t *context, time_t *theGMTTime)
 	struct micom_ioctl_data vData;
 
 	setMicomTime(*theGMTTime, vData.u.time.time);
-	fprintf(stderr, "Setting Current FP Time to = %02X%02X %d %d %d (mtime)\n",
-			vData.u.standby.time[0], vData.u.standby.time[1], vData.u.standby.time[2],
-			vData.u.standby.time[3], vData.u.standby.time[4]);
+	fprintf(stderr, "Setting Current FP Time to %d (MJD) %02d:%02d:%02d\n",
+			vData.u.standby.time[0] & 0xff, ((vData.u.standby.time[1] & 0xff) * 256+ vData.u.standby.time[2]) & 0xff,
+			vData.u.standby.time[3] & 0xff, vData.u.standby.time[4] & 0xff);
 	if (ioctl(context->fd, VFDSETTIME, &vData) < 0)
 	{
 		perror("settime: ");
