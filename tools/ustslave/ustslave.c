@@ -98,7 +98,7 @@ int writeToSlave(int cpuf, int fd, off_t DestinationAddress, unsigned int Source
 
 	err = lseek(cpuf, DestinationAddress, SEEK_SET);
 
-	printf("seeking to %x\n", (int)DestinationAddress);
+	//printf("seeking to %x\n", (int)DestinationAddress);
 
 	if (err < 0)
 	{
