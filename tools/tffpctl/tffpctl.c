@@ -91,48 +91,48 @@ typedef struct
 	unsigned char ScrollDelay;
 	unsigned char Spinner;
 	//--------------- for future enhancements: settings version 1 ends here
-}tSettings;
+} tSettings;
 
 tSettings Settings;
 
-void Help (void)
+void Help(void)
 {
-	printf ("Topfield TF77X0HDPVR front panel controller " VERSION "\n\n");
-	printf ("usage: tffpctl [options]\n\n");
+	printf("Topfield TF77X0HDPVR front panel controller " VERSION "\n\n");
+	printf("usage: tffpctl [options]\n\n");
 
-	printf ("--gettime                    returns the current frontpanel time\n");
-	printf ("--settime <yyyymmddhhmmss>   set the front panel time\n");
-	printf ("--syncsystime                sets the system time from the FP time\n");
-	printf ("--syncfptime                 sets the FP time from the system time\n");
-	printf ("--setgmtoffset               set the GMT offset from the timezone\n");
-	printf ("--cleartimers                clears all front panel timers\n");
-	printf ("--settimer <yyyymmddhhmm>    sets a front panel timer\n");
-	printf ("--brightness <0 to 5>        adjusts the brightness of the front panel display\n");
-	printf ("--irfilter1 <0|1>            turns IR mode 1 on or off\n");
-	printf ("--irfilter2 <0|1>            turns IR mode 2 on or off\n");
-	printf ("--irfilter3 <0|1>            turns IR mode 3 on or off\n");
-	printf ("--irfilter4 <0|1>            turns IR mode 4 on or off\n");
-	printf ("--poweroff                   turns the power off\n");
-	printf ("--reboot                     initiates a hard reboot\n");
-	printf ("--bootreason                 returns the boot reason\n");
-	printf ("--cleardisplay               clears the front panel display\n");
-	printf ("--resend                     sends the whole display buffer to the VFD\n");
-	printf ("--allcaps <0|1>              show all chars of the big display in CAPS letters\n");
-	printf ("--icon <xxxxxxxx_xxxxxxxx_m> defines which icons to be displayed\n");
-	printf ("--spinner <0|1>              switches spinner on or off\n");
+	printf("--gettime                    returns the current frontpanel time\n");
+	printf("--settime <yyyymmddhhmmss>   set the front panel time\n");
+	printf("--syncsystime                sets the system time from the FP time\n");
+	printf("--syncfptime                 sets the FP time from the system time\n");
+	printf("--setgmtoffset               set the GMT offset from the timezone\n");
+	printf("--cleartimers                clears all front panel timers\n");
+	printf("--settimer <yyyymmddhhmm>    sets a front panel timer\n");
+	printf("--brightness <0 to 5>        adjusts the brightness of the front panel display\n");
+	printf("--irfilter1 <0|1>            turns IR mode 1 on or off\n");
+	printf("--irfilter2 <0|1>            turns IR mode 2 on or off\n");
+	printf("--irfilter3 <0|1>            turns IR mode 3 on or off\n");
+	printf("--irfilter4 <0|1>            turns IR mode 4 on or off\n");
+	printf("--poweroff                   turns the power off\n");
+	printf("--reboot                     initiates a hard reboot\n");
+	printf("--bootreason                 returns the boot reason\n");
+	printf("--cleardisplay               clears the front panel display\n");
+	printf("--resend                     sends the whole display buffer to the VFD\n");
+	printf("--allcaps <0|1>              show all chars of the big display in CAPS letters\n");
+	printf("--icon <xxxxxxxx_xxxxxxxx_m> defines which icons to be displayed\n");
+	printf("--spinner <0|1>              switches spinner on or off\n");
 
-	printf ("--typematicdelay <0 to 255>  delay between the first and the repeated keys\n");
-	printf ("--typematicrate <0 to 255>   delay between the repeated key codes\n");
-	printf ("                             the typematic rate unit is about 1/9th of a second\n");
-	printf ("--keyemulationmode <0 to 2>  selects the emulation mode (0=TF7700, 1=UFS910, 2=TF7700LKP)\n");
+	printf("--typematicdelay <0 to 255>  delay between the first and the repeated keys\n");
+	printf("--typematicrate <0 to 255>   delay between the repeated key codes\n");
+	printf("                             the typematic rate unit is about 1/9th of a second\n");
+	printf("--keyemulationmode <0 to 2>  selects the emulation mode (0=TF7700, 1=UFS910, 2=TF7700LKP)\n");
 
-	printf ("--scrollmode <0 to 2>        selects a scroll mode (0=none, 1=once, 2=always)\n");
-	printf ("--scrollpause <1 to 255>     sets the pause between the first 8 chars and the following scroll (n*100ms)\n");
-	printf ("--scrolldelay <1 to 255>     sets the delay between 2 text shifts (n*100ms)\n");
+	printf("--scrollmode <0 to 2>        selects a scroll mode (0=none, 1=once, 2=always)\n");
+	printf("--scrollpause <1 to 255>     sets the pause between the first 8 chars and the following scroll (n*100ms)\n");
+	printf("--scrolldelay <1 to 255>     sets the delay between 2 text shifts (n*100ms)\n");
 
-	printf ("--restoresettings            resends several settings to the frontpanel\n");
+	printf("--restoresettings            resends several settings to the frontpanel\n");
 
-	printf ("--help                       this screen\n");
+	printf("--help                       this screen\n");
 }
 
 void LoadSettings(void)
@@ -146,7 +146,7 @@ void LoadSettings(void)
 		fclose(fp);
 	}
 
-	switch(Settings.Version)
+	switch (Settings.Version)
 	{
 		case 0:
 		{
@@ -184,7 +184,7 @@ void SaveSettings(void)
 	}
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
 	int file_fp;
 
@@ -229,7 +229,7 @@ int main(int argc, char** argv)
 
 			{"typematicdelay",  required_argument, 0, 0},
 			{"typematicrate",   required_argument, 0, 0},
-			{"keyemulationmode",required_argument, 0, 0},
+			{"keyemulationmode", required_argument, 0, 0},
 			{"reboot",          no_argument      , 0, 0},
 			{"icon",            required_argument, 0, 0},
 
@@ -252,7 +252,7 @@ int main(int argc, char** argv)
 			{NULL,      0, 0, 0}
 		};
 
-		c = getopt_long (argc, argv, "", long_options, &option_index);
+		c = getopt_long(argc, argv, "", long_options, &option_index);
 		if (c == -1) break;
 
 		switch (c)
@@ -266,7 +266,7 @@ int main(int argc, char** argv)
 						frontpanel_ioctl_time fpdata;
 
 						ioctl(file_fp, FRONTPANELGETTIME, &fpdata);
-						printf ("%d-%2.2d-%2.2d %s %2.2d:%2.2d:%2.2d\n", fpdata.year, fpdata.month, fpdata.day, fpdata.sdow, fpdata.hour, fpdata.min, fpdata.sec);
+						printf("%d-%2.2d-%2.2d %s %2.2d:%2.2d:%2.2d\n", fpdata.year, fpdata.month, fpdata.day, fpdata.sdow, fpdata.hour, fpdata.min, fpdata.sec);
 						break;
 					}
 					case _FRONTPANELSETTIME:
@@ -277,17 +277,29 @@ int main(int argc, char** argv)
 						if (strlen(optarg) == 14)
 						{
 							//yyyymmddhhmmss
-							strncpy(s, &optarg[ 0], 4); s[4] = '\0'; fpdata.year  = atoi(s);
-							strncpy(s, &optarg[ 4], 2); s[2] = '\0'; fpdata.month = atoi(s);
-							strncpy(s, &optarg[ 6], 2); s[2] = '\0'; fpdata.day   = atoi(s);
-							strncpy(s, &optarg[ 8], 2); s[2] = '\0'; fpdata.hour  = atoi(s);
-							strncpy(s, &optarg[10], 2); s[2] = '\0'; fpdata.min   = atoi(s);
-							strncpy(s, &optarg[12], 2); s[2] = '\0'; fpdata.sec   = atoi(s);
+							strncpy(s, &optarg[ 0], 4);
+							s[4] = '\0';
+							fpdata.year  = atoi(s);
+							strncpy(s, &optarg[ 4], 2);
+							s[2] = '\0';
+							fpdata.month = atoi(s);
+							strncpy(s, &optarg[ 6], 2);
+							s[2] = '\0';
+							fpdata.day   = atoi(s);
+							strncpy(s, &optarg[ 8], 2);
+							s[2] = '\0';
+							fpdata.hour  = atoi(s);
+							strncpy(s, &optarg[10], 2);
+							s[2] = '\0';
+							fpdata.min   = atoi(s);
+							strncpy(s, &optarg[12], 2);
+							s[2] = '\0';
+							fpdata.sec   = atoi(s);
 							ioctl(file_fp, FRONTPANELSETTIME, &fpdata);
 						}
 						else
 						{
-							printf ("Invalid settime parameter\n");
+							printf("Invalid settime parameter\n");
 						}
 						break;
 					}
@@ -309,16 +321,26 @@ int main(int argc, char** argv)
 						if (strlen(optarg) == 12)
 						{
 							//yyyymmddhhmm
-							strncpy(s, &optarg[ 0], 4); s[4] = '\0'; fpdata.year  = atoi(s);
-							strncpy(s, &optarg[ 4], 2); s[2] = '\0'; fpdata.month = atoi(s);
-							strncpy(s, &optarg[ 6], 2); s[2] = '\0'; fpdata.day   = atoi(s);
-							strncpy(s, &optarg[ 8], 2); s[2] = '\0'; fpdata.hour  = atoi(s);
-							strncpy(s, &optarg[10], 2); s[2] = '\0'; fpdata.min   = atoi(s);
+							strncpy(s, &optarg[ 0], 4);
+							s[4] = '\0';
+							fpdata.year  = atoi(s);
+							strncpy(s, &optarg[ 4], 2);
+							s[2] = '\0';
+							fpdata.month = atoi(s);
+							strncpy(s, &optarg[ 6], 2);
+							s[2] = '\0';
+							fpdata.day   = atoi(s);
+							strncpy(s, &optarg[ 8], 2);
+							s[2] = '\0';
+							fpdata.hour  = atoi(s);
+							strncpy(s, &optarg[10], 2);
+							s[2] = '\0';
+							fpdata.min   = atoi(s);
 							ioctl(file_fp, FRONTPANELSETTIMER, &fpdata);
 						}
 						else
 						{
-							printf ("Invalid settimer parameter\n");
+							printf("Invalid settimer parameter\n");
 						}
 						break;
 					}
@@ -411,7 +433,7 @@ int main(int argc, char** argv)
 						frontpanel_ioctl_bootreason fpdata;
 
 						ioctl(file_fp, FRONTPANELBOOTREASON, &fpdata);
-						printf ("%d\n", fpdata.reason);
+						printf("%d\n", fpdata.reason);
 						break;
 					}
 					case _FRONTPANELCLEAR:
@@ -427,14 +449,20 @@ int main(int argc, char** argv)
 						if (strlen(optarg) == 19)
 						{
 							//xxxxxxxx_xxxxxxxx_m
-							strncpy(s, &optarg[ 0], 8); s[8] = '\0'; fpdata.Icons1    = strtol(s, NULL, 16);
-							strncpy(s, &optarg[ 9], 8); s[8] = '\0'; fpdata.Icons2    = strtol(s, NULL, 16);
-							strncpy(s, &optarg[18], 1); s[1] = '\0'; fpdata.BlinkMode = strtol(s, NULL, 16) & 0x0f;
-							ioctl (file_fp, FRONTPANELICON, &fpdata);
+							strncpy(s, &optarg[ 0], 8);
+							s[8] = '\0';
+							fpdata.Icons1    = strtol(s, NULL, 16);
+							strncpy(s, &optarg[ 9], 8);
+							s[8] = '\0';
+							fpdata.Icons2    = strtol(s, NULL, 16);
+							strncpy(s, &optarg[18], 1);
+							s[1] = '\0';
+							fpdata.BlinkMode = strtol(s, NULL, 16) & 0x0f;
+							ioctl(file_fp, FRONTPANELICON, &fpdata);
 						}
 						else
 						{
-							printf ("Invalid icon parameter\n");
+							printf("Invalid icon parameter\n");
 						}
 						break;
 					}
@@ -472,7 +500,6 @@ int main(int argc, char** argv)
 						ioctl(file_fp, FRONTPANELTYPEMATICRATE, &fpdata);
 						break;
 					}
-
 					case _FRONTPANELKEYEMULATION:
 					{
 						frontpanel_ioctl_keyemulation fpdata;
@@ -514,7 +541,6 @@ int main(int argc, char** argv)
 						ioctl(file_fp, FRONTPANELALLCAPS, &fpdata);
 						break;
 					}
-
 					case _FRONTPANELSCROLLMODE:
 					{
 						frontpanel_ioctl_scrollmode fpdata;
@@ -535,7 +561,6 @@ int main(int argc, char** argv)
 						ioctl(file_fp, FRONTPANELSCROLLMODE, &fpdata);
 						break;
 					}
-
 					case _FRONTPANELSCROLLPAUSE:
 					{
 						frontpanel_ioctl_scrollmode fpdata;
@@ -548,7 +573,6 @@ int main(int argc, char** argv)
 						ioctl(file_fp, FRONTPANELSCROLLMODE, &fpdata);
 						break;
 					}
-
 					case _FRONTPANELSCROLLDELAY:
 					{
 						frontpanel_ioctl_scrollmode fpdata;
@@ -619,21 +643,21 @@ int main(int argc, char** argv)
 			}
 			default:
 			{
-				printf ("?? getopt returned character code 0%x ??\n", c);
+				printf("?? getopt returned character code 0%x ??\n", c);
 			}
 		}
 	}
 
 	if (optind < argc)
 	{
-		printf ("non-option ARGV-elements: ");
+		printf("non-option ARGV-elements: ");
 		while (optind < argc)
 		{
-			printf ("%s ", argv[optind++]);
+			printf("%s ", argv[optind++]);
 		}
-		printf ("\n");
+		printf("\n");
 	}
-	close (file_fp);
+	close(file_fp);
 
 	return 0;
 }

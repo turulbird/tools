@@ -279,7 +279,8 @@ int processComplex(Context_t *context, int argc, char *argv[])
 			{
 				keyCount += 1;
 				printf("Power Count= %d\n", keyCount);
-				if (keyCount >= 5) {
+				if (keyCount >= 5)
+				{
 					countFlag = false;
 					keyCount = 0;
 					waitTime = 0;

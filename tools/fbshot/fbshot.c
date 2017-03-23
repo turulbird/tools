@@ -51,8 +51,8 @@
 #include <linux/stmfb.h>
 
 #define DEFAULT_FB      "/dev/fb0"
-#define PACKAGE 	"fbshot"
-#define VERSION 	"0.4"
+#define PACKAGEN 	"fbshot"
+#define VERSIONN 	"0.4"
 #define MAINTAINER_NAME "Dariusz Swiderski"
 #define MAINTAINER_ADDR "sfires@sfires.net"
 
@@ -333,7 +333,7 @@ static int Write_PNG(struct picture *pict, char *filename, int interlace, int gr
 		FatalError("couldn't create PNG info struct.");
 	}
 
-	/*  host_info=(struct utsname*)malloc(sizeof(struct utsname));
+	/*  host_info = (struct utsname*)malloc(sizeof(struct utsname));
 	  uname(host_info);*/
 	txt_ptr[0].key = "Name";
 	txt_ptr[0].text = "FrameBuffer screenshot";
@@ -345,7 +345,7 @@ static int Write_PNG(struct picture *pict, char *filename, int interlace, int gr
 	txt_ptr[2].text = "snoopy";
 	txt_ptr[2].compression = PNG_TEXT_COMPRESSION_NONE;
 	txt_ptr[3].key = "Program";
-	txt_ptr[3].text = PACKAGE" v."VERSION;
+	txt_ptr[3].text = PACKAGEN" v."VERSIONN;
 	txt_ptr[3].compression = PNG_TEXT_COMPRESSION_NONE;
 
 	png_set_text(png_ptr, info_ptr, txt_ptr, 4);
@@ -480,9 +480,9 @@ int main(int argc, char **argv)
 				device = optarg;
 				break;
 			/* not supported as for now
-			    case 'g':
-			      gray=-1;
-			      break;
+			case 'g':
+				gray=-1;
+				break;
 			 */
 			case 'h':
 				Help(argv[0]);
