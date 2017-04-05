@@ -1,5 +1,3 @@
-ACLOCAL_AMFLAGS = -I m4
-
 bin_PROGRAMS = fbshot
 
 fbshot_SOURCES = fbshot.c

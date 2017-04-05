@@ -6,19 +6,19 @@ SUBDIRS = \
 	evremote2 \
 	fp_control \
 	fbshot \
-	gitVCInfo \
-	hd-idle \
-	hotplug \
-	libmme_host \
-	libmme_image \
 	showiframe \
 	streamproxy \
 	stfbcontrol \
 	ustslave \
+	gitVCInfo \
+	hotplug \
 	vfdctl \
+	hd-idle \
+	libmme_host \
+	libmme_image \
 	wait4button
 
-if ENABLE_TF7700
+if BOXTYPE_TF7700
 SUBDIRS += \
 	tffpctl \
 	tfd2mtd

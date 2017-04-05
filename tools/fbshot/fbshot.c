@@ -481,7 +481,7 @@ int main(int argc, char **argv)
 				break;
 			/* not supported as for now
 			case 'g':
-				gray=-1;
+				gray = -1;
 				break;
 			 */
 			case 'h':

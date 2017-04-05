@@ -171,6 +171,7 @@ static int init(Context_t *context)
 {
 	tFortisPrivate *private = malloc(sizeof(tFortisPrivate));
 	int vFd;
+
 	vFd = open(cVFD_DEVICE, O_RDWR);
 	if (vFd < 0)
 	{
