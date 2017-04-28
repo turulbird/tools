@@ -29,7 +29,6 @@
 
 #include "global.h"
 
-/* #define E2TIMERSXML "/usr/local/share/enigma2/timers.xml" */
 #define E2TIMERSXML "/etc/enigma2/timers.xml"
 #define E2WAKEUPTIME "/proc/stb/fp/wakeup_time"
 
@@ -117,10 +116,6 @@ static time_t read_e2_timers(time_t curTime)
 		}
 		else
 		{
-//			int wakeupDecrement = 5 * 60;
-//			int platzhalter;
-//			char *platzhalters;
-//			checkConfig(&platzhalter, &platzhalter, &platzhalters, &wakeupDecrement);
 			recordTime -= Vwakeup;
 		}
 		printf(" - Done\n");
@@ -142,7 +137,6 @@ static time_t read_neutrino_timers(time_t curTime)
 	printf("Getting 1st neutrino timer");
 	if (fd > 0)
 	{
-//		printf("Opening %s\n", NEUTRINO_TIMERS);
 		while (fgets(line, 999, fd) != NULL)
 		{
 			line[999] = '\0';
@@ -251,11 +245,11 @@ int syncWasTimerWakeup(eWakeupReason reason)
 // If no wakeup time can be found LONG_MAX will be returned
 time_t read_timers_utc(time_t curTime)
 {
-	time_t wakeupTime = LONG_MAX;  //flag no timer read (yet)
-	wakeupTime = read_e2_timers(curTime);  //get next e2timer
-	if (wakeupTime == LONG_MAX) //if none
+	time_t wakeupTime = LONG_MAX;  // flag no timer read (yet)
+	wakeupTime = read_e2_timers(curTime);  // get next e2timer
+	if (wakeupTime == LONG_MAX) // if none
 	{
-		wakeupTime = read_neutrino_timers(curTime);  //try neutrino timer
+		wakeupTime = read_neutrino_timers(curTime);  // try neutrino timer
 	}
 	write_wakeup_file(wakeupTime);
 	return wakeupTime;
@@ -267,6 +261,7 @@ time_t read_fake_timer_utc(time_t curTime)
 	struct tm tsWake;
 	struct tm *ts;
 	time_t wakeupTime = LONG_MAX;
+
 	ts = gmtime(&curTime);
 	tsWake.tm_hour = ts->tm_hour;
 	tsWake.tm_min  = ts->tm_min;
@@ -280,11 +275,12 @@ time_t read_fake_timer_utc(time_t curTime)
 /* ******************************************** */
 
 double modJulianDate(struct tm *theTime)
-{
+{ // struct tm (date) -> MJD since epoch
 	double date;
 	int month;
 	int day;
 	int year;
+
 	year  = theTime->tm_year + 1900;
 	month = theTime->tm_mon + 1;
 	day   = theTime->tm_mday;
@@ -298,6 +294,67 @@ double modJulianDate(struct tm *theTime)
 	date -= 2400000.5;
 	return date;
 }
+
+int get_GMT_offset(struct tm theTime)
+{
+	time_t theoffsetTime;
+	time_t theinputTime;
+	int gmt_offset;
+
+	// Calculate time_t of input time theTime
+//	theinputTime = (((int)modJulianDate(&theTime) & 0xffff) - 40587) * 86400;  // mjd starts on midnight 17-11-1858 which is 40587 days before unix epoch
+	theinputTime = ((int)modJulianDate(&theTime) - 40587) * 86400;  // mjd starts on midnight 17-11-1858 which is 40587 days before unix epoch
+	theinputTime += theTime.tm_hour * 3600;
+	theinputTime += theTime.tm_min * 60;
+	theinputTime += theTime.tm_sec;
+
+	// Get time_t of input time theTime minus GMT offset
+	theTime.tm_isdst = -1; /* say mktime that we do not know */
+	theoffsetTime = mktime(&theTime);
+
+	gmt_offset = theinputTime - theoffsetTime;
+	return gmt_offset;
+}
+
+#if 0
+#define LEAPYEAR(year) (!((year) % 4) && (((year) % 100) || !((year) % 400)))
+#define YEARSIZE(year) (LEAPYEAR(year) ? 366 : 365)
+static const int _ytab[2][12] =
+{
+	{ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 },
+	{ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+};
+
+int get_ndays(struct tm *theTime)
+{ // struct tm (date) -> number of days since linux epoch
+	int ndays = 0;
+	int year;
+	int i;
+
+	year  = theTime->tm_year - 1; // do not count current year
+	while (year >= 70)
+	{
+		ndays += 365;
+		if (LEAPYEAR(year))
+		{
+			ndays++;
+		}
+		year--;
+	}
+	for (i = 0; i < theTime->tm_mon; i++)
+	{
+		ndays += _ytab[0][i];
+	}
+	if ((LEAPYEAR(theTime->tm_year)) && (theTime->tm_mon > 2))
+	{
+		ndays++;
+	}
+	ndays += theTime->tm_mday;
+	printf("%s ndays: %d\n", __func__, ndays);
+	printf("%s MJD: %d\n", __func__, ndays + 40587);
+	return ndays;
+}
+#endif
 
 /* ********************************************** */
 

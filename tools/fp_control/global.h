@@ -121,6 +121,7 @@ extern Model_t Cuberevo_model;
 extern Model_t CNBOX_model;
 
 double modJulianDate(struct tm *theTime);
+int get_GMT_offset(struct tm theTime);
 time_t read_timers_utc(time_t curTime);
 time_t read_fake_timer_utc(time_t curTime);
 int searchModel(Context_t *context, eBoxType type);

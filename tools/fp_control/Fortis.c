@@ -49,6 +49,7 @@
 static int setText(Context_t *context, char *theText);
 static int Clear(Context_t *context);
 static int setIcon(Context_t *context, int which, int on);
+//extern int gmt_offset;
 
 /* ******************* constants ************************ */
 
@@ -68,28 +69,28 @@ typedef struct
 
 tArgs vSArgs[] =
 {
-	{ "-e", "  --setTimer           ", "Args: [time date]  Format: HH:MM:SS dd-mm-YYYY" },
+	{ "-e", "  --setTimer         * ", "Args: [time date]  Format: HH:MM:SS dd-mm-YYYY" },
 	{ "", "                         ", "      No arg: Set the most recent timer from e2 or neutrino" },
 	{ "", "                         ", "      to the frontcontroller and shutdown" },
 	{ "", "                         ", "      Arg time date: Set frontcontroller wake up time to" },
 	{ "", "                         ", "      time, shutdown, and wake up at given time" },
-	{ "-d", "  --shutdown           ", "Args: None or [time date]  Format: HH:MM:SS dd-mm-YYYY" },
+	{ "-d", "  --shutdown         * ", "Args: None or [time date]  Format: HH:MM:SS dd-mm-YYYY" },
 	{ "", "                         ", "      No arg: Shut down immediately" },
 	{ "", "                         ", "      Arg time date: Shut down at given time/date" },
-	{ "-r", "  --reboot             ", "Args: None" },
+	{ "-r", "  --reboot           * ", "Args: None" },
 	{ "", "                         ", "      No arg: Reboot immediately" },
 	{ "", "                         ", "      Arg time date: Reboot at given time/date" },
-	{ "-g", "  --getTime            ", "Args: None        Display currently set frontprocessor time" },
-	{ "-gs", " --getTimeAndSet      ", "Args: None" },
+	{ "-g", "  --getTime          *  ", "Args: None        Display currently set frontprocessor time" },
+	{ "-gs", " --getTimeAndSet    * ", "Args: None" },
 	{ "", "                         ", "      Set system time to current frontprocessor time" },
 	{ "", "                         ", "      WARNING: system date will be 01-01-1970!" },
-	{ "-gw", " --getWTime           ", "Args: None        Get the current frontcontroller wake up time" },
-	{ "-st", " --setWakeTime        ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
+	{ "-gw", " --getWTime         * ", "Args: None        Get the current frontcontroller wake up time" },
+	{ "-st", " --setWakeTime      * ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
 	{ "", "                         ", "      Set the frontcontroller wake up time" },
-	{ "-s", "  --setTime            ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
+	{ "-s", "  --setTime          * ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
 	{ "", "                         ", "      Set the frontprocessor time" },
-	{ "-sst", "--setSystemTime      ", "Args: None        Set front processor time to system time" },
-	{ "-p", "  --sleep              ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
+	{ "-sst", "--setSystemTime    * ", "Args: None        Set front processor time to system time" },
+	{ "-p", "  --sleep            * ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
 	{ "", "                         ", "      Reboot receiver via fp at given time" },
 	{ "-t", "  --settext            ", "Args: text        Set text to frontpanel" },
 	{ "-l", "  --setLed             ", "Args: LED# int    LED#: int=brightness (0..31)" },
@@ -139,7 +140,6 @@ unsigned long calcGetNuvotonTime(char *nuvotonTimeString)
 	unsigned int    sec     = nuvotonTimeString[4] & 0xFF;
 
 	epoch += (hour * 3600 + min * 60 + sec);
-//	printf("MJD = %d epoch = %ld, time = %02d:%02d:%02d\n", mjd, epoch, hour, min, sec);
 	return epoch;
 }
 
@@ -151,18 +151,15 @@ unsigned long calcGetNuvotonTime(char *nuvotonTimeString)
 void calcSetNuvotonTime(time_t theTime, char *destString)
 {
 	struct tm *now_tm;
+	int mjd;
 
 	now_tm = gmtime(&theTime);
-//	printf("Input time to set: %02d:%02d:%02d %02d-%02d-%04d\n", now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec,
-//		 now_tm->tm_mday, now_tm->tm_mon+1, now_tm->tm_year+1900);
-	double mjd = modJulianDate(now_tm);
-	int mjd_int = mjd;
-	destString[0] = (mjd_int >> 8);
-	destString[1] = (mjd_int & 0xff);
+	mjd = (int)modJulianDate(now_tm);
+	destString[0] = (mjd >> 8);
+	destString[1] = (mjd & 0xff);
 	destString[2] = now_tm->tm_hour;
 	destString[3] = now_tm->tm_min;
 	destString[4] = now_tm->tm_sec;
-//	printf("Converted time to set: %02d:%02d:%02d MJD=%d\n", destString[2], destString[3], destString[4], mjd_int);
 }
 
 /* ******************* driver functions ****************** */
@@ -201,12 +198,13 @@ static int usage(Context_t *context, char *prg_name, char *cmd_name)
 			fprintf(stderr, "%s   %s   %s\n", vSArgs[i].arg, vSArgs[i].arg_long, vSArgs[i].arg_description);
 		}
 	}
+	fprintf(stderr, "Options marked * should be the only calling argument.\n");
 	return 0;
 }
 
 static int setTime(Context_t *context, time_t *theGMTTime)
 {
-	// -s command, OK
+	// -s command
 	struct nuvoton_ioctl_data vData;
 
 	calcSetNuvotonTime(*theGMTTime, vData.u.time.time);
@@ -220,19 +218,22 @@ static int setTime(Context_t *context, time_t *theGMTTime)
 
 static int setSTime(Context_t *context, time_t *theGMTTime)
 {
-	// -sst command, OK
+	// -sst command
 	time_t curTime;
 	char fp_time[8];
 	time_t curTimeFP;
-	struct tm *ts;
+	struct tm *ts_gmt;
+	int gmt_offset;
 	int proc_fs;
 	FILE *proc_fs_file;
 
-	time(&curTime);  //get system time (UTC)
-	ts = localtime(&curTime);  // get local time
-	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts->tm_hour, ts->tm_min, ts->tm_sec,
-		ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
-	setTime(context, &curTime); //set fp clock to local time
+	time(&curTime); // get system time in UTC
+	ts_gmt = gmtime(&curTime);
+	gmt_offset = get_GMT_offset(*ts_gmt);
+	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts_gmt->tm_hour + (gmt_offset / 3600), ts_gmt->tm_min, ts_gmt->tm_sec,
+		ts_gmt->tm_mday, ts_gmt->tm_mon + 1, ts_gmt->tm_year + 1900);
+	curTime += gmt_offset;
+	setTime(context, &curTime); // set fp clock to local time
 
 	/* Read fp time back */
 	if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
@@ -241,10 +242,9 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 		return -1;
 	}
 	curTimeFP = (time_t)calcGetNuvotonTime(fp_time);
-	ts = localtime(&curTimeFP);
-	printf("Front panel time set to: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts->tm_hour, ts->tm_min, ts->tm_sec,
-		ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
-	ts = gmtime(&curTimeFP); //get UTC offset
+	ts_gmt = gmtime(&curTimeFP);
+	printf("Front panel time set to: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts_gmt->tm_hour, ts_gmt->tm_min, ts_gmt->tm_sec,
+		ts_gmt->tm_mday, ts_gmt->tm_mon + 1, ts_gmt->tm_year + 1900);
 
 	// write UTC offset to /proc/stb/fp/rtc_offset
 	proc_fs_file = fopen(cRTC_OFFSET_FILE, "w");
@@ -253,20 +253,21 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 		perror("Open rtc_offset");
 		return -1;
 	}
-	proc_fs = fprintf(proc_fs_file, "%d", (int)ts->tm_gmtoff);
+	proc_fs = fprintf(proc_fs_file, "%d", gmt_offset);
 	if (proc_fs < 0)
 	{
 		perror("Write rtc_offset");
 		return -1;
 	}
 	fclose(proc_fs_file);
-	fprintf(stderr, "/proc/stb/fp/rtc_offset set to: %+d seconds\n", (int)ts->tm_gmtoff);
+	printf("Note: /proc/stb/fp/rtc_offset set to: %+d seconds.\n", gmt_offset);
+
 	return 0;
 }
 
 static int getTime(Context_t *context, time_t *theGMTTime)
 {
-	// -g command, OK
+	// -g command
 	char fp_time[8];
 
 	if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
@@ -290,77 +291,81 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 static int setTimer(Context_t *context, time_t *theGMTTime)
 {
 	// -e command, OK
-	struct nuvoton_ioctl_data vData;
 	time_t curTime;
 	time_t curTimeFP = 0;
 	time_t wakeupTime;
-	struct tm *ts;
+	struct tm *ts_gmt;
+	int gmt_offset;
 	struct tm *tsw;
+	struct nuvoton_ioctl_data vData;
 
-	time(&curTime);
-	ts = localtime(&curTime);
-	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts->tm_hour, ts->tm_min, ts->tm_sec,
-		ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
+	time(&curTime); // get system time in UTC
+	ts_gmt = gmtime(&curTime);
+	gmt_offset = get_GMT_offset(*ts_gmt);
+	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts_gmt->tm_hour + (gmt_offset / 3600), ts_gmt->tm_min, ts_gmt->tm_sec,
+		ts_gmt->tm_mday, ts_gmt->tm_mon + 1, ts_gmt->tm_year + 1900);
+
 	if (theGMTTime == NULL) // -e no argument = shutdown until next e2/neutrino timer
 	{
 		wakeupTime = read_timers_utc(curTime); //get current 1st timer
+		wakeupTime += gmt_offset; // timers are stored in UTC
 	}
 	else
 	{
-		wakeupTime = *theGMTTime; //get specified time
+		wakeupTime = *theGMTTime; //get specified time (assumed local)
 	}
-	//check --> wakeupTime is set and larger than curTime and no larger than 300 days in the future (gost)
-	//check --> there is no timer set
+	curTime += gmt_offset;
+	// check --> wakeupTime is set and larger than curTime and no larger than 300 days in the future
+	// check --> there is no timer set
 	if ((wakeupTime <= 0) || ((wakeupTime == LONG_MAX)) || (curTime > wakeupTime) || (curTime < (wakeupTime - 25920000)))
 	{
 		/* shut down immedately */
-		fprintf(stderr, "No timers set or timer more than 300 days ahead, or wake up time in the past.\n");
-//		vData.u.standby.time[0] = '\0'; //Set wake up time in the past
-		wakeupTime = LONG_MAX; //Set wake up time to max. in the future
+		printf("No timers set or 1st timer more than 300 days ahead,\nor all timer(s) in the past.\n");
+//		wakeupTime = read_fake_timer_utc(curTime) = gmt_offset; //Set wake up time to max. in the future
+		wakeupTime = LONG_MAX;
 	}
-	else //wake up time valid and in the coming 300 days
+	else // wake up time valid and in the coming 300 days
 	{
 		unsigned long diff;
 		char fp_time[8];
 
-//		tsw = localtime(&wakeupTime);
-//		printf("Wake up Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min, tsw->tm_sec,
-//			tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
-
 		/* Determine difference between system time and wake up time */
 		diff = (unsigned long int) wakeupTime - curTime;
 
-		/* Check if front panel clock is set prpoperly */
+		/* Check if front panel clock is set properly */
 		if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
 		{
 			perror("Gettime");
 			return -1;
 		}
+
 		if (fp_time[0] != '\0')
 		{
-			curTimeFP = (time_t) calcGetNuvotonTime(fp_time);
-			/* set FP-Time if system time of more than 1 hour off */
+			curTimeFP = (time_t)calcGetNuvotonTime(fp_time);
+			/* set FP-Time if system time is more than 1 hour off */
 			if (((curTimeFP - curTime) > 3600) || ((curTime - curTimeFP) > 3600))
 			{
-				printf("Time difference between fp and system: %d seconds.\n", (int)(curTimeFP - curTime));
-				setTime(context, &curTime); //sync fp clock
+				printf("Time difference between fp and system: %+d seconds.\n", (int)(curTimeFP - curTime));
+				setTime(context, &curTime); // sync fp clock
 				curTimeFP = curTime;
-				tsw = localtime(&curTimeFP);
+				ts_gmt = gmtime(&curTimeFP);
 				printf("Front panel time corrected, set to: %02d:%02d:%02d %02d-%02d-%04d (local)\n",
-					tsw->tm_hour, tsw->tm_min, tsw->tm_sec, tsw->tm_mday, tsw->tm_mon+1, tsw->tm_year + 1900);
+					ts_gmt->tm_hour, ts_gmt->tm_min, ts_gmt->tm_sec, ts_gmt->tm_mday, ts_gmt->tm_mon + 1, ts_gmt->tm_year + 1900);
 			}
 		}
 		else
 		{
-			fprintf(stderr, "Error reading front panel time; ...assuming system time.\n");
+			fprintf(stderr, "Error reading front panel time... using system time.\n");
 			curTimeFP = curTime;
 		}
 		wakeupTime = curTimeFP + diff;
 	}
-	tsw = localtime(&wakeupTime);
+
+	tsw = gmtime(&wakeupTime);
 	printf("Wake up Time: %02d:%02d:%02d %02d-%02d-%04d (local)\n", tsw->tm_hour, tsw->tm_min,
 		tsw->tm_sec, tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
 	calcSetNuvotonTime(wakeupTime, vData.u.standby.time);
+	sleep(1);
 	if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
 	{
 		perror("Shut down");
@@ -401,14 +406,24 @@ static int setWTime(Context_t *context, time_t *theGMTTime)
 	//-st command
 	struct nuvoton_ioctl_data vData;
 	struct tm *swtm;
+	int gmt_offset;
 	time_t wakeupTime;
 	int proc_fs;
 	FILE *proc_fs_file;
 
 	wakeupTime = *theGMTTime;
-	swtm = localtime(&wakeupTime);
-	fprintf(stderr, "Setting wake up time to %02d:%02d:%02d %02d-%02d-%04d (local, seconds ignored) %+d\n", swtm->tm_hour,
-		swtm->tm_min, swtm->tm_sec, swtm->tm_mday, swtm->tm_mon + 1, swtm->tm_year + 1900, (int)swtm->tm_gmtoff);
+	swtm = gmtime(&wakeupTime);
+	gmt_offset= get_GMT_offset(*swtm);
+	printf("Setting wake up time to %02d:%02d:%02d %02d-%02d-%04d (local, seconds ignored)\n", swtm->tm_hour + (gmt_offset / 3600),
+		swtm->tm_min, swtm->tm_sec, swtm->tm_mday, swtm->tm_mon + 1, swtm->tm_year + 1900);
+	wakeupTime += gmt_offset;
+
+	calcSetNuvotonTime(wakeupTime, vData.u.standby.time);
+	if (ioctl(context->fd, VFDSETPOWERONTIME, &vData) < 0)
+	{
+		perror("Set wake up time");
+		return -1;
+	}
 
 	// write UTC offset to /proc/stb/fp/rtc_offset
 	proc_fs_file = fopen(cRTC_OFFSET_FILE, "w");
@@ -417,23 +432,14 @@ static int setWTime(Context_t *context, time_t *theGMTTime)
 		perror("Open rtc_offset");
 		return -1;
 	}
-	proc_fs = fprintf(proc_fs_file, "%d", (int)swtm->tm_gmtoff);
+	proc_fs = fprintf(proc_fs_file, "%d", gmt_offset);
 	if (proc_fs < 0)
 	{
 		perror("Write rtc_offset");
 		return -1;
 	}
 	fclose(proc_fs_file);
-	fprintf(stderr, "/proc/stb/fp/rtc_offset set to: %+d seconds\n", (int)swtm->tm_gmtoff);
-
-	wakeupTime -= swtm->tm_gmtoff; //get wake up time in UTC
-
-	calcSetNuvotonTime(wakeupTime, vData.u.standby.time);
-	if (ioctl(context->fd, VFDSETPOWERONTIME, &vData) < 0)
-	{
-		perror("Set wake up time");
-		return -1;
-	}
+	printf("Note: /proc/stb/fp/rtc_offset set to: %+d seconds.\n", gmt_offset);
 	return 0;
 }
 
@@ -442,7 +448,7 @@ static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 	// -d command to check
 	time_t curTime;
 
-	/* shutdown immediate */
+	/* shutdown immediately */
 	if (*shutdownTimeGMT == -1)
 	{
 		return (setTimer(context, NULL));
@@ -486,12 +492,13 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 {
 	// -p command, to be checked
 	time_t curTime;
+	int gmt_offset;
+	struct tm *ts;
 	int sleep = 1;
-	int vFd;
 	fd_set rfds;
 	struct timeval tv;
+	int vFd;
 	int retval, i, rd;
-	struct tm *ts;
 	char output[cMAXCharsFortis + 1];
 	struct input_event ev[64];
 
@@ -505,8 +512,11 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 	}
 	while (sleep)
 	{
-		time(&curTime);
-		ts = localtime(&curTime);
+		time(&curTime);  // get system time (UTC)
+		ts = gmtime(&curTime);
+		gmt_offset = get_GMT_offset(*ts);
+		curTime += gmt_offset;
+
 		if (curTime >= *wakeUpGMT)
 		{
 			sleep = 0;
@@ -557,8 +567,10 @@ static int setText(Context_t *context, char *theText)
 	// -t command to check
 	char vHelp[128];
 
-	strncpy(vHelp, theText, cMAXCharsFortis);
-	vHelp[cMAXCharsFortis] = '\0';
+//	strncpy(vHelp, theText, cMAXCharsFortis);
+	strncpy(vHelp, theText, 64);
+//	vHelp[cMAXCharsFortis] = '\0';
+	vHelp[64] = '\0';
 	write(context->fd, vHelp, strlen(vHelp));
 	return 0;
 }
