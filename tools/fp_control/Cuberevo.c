@@ -523,7 +523,7 @@ static int setLight(Context_t *context, int on)
  * 0x00 ->timer off
  * 0x02 ->timer on
  */
-static int getWakeupReason(Context_t *context, int *reason)
+static int getWakeupReason(Context_t *context, eWakeupReason *reason)
 {
 	struct micom_ioctl_data vData;
 	fprintf(stderr, "Waiting for wakeupmode from fp...\n");

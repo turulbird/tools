@@ -161,8 +161,9 @@ static time_t read_neutrino_timers(time_t curTime)
 	{
 		int wakeupDecrement = Vwakeup;
 		int platzhalter;
-		char *platzhalters;
-		checkConfig(&platzhalter, &platzhalter, &platzhalters, &wakeupDecrement);
+		char *dummy;
+
+		checkConfig(&platzhalter, &platzhalter, &dummy, &wakeupDecrement);
 		recordTime -= wakeupDecrement;
 	}
 	return recordTime;
@@ -200,7 +201,7 @@ static time_t read_wakeup_file()
 // Important: system has to have a valid current time
 // This is a little bit tricky, we can only detect if the time is valid
 // and this check happens +-5min arround the timer
-int getWakeupReasonPseudo(int *reason)
+int getWakeupReasonPseudo(eWakeupReason *reason)
 {
 	time_t curTime    = 0;
 	time_t wakeupTime = LONG_MAX;

@@ -784,7 +784,7 @@ static int Spark_clear(Context_t *context)
 	return 0;
 }
 
-static int Spark_getWakeupReason(Context_t *context, int *reason)
+static int Spark_getWakeupReason(Context_t *context, eWakeupReason *reason)
 {
 	//-w command
 	char mode[8];
@@ -875,7 +875,7 @@ static int Spark_exit(Context_t *context)
 		close(context->fd);
 	}
 	free(private);
-	exit(1);
+	return 1;
 }
 
 Model_t Spark_model =

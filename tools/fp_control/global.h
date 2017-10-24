@@ -8,21 +8,10 @@
 #endif
 
 #define VFDDISPLAYCHARS         0xc0425a00
-//#define VFDTESTONE              0xc0425a01
-//#define VFDTESTTWO              0xc0425a02
 #define VFDBRIGHTNESS           0xc0425a03
 #define VFDPWRLED               0xc0425a04 /* added by zeroone, also used in nuvoton.h; set PowerLed Brightness on Fortis*/
 #define VFDDISPLAYWRITEONOFF    0xc0425a05
-//#define VFDTESTSIX              0xc0425a06
-//#define VFDTESTSEVEN            0xc0425a07
-//#define VFDTESTEIGHT            0xc0425a08
-//#define VFDTESTNINE             0xc0425a09
 #define VFDICONDISPLAYONOFF     0xc0425a0a
-//#define VFDTESTELEVEN           0xc0425a0b
-//#define VFDTESTTWELVE           0xc0425a0c
-//#define VFDTESTTHIRTEEN         0xc0425a0d
-//#define VFDTESTFOURTEEN         0xc0425a0e
-//#define VFDTESTFIFTEEN          0xc0425a0f
 
 #define VFDTEST                 0xc0425af0
 #define VFDGETBLUEKEY           0xc0425af1 /* Spark specific */
@@ -49,7 +38,7 @@
 #define VFDGETTIMEFORMAT        0xc0425b05 /* Fortis specific */
 
 //Comment next line if you do not want the -ms option
-#define MODEL_SPECIFIC 1
+//#define MODEL_SPECIFIC 1
 
 struct vfd_ioctl_data
 {
@@ -58,7 +47,7 @@ struct vfd_ioctl_data
 	unsigned char length;
 };
 
-typedef enum {NONE, TIMER, POWERON} eWakeupReason;
+typedef enum {NONE, POWERON, STANDBY, TIMER, POWER_SWITCH, UNK1, UNK2, UNK3} eWakeupReason;
 
 typedef enum {Unknown, Ufs910_1W, Ufs910_14W, Ufs922, Ufc960, Tf7700, Hl101, Vip2, Fortis, Hs5101, Ufs912, Spark, Cuberevo, Adb_Box, CNBox} eBoxType;
 
@@ -90,7 +79,7 @@ typedef struct Model_s
 	int	(*SetLed)           (Context_t *context, int which, int on);
 	int	(*SetIcon)          (Context_t *context, int which, int on);
 	int	(*SetBrightness)    (Context_t *context, int brightness);
-	int	(*GetWakeupReason)  (Context_t *context, int *reason);
+	int	(*GetWakeupReason)  (Context_t *context, eWakeupReason *reason);
 	int	(*SetLight)         (Context_t *context, int on);
 	int	(*Exit)             (Context_t *context);
 	int	(*SetLedBrightness) (Context_t *context, int brightness);
@@ -127,7 +116,7 @@ time_t read_fake_timer_utc(time_t curTime);
 int searchModel(Context_t *context, eBoxType type);
 int checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeup);
 
-int getWakeupReasonPseudo(int *reason);
+int getWakeupReasonPseudo(eWakeupReason *reason);
 int syncWasTimerWakeup(eWakeupReason reason);
 
 int	disp; //controls screen output

@@ -557,7 +557,7 @@ static int Exit(Context_t *context)
 	close(private->fd_red);
 	close(private->fd_yellow);
 	free(private);
-	exit(1);
+	return 1;
 }
 
 static int Clear(Context_t *context)

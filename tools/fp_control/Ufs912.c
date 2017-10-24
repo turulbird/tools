@@ -490,7 +490,7 @@ static int setLight(Context_t *context, int on)
  * 0xc3 = time (timer)
  * 0xc4 = ac (power on)
  */
-static int getWakeupReason(Context_t *context, int *reason)
+static int getWakeupReason(Context_t *context, eWakeupReason *reason)
 {
 	unsigned char mode[8];
 	/* front controller time */
@@ -604,7 +604,7 @@ static int Exit(Context_t *context)
 		close(context->fd);
 	}
 	free(private);
-	exit(1);
+	return 1;
 }
 
 Model_t UFS912_model =

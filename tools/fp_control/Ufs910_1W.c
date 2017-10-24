@@ -390,7 +390,7 @@ static int Exit(Context_t *context)
 		close(context->fd);
 	}
 	free(private);
-	exit(1);
+	return 1;
 }
 
 static int Clear(Context_t *context)

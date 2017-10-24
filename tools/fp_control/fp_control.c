@@ -35,7 +35,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Software version of fp_control, please increase on every change */
-static const char *sw_version = "1.09Audioniek 20170417.1";
+static const char *sw_version = "1.09Audioniek 20171024.1";
+static eWakeupReason reason = 0;
 
 typedef struct
 {
@@ -51,7 +52,7 @@ int Vdisplay = 0; //
 int Vdisplay_custom = 0;
 char *VtimeFormat = "Unknown";
 int Vwakeup = 5 * 60; //default wakeup decrement in minutes
-const char *wakeupreason[4] = { "Unknown", "Power on", "From deep standby", "Timer" };
+const char *wakeupreason[8] = { "Unknown", "Power on", "From deep standby", "Timer", "Power switch", "Unknown", "Unknown", "Unknown" };
 
 tArgs vArgs[] =
 {
@@ -211,6 +212,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 					{
 						/* FIXME/CAUTION: assumes frontprocessor time is local and not UTC */
 						struct tm *gmt = gmtime(&theGMTTime);
+
 						printf("Setting system time to current frontpanel time: %02d:%02d:%02d %02d-%02d-%04d\n",
 								gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon + 1, gmt->tm_year + 1900);
 						char cmd[50];
@@ -458,7 +460,6 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			else if ((strcmp(argv[i], "-w") == 0) || (strcmp(argv[i], "--getWakeupReason") == 0))
 			{
 				int ret = -1;
-				int reason;
 
 				if (((Model_t *)context->m)->GetWakeupReason)
 				{
@@ -470,7 +471,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				}
 				if (ret == 0)
 				{
-					printf("Wakeup reason = %d (%s)\n\n", reason & 0x03, wakeupreason[reason & 0x03]);
+					printf("Wakeup reason = %d (%s)\n\n", reason & 0x07, wakeupreason[reason & 0x07]);
 					syncWasTimerWakeup((eWakeupReason)reason);
 				}
 			}
@@ -702,7 +703,6 @@ void processCommand(Context_t *context, int argc, char *argv[])
 	{
 		((Model_t *)context->m)->Exit(context);
 	}
-	exit(1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -754,21 +754,37 @@ int getModel()
 			}
 		}
 		else if (!strncasecmp(vName, "ufs922", 6))
+		{
 			vBoxType = Ufs922;
+		}
 		else if (!strncasecmp(vName, "ufc960", 6))
+		{
 			vBoxType = Ufc960;
+		}
 		else if (!strncasecmp(vName, "ufs912", 6))
+		{
 			vBoxType = Ufs912;
+		}
 		else if (!strncasecmp(vName, "ufs913", 6))
+		{
 			vBoxType = Ufs912;
+		}
 		else if (!strncasecmp(vName, "tf7700hdpvr", 11))
+		{
 			vBoxType = Tf7700;
+		}
 		else if (!strncasecmp(vName, "hl101", 5))
+		{
 			vBoxType = Hl101;
+		}
 		else if (!strncasecmp(vName, "vip1-v2", 7))
+		{
 			vBoxType = Vip2;
+		}
 		else if (!strncasecmp(vName, "vip2-v1", 7))
+		{
 			vBoxType = Vip2;
+		}
 		else
 			if ((!strncasecmp(vName, "hdbox", 5))
 			|| (!strncasecmp(vName, "octagon1008", 11))
@@ -789,7 +805,9 @@ int getModel()
 				vBoxType = CNBox;
 			}
 		else if (!strncasecmp(vName, "hs5101", 6))
+		{
 			vBoxType = Hs5101;
+		}
 		else
 			if ((!strncasecmp(vName, "spark", 5))
 			|| (!strncasecmp(vName, "spark7162", 9)))
@@ -797,7 +815,9 @@ int getModel()
 				vBoxType = Spark;
 			}
 		else if (!strncasecmp(vName, "adb_box", 7))
+		{
 			vBoxType = Adb_Box;
+		}
 		else
 			if ((!strncasecmp(vName, "cuberevo", 8))
 		    || (!strncasecmp(vName, "cuberevo-mini", 13))
@@ -854,6 +874,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	processCommand(&context, argc, argv);
-	return 0;
+
+	exit(reason & 0x07);
 }
 // vim:ts=4

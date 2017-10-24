@@ -684,7 +684,7 @@ static int setLight(Context_t *context, int on)
 	return 0;
 }
 
-static int getWakeupReason(Context_t *context, int *reason)
+static int getWakeupReason(Context_t *context, eWakeupReason *reason)
 {
 	//-w command, OK
 	int mode = -1;
@@ -793,12 +793,13 @@ static int modelSpecific(Context_t *context, char len, char *data)
 static int Exit(Context_t *context)
 {
 	tFortisPrivate *private = (tFortisPrivate *)((Model_t *)context->m)->private;
+
 	if (context->fd > 0)
 	{
 		close(context->fd);
 	}
 	free(private);
-	exit(1);
+	return 1;
 }
 
 Model_t Fortis_model =
