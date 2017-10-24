@@ -1,7 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 #AUTOMAKE_OPTIONS = subdir-objects
 
-if ENABLE_MULTICOM324
 lib_LTLIBRARIES = libmme_host.la
 
 libmme_host_la_SOURCES = \
@@ -12,6 +11,5 @@ libmme_host_la_SOURCES = \
 	$(DRIVER_TOPDIR)/multicom/mme/MMEMessageQueue.c \
 	$(DRIVER_TOPDIR)/multicom/mme/mme_tune.c \
 	$(DRIVER_TOPDIR)/multicom/embxshell/embx_linux.c
-endif
 
 AM_CFLAGS = -Wall -D__LINUX__ -I $(DRIVER_TOPDIR)/include/multicom -I$(DRIVER_TOPDIR)/multicom/mme
