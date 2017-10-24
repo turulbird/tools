@@ -58,6 +58,7 @@ tools/libeplayer3/output/.dirstamp
 tools/libeplayer3/output/writer/.dirstamp
 tools/libeplayer3/playback/.dirstamp
 tools/libeplayer3/tools/.dirstamp
+tools/satfind/satfind
 tools/showiframe/showiframe
 tools/stfbcontrol/stfbcontrol
 tools/streamproxy/streamproxy
