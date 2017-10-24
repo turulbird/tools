@@ -26,6 +26,7 @@ config.status
 config.guess
 config.sub
 ltmain.sh
+config.h
 config.h.in
 compile
 configure
@@ -33,6 +34,8 @@ install-sh
 libtool
 missing
 depcomp
+stamp-h1
+.dirstamp
 .deps/
 .libs/
 libs/libstgles/libltdl/
