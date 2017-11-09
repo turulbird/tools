@@ -159,8 +159,9 @@ int main(int argc, char **argv)
 	int i;
 	unsigned char centerText = false;
 	char *output = 0;
+#ifndef HAVE_SPARK7162_HARDWARE
 	int animationSpeed = 500000;	// default animation to 1/2 second
-
+#endif
 	for (i = 1; i < argc; i++)
 	{
 		char *cmd = argv[i];
@@ -381,15 +382,22 @@ void show_help()
 
 void centeredText(char *text)
 {
-	if (verbose) printf("centering text\n");
+	char *textout;
 
+	if (verbose)
+	{
+		printf("[vfdctl] centering text\n");
+	}
 	int ws = 0; // needed whitespace for centering
 	if (strlen(text) < VFD_LEN)
+	{
 		ws = (VFD_LEN - strlen(text)) / 2;
+	}
 	else
+	{
 		ws = 0;
-
-	char *textout = malloc(VFD_LEN);
+	}
+	textout = malloc(VFD_LEN);
 	memset(textout, ' ', VFD_LEN);
 	memcpy(textout + ws, text, VFD_LEN - ws);
 	setMessageToDisplay(textout);
@@ -415,7 +423,6 @@ void scrollText(char *text)
 		setMessageToDisplay(out);
 		usleep(SLEEPTIME);
 	}
-
 	memcpy(out, text, VFD_LEN); // display first 16 chars after scrolling
 	setMessageToDisplay(out);
 	free(out);
@@ -442,9 +449,10 @@ int iconOnOff(char *sym, unsigned char onoff)
 	data.length = 5;
 	ioctl(file_vfd, VFDICONDISPLAYONOFF, &data);
 #endif
-
 	if (verbose)
-		printf("set icon %s(%x) %d \n", sym, icon, onoff);
+	{
+		printf("[vfdctl] set icon %s(%x) %d \n", sym, icon, onoff);
+	}
 	return 0;
 }
 
@@ -506,7 +514,9 @@ void demoMode(void)
 void sigfunc(int sig)
 {
 	if (sig != SIGINT)
+	{
 		return;
+	}
 	else
 	{
 		exit(-1);
@@ -516,18 +526,22 @@ void sigfunc(int sig)
 void appendToOutput(char c)
 {
 	//fprintf(stderr,"< appendToOutput\n");
-	if (c == 0) return;
-
+	if (c == 0)
+	{
+		return;
+	}
 	input[position] = c;
 	if (position == MAX_INPUT)
+	{
 		return;
+	}
 	position++;
 
 	refreshDisp();
 	//fprintf(stderr,"appendToOutput >\n");
 }
 
-void refreshDisp()
+void refreshDisp(void)
 {
 	memset(&outbuffer[offset], ' ', 16 - offset);
 	if (position > 15 - offset)
@@ -563,6 +577,9 @@ void inputRemote(char *text)
 	//fprintf(stderr, "< inputRemote(%s)\n", text);
 
 	char *out = malloc(16);
+	int in, in2, in3;
+	char dec_in;
+
 	memset(out, 0x10, 16);
 	memset(input, 0, MAX_INPUT);
 	memset(outbuffer, ' ', 16);
@@ -570,21 +587,20 @@ void inputRemote(char *text)
 	if (text != (void *)0)
 	{
 		offset = strlen(text);
-		if (offset > 10) offset = 10;
+		if (offset > 10)
+		{
+			offset = 10;
+		}
 		memcpy(outbuffer, text, offset);
 	}
-
 	outbuffer[offset] = IN_CHAR;
 
 	FILE *fd = fopen("/dev/ttyAS1", "r");
 	if (fd)
 	{
-		fprintf(stderr, "opened remote control\n");
+		fprintf(stderr, "[vfdctl] opened remote control\n");
 	}
-
 	setMessageToDisplay(outbuffer);
-	int in, in2, in3;
-	char dec_in;
 
 	while ((in = fgetc(fd)) > 0)
 	{
@@ -617,7 +633,6 @@ void inputRemote(char *text)
 			appendToOutput(dec_in);
 		}
 	}
-
 	memset(&outbuffer, ' ', 16);
 	setMessageToDisplay(outbuffer);
 	fprintf(stderr, "bye\n");
@@ -669,7 +684,10 @@ void setMessageToDisplayEx(char *str, int len)
 
 	memset(writedisp_data.data, ' ', 16);
 
-	if (len > 16) len = 16;
+	if (len > 16)
+	{
+		len = 16;
+	}
 	memcpy(writedisp_data.data, str, len);
 
 	writedisp_data.start = 0;
@@ -703,13 +721,11 @@ void printBitmap(char *filename, int animationTime)
 			setMessageToDisplayEx((char *)tx, 16);
 			usleep(animationTime);
 		}
-
 		fclose(fd);
-
 	}
 	else
 	{
-		fprintf(stderr, "cannot open file\n");
+		fprintf(stderr, "[vfdctl] cannot open file\n");
 	}
 	free(tx);
 	free(buf);
@@ -764,15 +780,13 @@ void playVfdx(char *filename)
 				break;
 			}
 		}
-
 		fclose(fd);
-
 	}
 	else
 	{
-		fprintf(stderr, "cannot open file\n");
+		fprintf(stderr, "[vfdctl] cannot open file\n");
 	}
-
 	free(buf);
 }
+// vim:ts=4
 
