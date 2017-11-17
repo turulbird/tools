@@ -50,7 +50,7 @@ static int version = 0;
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
-	10, 140,
+	10, 140
 };
 
 static tButton cButtonCuberevo[] =
@@ -115,53 +115,54 @@ static tButton cButtonCuberevo[] =
 
 typedef struct
 {
-	char          *KeyName;
+	char *KeyName;
 	unsigned short code;
-	int            KeyCode;
+	int KeyCode;
 } key_table_t;
 
 key_table_t front_keymap_13grid[] =
 {
-	{ "STANDBY", 0x1000,              KEY_POWER         },  /* front power */
-	{ "LEFT"   , 0x0002,              KEY_LEFT          },  /* front left */
-	{ "RIGHT"  , 0x0004,              KEY_RIGHT         },  /* front right */
-	{ "UP"     , 0x4000,              KEY_UP            },  /* front up */
-	{ "FILE"   , 0x2000,              KEY_MEDIA         },  /* front file */
-	{ "DOWN"   , 0x0040,              KEY_DOWN          },  /* front down */
-	{ "OK"     , 0x0020,              KEY_OK            },  /* front ok */
-	{ "HOME"   , 0x0010,              KEY_HOME          },  /* front back */
-	{ "MENU"   , 0x0001,              KEY_MENU          },  /* front menu */
-	{ "RELEASE", 0xFFFF,              KEY_NULL          },  /* release */
-	{ ""       , 0x0000,              KEY_NULL          },
+	{ "STANDBY", 0x1000,   KEY_POWER },  /* front power */
+	{ "LEFT"   , 0x0002,   KEY_LEFT  },  /* front left */
+	{ "RIGHT"  , 0x0004,   KEY_RIGHT },  /* front right */
+	{ "UP"     , 0x4000,   KEY_UP    },  /* front up */
+	{ "FILE"   , 0x2000,   KEY_MEDIA },  /* front file */
+	{ "DOWN"   , 0x0040,   KEY_DOWN  },  /* front down */
+	{ "OK"     , 0x0020,   KEY_OK    },  /* front ok */
+	{ "HOME"   , 0x0010,   KEY_HOME  },  /* front back */
+	{ "MENU"   , 0x0001,   KEY_MENU  },  /* front menu */
+	{ "RELEASE", 0xFFFF,   KEY_NULL  },  /* release */
+	{ ""       , 0x0000,   KEY_NULL  },
 };
 
 key_table_t front_keymap_7seg[] =
 {
-	{ "STANDBY"  , 0x0001,              KEY_POWER         },  /* front power */
-	{ "MENU"     , 0x0002,              KEY_MENU          },  /* front menu  */
-	{ "EXIT"     , 0x0004,              KEY_HOME          },  /* front exit  */
-	{ "OK"       , 0x0010,              KEY_OK            },  /* front ok    */
-	{ "LEFT"     , 0x0020,              KEY_LEFT          },  /* front left  */
-	{ "RIGHT"    , 0x0040,              KEY_RIGHT         },  /* front right */
-	{ "UP"       , 0x0080,              KEY_UP            },  /* front up    */
-	{ "DOWN"     , 0x0100,              KEY_DOWN          },  /* front down  */
-	{ ""         , 0x0000,              KEY_NULL          },
+	{ "STANDBY", 0x0001,   KEY_POWER },  /* front power */
+	{ "MENU"   , 0x0002,   KEY_MENU  },  /* front menu  */
+	{ "EXIT"   , 0x0004,   KEY_HOME  },  /* front exit  */
+	{ "OK"     , 0x0010,   KEY_OK    },  /* front ok    */
+	{ "LEFT"   , 0x0020,   KEY_LEFT  },  /* front left  */
+	{ "RIGHT"  , 0x0040,   KEY_RIGHT },  /* front right */
+	{ "UP"     , 0x0080,   KEY_UP    },  /* front up    */
+	{ "DOWN"   , 0x0100,   KEY_DOWN  },  /* front down  */
+	{ ""       , 0x0000,   KEY_NULL  },
 };
 
 key_table_t front_keymap_12dotmatrix[] =
 {
-	{ "STANDBY", (1 << 0),        KEY_POWER         }, /* front power */
-	{ "MENU"   , (1 << 1),        KEY_MENU          }, /* front menu */
-	{ "HOME"   , (1 << 2),        KEY_HOME          }, /* front back */
-	{ "FILE"   , (1 << 3),        KEY_MEDIA         }, /* front file */
-	{ "OK"     , (1 << 4),        KEY_OK            }, /* front ok */
-	{ "LEFT"   , (1 << 5),        KEY_LEFT          }, /* front left */
-	{ "RIGHT"  , (1 << 6),        KEY_RIGHT         }, /* front right */
-	{ "UP"     , (1 << 7),        KEY_UP            }, /* front up */
-	{ "DOWN"   , (1 << 8),        KEY_DOWN          }, /* front down */
-	{ "RELEASE", 0xFFFF,        KEY_NULL          },  /* front release */
-	{ ""       , 0x0000,        KEY_NULL          },
+	{ "STANDBY", (1 << 0), KEY_POWER }, /* front power */
+	{ "MENU"   , (1 << 1), KEY_MENU  }, /* front menu */
+	{ "HOME"   , (1 << 2), KEY_HOME  }, /* front back */
+	{ "FILE"   , (1 << 3), KEY_MEDIA }, /* front file */
+	{ "OK"     , (1 << 4), KEY_OK    }, /* front ok */
+	{ "LEFT"   , (1 << 5), KEY_LEFT  }, /* front left */
+	{ "RIGHT"  , (1 << 6), KEY_RIGHT }, /* front right */
+	{ "UP"     , (1 << 7), KEY_UP    }, /* front up */
+	{ "DOWN"   , (1 << 8), KEY_DOWN  }, /* front down */
+	{ "RELEASE", 0xFFFF,   KEY_NULL  },  /* front release */
+	{ ""       , 0x0000,   KEY_NULL  },
 };
+
 
 int getCuberevoCode(key_table_t *cKeys, unsigned short code)
 {
@@ -171,11 +172,10 @@ int getCuberevoCode(key_table_t *cKeys, unsigned short code)
 	{
 		if (cKeys[vLoop].code == code)
 		{
-			printf("%02X - %s\n", cKeys[vLoop].KeyCode, cKeys[vLoop].KeyName);
+			printf("[evremote2 cuberevo] %02X - %s\n", cKeys[vLoop].KeyCode, cKeys[vLoop].KeyName);
 			return cKeys[vLoop].KeyCode;
 		}
 	}
-
 	return 0;
 }
 
@@ -189,72 +189,67 @@ static int pInit(Context_t *context, int argc, char *argv[])
 	{
 		cLongKeyPressSupport.period = atoi(argv[1]);
 	}
-
 	if (argc >= 3)
 	{
 		cLongKeyPressSupport.delay = atoi(argv[2]);
 	}
-
-	printf("period %d, delay %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
-
+	printf("[evremote2 cuberevo] Period = %d, delay = %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
 	if (ioctl(vFd, VFDGETVERSION, &micom) < 0)
 	{
 		perror("getVersion: ");
 	}
-
-	printf("micom version = %d\n", micom.u.version.version);
+	printf("[evremote2 cuberevo] micom version = %d\n", micom.u.version.version);
 	version = micom.u.version.version;
-
 	return vFd;
 }
 
 
 static int pRead(Context_t *context)
 {
-	unsigned char   vData[cCuberevoCommandLen];
-	eKeyType        vKeyType = RemoteControl;
-	static   int    vNextKey = 0;
-	static   int    lastCode = 0;
-	int             vCurrentCode = -1;
+	unsigned char vData[cCuberevoCommandLen];
+	eKeyType vKeyType = RemoteControl;
+	static int vNextKey = 0;
+	static int lastCode = 0;
+	int vCurrentCode = -1;
 
-	//printf("%s >\n", __func__);
-
+//	printf([evremote2 cuberevo] "%s >\n", __func__);
 	while (1)
 	{
 		read(context->fd, vData, cCuberevoCommandLen);
 
 		if (vData[0] == 0xe0)
+		{
 			vKeyType = RemoteControl;
+		}
 		else if (vData[0] == 0xE1)
+		{
 			vKeyType = FrontPanel;
+		}
 		else if (vData[0] == 0xE2)
+		{
 			vKeyType = FrontPanel;
+		}
 		else
+		{
 			continue;
-
-		printf("data[0] 0x%2x, data[1] 0x%2x\n", vData[0], vData[1]);
-
+		}
+		printf("[evremote2 cuberevo] data[0] 0x%2x, data[1] 0x%2x\n", vData[0], vData[1]);
 		if (vKeyType == RemoteControl)
 		{
 			if (vData[1] != 0xff)
 			{
-				vCurrentCode =
-					getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData[1]);
+				vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[1]);
 			}
 			else
 			{
 				vCurrentCode = lastCode = 0;
 			}
-
 			if (vCurrentCode != 0)
 			{
 				vNextKey = ((vCurrentCode != lastCode) ? vNextKey + 1 : vNextKey) % 0x100;
 				lastCode = vCurrentCode;
-
-//               printf("nextFlag %d\n", vNextKey);
-
+//				printf("[evremote2 cuberevo] nextFlag %d\n", vNextKey);
 				vCurrentCode += (vNextKey << 16);
-
 				break;
 			}
 		}
@@ -270,51 +265,51 @@ static int pRead(Context_t *context)
 			else
 			{
 				front_key |= vData[1];
-
-				printf("front_key = 0x%04x\n", front_key);
+				printf("[evremote2 cuberevo] front_key = 0x%04x\n", front_key);
 
 				/* 12 dot, 12 and 14 segs */
 				if ((version == 0) || (version == 2))
+				{
 					vCurrentCode = getCuberevoCode(front_keymap_12dotmatrix, front_key);
+				}
 				else if (version == 3)
+				{
 					vCurrentCode = getCuberevoCode(front_keymap_7seg, front_key);
+				}
 				else
+				{
 					vCurrentCode = getCuberevoCode(front_keymap_13grid, front_key);
-
+				}
 				if (vCurrentCode != 0)
 				{
 					vNextKey = ((vCurrentCode != lastCode) ? vNextKey + 1 : vNextKey) % 0x100;
 					lastCode = vCurrentCode;
-
-					//             printf("nextFlag %d\n", vNextKey);
-
+//					printf("[evremote2 cuberevo] nextFlag %d\n", vNextKey);
 					vCurrentCode += (vNextKey << 16);
-
 					break;
 				}
-
-//               if (vCurrentCode == 0xffff) /* key release */
-//                  vCurrentCode = 0x0000;
+#if 0
+				if (vCurrentCode == 0xffff) /* key release */
+				{
+					vCurrentCode = 0x0000;
+				}
+#endif
 			}
 		}
 	}
-
-	printf("%s < %08X\n", __func__, vCurrentCode);
-
+//	printf("[evremote2 cuberevo] %s < %08X\n", __func__, vCurrentCode);
 	return vCurrentCode;
 }
 
 static int pNotification(Context_t *context, const int cOn)
 {
-
+	/* noop: is handled from fp itself */
 	return 0;
 }
 
 static int pShutdown(Context_t *context)
 {
-
 	close(context->fd);
-
 	return 0;
 }
 
@@ -322,14 +317,19 @@ RemoteControl_t Cuberevo_RC =
 {
 	"Cuberevo RemoteControl",
 	Cuberevo,
-	&pInit,
-	&pShutdown,
-	&pRead,
-	&pNotification,
 	cButtonCuberevo,
 	NULL,
 	NULL,
 	1,
-	&cLongKeyPressSupport,
+	&cLongKeyPressSupport
 };
+
+BoxRoutines_t Cuberevo_BR =
+{
+	&pInit,
+	&pShutdown,
+	&pRead,
+	&pNotification
+};
+// vim:ts=4
 

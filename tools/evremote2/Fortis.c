@@ -41,7 +41,7 @@
 /* ***************** some constants **************** */
 
 #define rcDeviceName "/dev/rc"
-#define cFortisDataLen    128
+#define cFortisDataLen 128
 
 typedef struct
 {
@@ -51,7 +51,7 @@ typedef struct
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
-	10, 140,
+	10, 140
 };
 
 static tButton cButtonFortis[] =
@@ -111,7 +111,7 @@ static tButton cButtonFortis[] =
 	{""               , ""  , KEY_NULL}
 };
 
-/* ***************** our fp button assignment **************** */
+/* ***************** front panel button assignment **************** */
 
 static tButton cButtonFortisFrontpanel[] =
 {
@@ -130,93 +130,82 @@ static int pInit(Context_t *context, int argc, char *argv[])
 	int vFd;
 	tFortisPrivate *private = malloc(sizeof(tFortisPrivate));
 
-	((RemoteControl_t *)context->r)->private = private;
-
+	context->r->private = private;
 	memset(private, 0, sizeof(tFortisPrivate));
-
 	vFd = open(rcDeviceName, O_RDWR);
-
 	if (argc >= 2)
 	{
 		cLongKeyPressSupport.period = atoi(argv[1]);
 	}
-
 	if (argc >= 3)
 	{
 		cLongKeyPressSupport.delay = atoi(argv[2]);
 	}
-
-	printf("period %d, delay %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
-
+	printf("[evremote2 fortis] Period = %d, delay = %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
 	return vFd;
 }
 
-
 static int pRead(Context_t *context)
 {
-	unsigned char   vData[cFortisDataLen];
-	eKeyType        vKeyType = RemoteControl;
-	int             vCurrentCode = -1;
-	static   int    vNextKey = 0;
-	static   char   vOldButton = 0;
+	unsigned char vData[cFortisDataLen];
+	eKeyType vKeyType = RemoteControl;
+	int vCurrentCode = -1;
+	static int vNextKey = 0;
+	static char vOldButton = 0;
 
 	while (1)
 	{
+		read(context->fd, vData, cFortisDataLen);
 #if 0
-		int vLoop;
-		int n =
-#endif
-			read(context->fd, vData, cFortisDataLen);
-
-#if 0
-		printf("(len %d): ", n);
+		printf("[evremote2 fortis] (len %d): ", n);
 
 		for (vLoop = 0; vLoop < n; vLoop++)
+		{
 			printf("0x%02X ", vData[vLoop]);
-
+		}
 		printf("\n");
 #endif
-
 		if ((vData[2] != 0x51) && (vData[2] != 0x63) && (vData[2] != 0x80))
+		{
 			continue;
-
+		}
 		if (vData[2] == 0x63)
+		{
 			vKeyType = RemoteControl;
+		}
 		else if (vData[2] == 0x51)
+		{
 			vKeyType = FrontPanel;
+		}
 		else
+		{
 			continue;
-
+		}
 		if (vKeyType == RemoteControl)
 		{
-			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData[5] & ~0x80);
+			vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[5] & ~0x80);
 
 			if (vCurrentCode != 0)
 			{
 				vNextKey = (vData[5] & (0x80 == 0 ? vNextKey + 1 : vNextKey)) % 0x100;
-
-				/* printf("nextFlag %d\n", vNextKey);*/
-
+//				printf("[evremote2 fortis] nextFlag %d\n", vNextKey);
 				vCurrentCode += (vNextKey << 16);
 				break;
 			}
 		}
 		else
 		{
-			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->Frontpanel, vData[3]);
+			vCurrentCode = getInternalCodeHex(context->r->Frontpanel, vData[3]);
 
 			if (vCurrentCode != 0)
 			{
 				vNextKey = (vOldButton != vData[3] ? vNextKey + 1 : vNextKey) % 0x100;
-
-				/* printf("nextFlag %d\n", vNextKey);*/
-
+//				printf("[evremote2 fortis] nextFlag %d\n", vNextKey);
 				vCurrentCode += (vNextKey << 16);
 				break;
 			}
 		}
 	} /* for later use we make a dummy while loop here */
-
 	return vCurrentCode;
 }
 
@@ -228,11 +217,10 @@ static int pNotification(Context_t *context, const int cOn)
 
 static int pShutdown(Context_t *context)
 {
-	tFortisPrivate *private = (tFortisPrivate *)((RemoteControl_t *)context->r)->private;
+	tFortisPrivate *private = (tFortisPrivate *)context->r->private;
 
 	close(context->fd);
 	free(private);
-
 	return 0;
 }
 
@@ -240,13 +228,19 @@ RemoteControl_t Fortis_RC =
 {
 	"Fortis RemoteControl",
 	Fortis,
-	&pInit,
-	&pShutdown,
-	&pRead,
-	&pNotification,
 	cButtonFortis,
 	cButtonFortisFrontpanel,
 	NULL,
 	1,
-	&cLongKeyPressSupport,
+	&cLongKeyPressSupport
 };
+
+BoxRoutines_t Fortis_BR =
+{
+	&pInit,
+	&pShutdown,
+	&pRead,
+	&pNotification
+};
+// vim:ts=4
+

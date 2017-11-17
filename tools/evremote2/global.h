@@ -13,43 +13,83 @@
 #define INPUT_PRESS 1
 #define INPUT_RELEASE 0
 
-typedef enum {Unknown, Ufs910_1W, Ufs910_14W, Ufs922, Ufc960, Tf7700, Hl101, Vip2, Fortis,
-	      Hs5101, Ufs912, Spark, Cuberevo, Adb_Box, Ipbox, CNBox, VitaminHD5000, LircdName
-	     } eBoxType;
-typedef enum {RemoteControl, FrontPanel} eKeyType;
-
-typedef struct Context_s
+typedef enum
 {
-	void * /* RemoteControl_t */  *r; /* instance data */
-	int                          fd; /* filedescriptor of fd */
+	Unknown,        //  0
+	Ufs910_1W,      //  1
+	Ufs910_14W,     //  2
+	Ufs922,         //  3
+	Ufc960,         //  4
+	Tf7700,         //  5
+	Hl101,          //  6
+	Vip2,           //  7
+	Fortis,         //  8
+	Hs5101,         //  9
+	Ufs912,         // 10
+	Spark,          // 11
+	Cuberevo,       // 12
+	Adb_Box,        // 13
+	Ipbox,          // 14
+	CNBox,          // 15
+	VitaminHD5000,  // 16
+	LircdName       // 17
+} eBoxType;
 
-} Context_t;
+typedef enum
+{
+	RemoteControl,
+	FrontPanel
+} eKeyType;
 
 typedef struct
 {
 	unsigned int delay;
 	unsigned int period;
 	unsigned int rc_code;
-
 } tLongKeyPressSupport;
 
+typedef struct RemoteControl_s
+{
+	char *Name;
+	eBoxType Type;
+
+	tButton *RemoteControl;
+	tButton *Frontpanel;
+
+	void *private;
+	unsigned char supportsLongKeyPress;
+	tLongKeyPressSupport *LongKeyPressSupport;
+} RemoteControl_t;
+
+typedef struct Context_s
+{
+//	void* *r;  // instance data
+	RemoteControl_t *r;  // instance data
+	int fd;  // filedescriptor of fd
+} Context_t;
+
+typedef struct BoxRoutines_s
+{
+	int (*Init)(Context_t *context, int argc, char *argv[]);
+	int (*Shutdown)(Context_t *context);
+	int (*Read)(Context_t *context);
+	int (*Notification)(Context_t *context, const int on);
+} BoxRoutines_t;
+
+typedef struct Context_r_s
+{
+	BoxRoutines_t *br;  // box specific routines
+} Context_r_t;
+
 int getInternalCode(tButton *cButtons, const char cCode[3]);
-
 int getInternalCodeHex(tButton *cButtons, const unsigned char cCode);
-
 int getInternalCodeLircKeyName(tButton *cButtons, const char cCode[30]);
-
 int printKeyMap(tButton *cButtons);
-
 int checkTuxTxt(const int cCode);
-
 void sendInputEvent(const int cCode);
 void sendInputEventT(const unsigned int type, const int cCode);
-
 int getEventDevice();
-
-int selectRemote(Context_t  *context, eBoxType type);
-
+int selectRemote(Context_r_t *context_r, Context_t *context, eBoxType type);
 void setInputEventRepeatRate(unsigned int delay, unsigned int period);
-
 #endif
+// vim:ts=4

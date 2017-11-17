@@ -67,7 +67,7 @@ static tButton cButtonUFS922[] =
 	{"BLUE"           , "70", KEY_BLUE},
 	{"EXIT"           , "55", KEY_HOME},
 	{"TEXT"           , "3C", KEY_TEXT},
-//  {"EPG"            , "4C", KEY_EPG},
+//	{"EPG"            , "4C", KEY_EPG},
 	{"EPG"            , "CC", KEY_EPG},
 	{"REWIND"         , "21", KEY_REWIND},
 	{"FASTFORWARD"    , "20", KEY_FASTFORWARD},
@@ -104,15 +104,15 @@ static tButton cButtonUFS922[] =
 
 static tButton cButtonUFS922Frontpanel[] =
 {
-	{"FP_MENU"		, "80", KEY_MENU},
-	{"FP_EXIT"		, "0D", KEY_HOME},
-	/*	{"FP_AUX"		, 0x20, ???},
-		{"FP_TV_R"		, 0x08, ???},
-	*/
-	{"FP_OK"		, "04", KEY_OK},
-	{"FP_WHEEL_LEFT"	, "0F", KEY_UP},
-	{"FP_WHEEL_RIGHT"	, "0E", KEY_DOWN},
-	{""	                , ""  , KEY_NULL}
+	{"FP_MENU"        , "80", KEY_MENU},
+	{"FP_EXIT"        , "0D", KEY_HOME},
+/*	{"FP_AUX"         , 0x20, ???},
+	{"FP_TV_R"        , 0x08, ???},
+*/
+	{"FP_OK"          , "04", KEY_OK},
+	{"FP_WHEEL_LEFT"  , "0F", KEY_UP},
+	{"FP_WHEEL_RIGHT" , "0E", KEY_DOWN},
+	{""	          , ""  , KEY_NULL}
 	/* is there no power key on frontpanel? */
 };
 
@@ -121,36 +121,35 @@ static int pInit(Context_t *context, int argc, char *argv[])
 	int vFd;
 	tUFS922Private *private = malloc(sizeof(tUFS922Private));
 
-	((RemoteControl_t *)context->r)->private = private;
-
+	context->r->private = private;
 	vFd = open(rcDeviceName, O_RDWR);
-
 	memset(private, 0, sizeof(tUFS922Private));
-
 	if (argc >= 2)
+	{
 		private->toggleFeedback = atoi(argv[1]);
+	}
 	else
+	{
 		private->toggleFeedback = 0;
-
+	}
 	if (argc >= 3)
+	{
 		private->disableFeedback = atoi(argv[2]);
+	}
 	else
+	{
 		private->disableFeedback = 0;
-
-	printf("toggle %d, disable %d\n", private->toggleFeedback, private->disableFeedback);
-
+	}
+	printf("[evremote2 ufs922] Toggle = %d, disable feedback = %d\n", private->toggleFeedback, private->disableFeedback);
 	if (argc >= 4)
 	{
 		cLongKeyPressSupport.period = atoi(argv[3]);
 	}
-
 	if (argc >= 5)
 	{
 		cLongKeyPressSupport.delay = atoi(argv[4]);
 	}
-
-	printf("period %d, delay %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
-
+	printf("[evremote2 ufs922] Period = %d, delay = %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
 	if (private->toggleFeedback)
 	{
 		struct micom_ioctl_data vfd_data;
@@ -161,89 +160,14 @@ static int pInit(Context_t *context, int argc, char *argv[])
 		ioctl(ioctl_fd, VFDSETLED, &vfd_data);
 		close(ioctl_fd);
 	}
-
 	return vFd;
-}
-
-
-static int pRead(Context_t *context)
-{
-	unsigned char   vData[cUFS922CommandLen];
-	eKeyType        vKeyType = RemoteControl;
-	int             vCurrentCode = -1;
-
-	/*    printf("%s >\n", __func__); */
-
-	while (1)
-	{
-//		int i;
-		read(context->fd, vData, cUFS922CommandLen);
-
-		if (vData[0] == 0xD2)
-			vKeyType = RemoteControl;
-		else if (vData[0] == 0xD1)
-			vKeyType = FrontPanel;
-		else
-			continue;
-
-		if (vKeyType == RemoteControl)
-		{
-			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData[1]);
-		}
-		else
-		{
-			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->Frontpanel, vData[1]);
-		}
-
-		if (vCurrentCode != 0)
-		{
-			unsigned int vNextKey = vData[4];
-			vCurrentCode += (vNextKey << 16);
-			break;
-		}
-	}
-
-	/*    printf("%s <\n", __func__);*/
-
-	return vCurrentCode;
-}
-
-static int pNotification(Context_t *context, const int cOn)
-{
-	int 	            ioctl_fd = -1;
-	struct micom_ioctl_data vfd_data;
-	tUFS922Private         *private = (tUFS922Private *)((RemoteControl_t *)context->r)->private;
-
-	if (private->disableFeedback)
-		return 0;
-
-	if (cOn)
-	{
-		ioctl_fd = open("/dev/vfd", O_RDONLY);
-		vfd_data.u.led.led_nr = 6;
-		vfd_data.u.led.on = !private->toggleFeedback;
-		ioctl(ioctl_fd, VFDSETLED, &vfd_data);
-		close(ioctl_fd);
-	}
-	else
-	{
-		usleep(100000);
-		ioctl_fd = open("/dev/vfd", O_RDONLY);
-		vfd_data.u.led.led_nr = 6;
-		vfd_data.u.led.on = private->toggleFeedback;
-		ioctl(ioctl_fd, VFDSETLED, &vfd_data);
-		close(ioctl_fd);
-	}
-
-	return 0;
 }
 
 static int pShutdown(Context_t *context)
 {
-	tUFS922Private         *private = (tUFS922Private *)((RemoteControl_t *)context->r)->private;
+	tUFS922Private *private = (tUFS922Private *)context->r->private;
 
 	close(context->fd);
-
 	if (private->toggleFeedback)
 	{
 		struct micom_ioctl_data vfd_data;
@@ -254,9 +178,75 @@ static int pShutdown(Context_t *context)
 		ioctl(ioctl_fd, VFDSETLED, &vfd_data);
 		close(ioctl_fd);
 	}
-
 	free(private);
+	return 0;
+}
 
+static int pRead(Context_t *context)
+{
+	unsigned char vData[cUFS922CommandLen];
+	eKeyType vKeyType = RemoteControl;
+	int vCurrentCode = -1;
+
+//	printf("%s >\n", __func__);
+	while (1)
+	{
+		read(context->fd, vData, cUFS922CommandLen);
+
+		if (vData[0] == 0xD2)
+		{
+			vKeyType = RemoteControl;
+		}
+		else if (vData[0] == 0xD1)
+		{
+			vKeyType = FrontPanel;
+		}
+		else
+		{
+			continue;
+		}
+		if (vKeyType == RemoteControl)
+		{
+			vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[1]);
+		}
+		else
+		{
+			vCurrentCode = getInternalCodeHex(context->r->Frontpanel, vData[1]);
+		}
+		if (vCurrentCode != 0)
+		{
+			unsigned int vNextKey = vData[4];
+			vCurrentCode += (vNextKey << 16);
+			break;
+		}
+	}
+//	printf("%s <\n", __func__);
+	return vCurrentCode;
+}
+
+static int pNotification(Context_t *context, const int cOn)
+{
+	int ioctl_fd = -1;
+	struct micom_ioctl_data vfd_data;
+	tUFS922Private *private = (tUFS922Private *)((RemoteControl_t *)context->r)->private;
+
+	if (private->disableFeedback)
+	{
+		return 0;
+	}
+	vfd_data.u.led.led_nr = 6;
+	if (cOn)
+	{
+		vfd_data.u.led.on = !private->toggleFeedback;
+	}
+	else
+	{
+		usleep(100000);
+		vfd_data.u.led.on = private->toggleFeedback;
+	}
+	ioctl_fd = open("/dev/vfd", O_RDONLY);
+	ioctl(ioctl_fd, VFDSETLED, &vfd_data);
+	close(ioctl_fd);
 	return 0;
 }
 
@@ -264,13 +254,19 @@ RemoteControl_t UFS922_RC =
 {
 	"Kathrein UFS922 RemoteControl",
 	Ufs922,
-	&pInit,
-	&pShutdown,
-	&pRead,
-	&pNotification,
 	cButtonUFS922,
 	cButtonUFS922Frontpanel,
 	NULL,
 	1,
-	&cLongKeyPressSupport,
+	&cLongKeyPressSupport
 };
+
+BoxRoutines_t UFS922_BR =
+{
+	&pInit,
+	&pShutdown,
+	&pRead,
+	&pNotification
+};
+// vim:ts=4
+

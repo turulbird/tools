@@ -78,8 +78,8 @@ static tButton cButtonsHomecast5101[] =
 /* fixme: move this to a structure and
  * use the private structure of RemoteControl_t
  */
-static struct sockaddr_un  vAddr;
-//static int                 vPanel;
+static struct sockaddr_un vAddr;
+
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
@@ -100,7 +100,6 @@ static int pInit(Context_t *context, int argc, char *argv[])
 		perror("connect");
 		return -1;
 	}
-
 	return vHandle;
 }
 
@@ -112,34 +111,33 @@ static int pShutdown(Context_t *context)
 
 static int pRead(Context_t *context)
 {
-	char                vBuffer[128];
-	char                vData[10];
-	const int           cSize         = 128;
-	int                 vCurrentCode  = -1;
+	char vBuffer[128];
+	char vData[10];
+	const int cSize = 128;
+	int vCurrentCode = -1;
 
-	//wait for new command
+	// wait for new command
 	read(context->fd, vBuffer, cSize);
-
-	//parse and send key event
+	// parse and send key event
 	vData[0] = vBuffer[17];
 	vData[1] = vBuffer[18];
 	vData[2] = '\0';
 
 	//prell, we could detect a long press here if we want
 	if (atoi(vData) % 3 != 0)
+	{
 		return -1;
-
+	}
 	vData[0] = vBuffer[14];
 	vData[1] = vBuffer[15];
 	vData[2] = '\0';
-
-	vCurrentCode = getInternalCode((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData);
-
+	vCurrentCode = getInternalCode(context->r->RemoteControl, vData);
 	return vCurrentCode;
 }
 
 static int pNotification(Context_t *context, const int cOn)
 {
+	/* noop: is handled from fp itself */
 	return 0;
 }
 
@@ -147,13 +145,19 @@ RemoteControl_t Hs5101_RC =
 {
 	"Homecast5101 RemoteControl",
 	Hs5101,
-	&pInit,
-	&pShutdown,
-	&pRead,
-	&pNotification,
 	cButtonsHomecast5101,
 	NULL,
 	NULL,
 	0,
 	NULL,
 };
+
+BoxRoutines_t Hs5101_BR =
+{
+	&pInit,
+	&pShutdown,
+	&pRead,
+	&pNotification
+};
+// vim:ts=4
+

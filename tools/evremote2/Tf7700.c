@@ -42,12 +42,12 @@
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
-	10, 110,
+	10, 110
 };
 
 static tButton cButtonsTopfield7700HDPVR[] =
 {
-	{"STANDBY"        , "0A", KEY_POWER}, //This is the real power key, but sometimes we only get 0x0C FP
+	{"STANDBY"        , "0A", KEY_POWER}, // This is the real power key, but sometimes we only get 0x0C FP
 	{"MUTE"           , "0C", KEY_MUTE},
 
 	{"V.FORMAT"       , "42", KEY_ZOOM},
@@ -66,7 +66,7 @@ static tButton cButtonsTopfield7700HDPVR[] =
 	{"9BUTTON"        , "19", KEY_9},
 
 	{"BACK"           , "1E", KEY_BACK},
-	{"INFO"           , "1D", KEY_HELP}, //THIS IS WRONG SHOULD BE KEY_INFO
+	{"INFO"           , "1D", KEY_HELP},  // THIS IS WRONG, SHOULD BE KEY_INFO
 	{"AUDIO"          , "05", KEY_LANGUAGE},
 	{"SUBTITLE"       , "07", KEY_SUBTITLE},
 	{"TEXT"           , "47", KEY_TEXT},
@@ -98,7 +98,7 @@ static tButton cButtonsTopfield7700HDPVR[] =
 	{"STEPBACK"       , "50", KEY_PREVIOUS},
 	{"STEPFORWARD"    , "52", KEY_NEXT},
 	{"MARK"           , "4C", KEY_OPTION},
-	{"TV/RADIO"       , "04", KEY_TV2}, //WE USE TV2 AS TV/RADIO SWITCH BUTTON
+	{"TV/RADIO"       , "04", KEY_TV2},  // WE USE TV2 AS TV/RADIO SWITCH BUTTON
 	{"USB"            , "40", KEY_ARCHIVE},
 	{"TIMER"          , "44", KEY_TIME},
 	{""               , ""  , KEY_NULL},
@@ -118,91 +118,87 @@ static tButton cButtonsTopfield7700HDPVRFrontpanel[] =
 	{""               , ""  , KEY_NULL},
 };
 
+static int gNextKey = 0;
+
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
-
-	int vFd              = open("/dev/rc", O_RDWR);
+	int vFd = open("/dev/rc", O_RDWR);
 
 	if (argc >= 2)
 	{
 		cLongKeyPressSupport.period = atoi(argv[1]);
 	}
-
 	if (argc >= 3)
 	{
 		cLongKeyPressSupport.delay = atoi(argv[2]);
 	}
-
-	printf("period %d, delay %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
-
+	printf("[evremote2 tf7700] Period = %d, delay = %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
 	return vFd;
 }
 
 static int pShutdown(Context_t *context)
 {
-
 	close(context->fd);
-
 	return 0;
 }
 
-static int gNextKey = 0;
-
 static int pRead(Context_t *context)
 {
-
 	unsigned char vData[3];
-	const int     cSize            = 3;
-	eKeyType      vKeyType         = RemoteControl;
-	int           vCurrentCode     = -1;
-	unsigned char vIsBurst         = 0;
-	//WORKAROUND: Power does not have burst flag
+	const int cSize = 3;
+	eKeyType vKeyType = RemoteControl;
+	int vCurrentCode = -1;
+	unsigned char vIsBurst = 0;
+	// WORKAROUND: Power does not have burst flag
 	static unsigned char sWasLastKeyPower = 0;
 
 	// wait for new command
 	read(context->fd, vData, cSize);
 
-	//printf("---> 0x%02X 0x%02X\n", vData[0], vData[1]);
+//	printf("[evremote2 tf7700] ---> 0x%02X 0x%02X\n", vData[0], vData[1]);
 	if (vData[0] == 0x61)
+	{
 		vKeyType = RemoteControl;
+	}
 	else if (vData[0] == 0x51)
+	{
 		vKeyType = FrontPanel;
-	else //Control Sequence
+	}
+	else  // Control Sequence
+	{
 		return -1;
-
+	}
 	vIsBurst = ((vData[1] & 0x80) == 0x80) ? 1 : 0;
 	vData[1] = vData[1] & 0x7f;
-
 	if (vKeyType == RemoteControl)
-		vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData[1]);
+	{
+		vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[1]);
+	}
 	else
-		vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->Frontpanel, vData[1]);
-
+	{
+		vCurrentCode = getInternalCodeHex(context->r->Frontpanel, vData[1]);
+	}
 	// We have a problem here, the power key has no burst flag, so a quick hack would be to always
-	// say its burst. this is not noce and hopefully nobody will notice
+	// say its burst. this is not nice and hopefully nobody will notice
 	if ((vKeyType == FrontPanel) && (vData[1] == 0x0C) && sWasLastKeyPower)
+	{
 		vIsBurst = 1;
-
+	}
 	sWasLastKeyPower = ((vKeyType == FrontPanel) && (vData[1] == 0x0C)) ? 1 : 0;
-
-	//printf("vIsBurst=%d Key=0x%02x\n", vIsBurst, vCurrentCode);
-
+//	printf("[evremote2 tf7700] vIsBurst=%d Key=0x%02x\n", vIsBurst, vCurrentCode);
 	if (vIsBurst == 0) // new key
 	{
 		gNextKey++;
 		gNextKey %= 20;
 	}
-
 	vCurrentCode += (gNextKey << 16);
-
 	return vCurrentCode;
 }
 
 static int pNotification(Context_t *context, const int cOn)
 {
-
-	//Notification is handeld by the frontpanel
+	//Notification is handled by the frontpanel
 	return 0;
 }
 
@@ -210,13 +206,19 @@ RemoteControl_t Tf7700_RC =
 {
 	"Tf7700 RemoteControl",
 	Tf7700,
-	&pInit,
-	&pShutdown,
-	&pRead,
-	&pNotification,
 	cButtonsTopfield7700HDPVR,
 	cButtonsTopfield7700HDPVRFrontpanel,
 	NULL,
 	1,
-	&cLongKeyPressSupport,
+	&cLongKeyPressSupport
 };
+
+BoxRoutines_t Tf7700_BR =
+{
+	&pInit,
+	&pShutdown,
+	&pRead,
+	&pNotification
+};
+// vim:ts=4
+

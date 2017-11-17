@@ -45,15 +45,15 @@
 
 typedef struct
 {
-	int          toggleFeedback;
-	int          disableFeedback;
+	int toggleFeedback;
+	int disableFeedback;
 } tUFC960Private;
 
 /* ***************** our key assignment **************** */
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
-	10, 120,
+	10, 120
 };
 
 static tButton cButtonUFC960[] =
@@ -67,7 +67,7 @@ static tButton cButtonUFC960[] =
 	{"BLUE"           , "70", KEY_BLUE},
 	{"EXIT"           , "55", KEY_HOME},
 	{"TEXT"           , "3C", KEY_TEXT},
-//  {"EPG"            , "4C", KEY_EPG},
+//	{"EPG"            , "4C", KEY_EPG},
 	{"EPG"            , "CC", KEY_EPG},
 	{"REWIND"         , "21", KEY_REWIND},
 	{"FASTFORWARD"    , "20", KEY_FASTFORWARD},
@@ -81,7 +81,7 @@ static tButton cButtonUFC960[] =
 	{"CHANNELDOWN"    , "1F", KEY_PAGEDOWN},
 	{"VOLUMEUP"       , "10", KEY_VOLUMEUP},
 	{"VOLUMEDOWN"     , "11", KEY_VOLUMEDOWN},
-	{"INFO"           , "0F", KEY_HELP}, //THIS IS WRONG SHOULD BE KEY_INFO
+	{"INFO"           , "0F", KEY_HELP},  // THIS IS WRONG, SHOULD BE KEY_INFO
 	{"OK"             , "5C", KEY_OK},
 	{"UP"             , "58", KEY_UP},
 	{"RIGHT"          , "5B", KEY_RIGHT},
@@ -106,9 +106,9 @@ static tButton cButtonUFC960Frontpanel[] =
 {
 	{"FP_MENU"		, "80", KEY_MENU},
 	{"FP_EXIT"		, "0D", KEY_HOME},
-	/*	{"FP_AUX"		, 0x20, ???},
-		{"FP_TV_R"		, 0x08, ???},
-	*/
+/*	{"FP_AUX"		, 0x20, ???},
+	{"FP_TV_R"		, 0x08, ???},
+*/
 	{"FP_OK"		, "04", KEY_OK},
 	{"FP_WHEEL_LEFT"	, "0F", KEY_UP},
 	{"FP_WHEEL_RIGHT"	, "0E", KEY_DOWN},
@@ -120,127 +120,52 @@ static int pInit(Context_t *context, int argc, char *argv[])
 {
 	int vFd;
 	tUFC960Private *private = malloc(sizeof(tUFC960Private));
+	struct micom_ioctl_data vfd_data;
+	int ioctl_fd;
 
-	((RemoteControl_t *)context->r)->private = private;
-
+	context->r->private = private;
 	vFd = open(rcDeviceName, O_RDWR);
-
 	memset(private, 0, sizeof(tUFC960Private));
-
 	if (argc >= 2)
+	{
 		private->toggleFeedback = atoi(argv[1]);
+	}
 	else
+	{
 		private->toggleFeedback = 0;
-
+	}
 	if (argc >= 3)
+	{
 		private->disableFeedback = atoi(argv[2]);
+	}
 	else
+	{
 		private->disableFeedback = 0;
-
-	printf("toggle %d, disable %d\n", private->toggleFeedback, private->disableFeedback);
-
+	}
+	printf("[evremote2 ufc960] Toggle = %d, disable feedback = %d\n", private->toggleFeedback, private->disableFeedback);
 	if (argc >= 4)
 	{
 		cLongKeyPressSupport.period = atoi(argv[3]);
 	}
-
 	if (argc >= 5)
 	{
 		cLongKeyPressSupport.delay = atoi(argv[4]);
 	}
-
-	printf("period %d, delay %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
-
+	printf("[evremote2 ufc960] Period = %d, delay = %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
 	if (private->toggleFeedback)
 	{
-		struct micom_ioctl_data vfd_data;
-		int ioctl_fd = open("/dev/vfd", O_RDONLY);
-
+		ioctl_fd = open("/dev/vfd", O_RDONLY);
 		vfd_data.u.led.led_nr = 6;
 		vfd_data.u.led.on = 1;
 		ioctl(ioctl_fd, VFDSETLED, &vfd_data);
 		close(ioctl_fd);
 	}
-
 	return vFd;
-}
-
-
-static int pRead(Context_t *context)
-{
-	unsigned char   vData[cUFC960CommandLen];
-	eKeyType        vKeyType = RemoteControl;
-	int             vCurrentCode = -1;
-
-	/*    printf("%s >\n", __func__); */
-
-	while (1)
-	{
-//		int i;
-		read(context->fd, vData, cUFC960CommandLen);
-
-		if (vData[0] == 0xD2)
-			vKeyType = RemoteControl;
-		else if (vData[0] == 0xD1)
-			vKeyType = FrontPanel;
-		else
-			continue;
-
-		if (vKeyType == RemoteControl)
-		{
-			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData[1]);
-		}
-		else
-		{
-			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->Frontpanel, vData[1]);
-		}
-
-		if (vCurrentCode != 0)
-		{
-			unsigned int vNextKey = vData[4];
-			vCurrentCode += (vNextKey << 16);
-			break;
-		}
-	}
-
-	/*    printf("%s <\n", __func__);*/
-
-	return vCurrentCode;
-}
-
-static int pNotification(Context_t *context, const int cOn)
-{
-	int 	            ioctl_fd = -1;
-	struct micom_ioctl_data vfd_data;
-	tUFC960Private         *private = (tUFC960Private *)((RemoteControl_t *)context->r)->private;
-
-	if (private->disableFeedback)
-		return 0;
-
-	if (cOn)
-	{
-		ioctl_fd = open("/dev/vfd", O_RDONLY);
-		vfd_data.u.led.led_nr = 6;
-		vfd_data.u.led.on = !private->toggleFeedback;
-		ioctl(ioctl_fd, VFDSETLED, &vfd_data);
-		close(ioctl_fd);
-	}
-	else
-	{
-		usleep(100000);
-		ioctl_fd = open("/dev/vfd", O_RDONLY);
-		vfd_data.u.led.led_nr = 6;
-		vfd_data.u.led.on = private->toggleFeedback;
-		ioctl(ioctl_fd, VFDSETLED, &vfd_data);
-		close(ioctl_fd);
-	}
-
-	return 0;
 }
 
 static int pShutdown(Context_t *context)
 {
-	tUFC960Private         *private = (tUFC960Private *)((RemoteControl_t *)context->r)->private;
+	tUFC960Private *private = (tUFC960Private *)context->r->private;
 
 	close(context->fd);
 
@@ -254,9 +179,74 @@ static int pShutdown(Context_t *context)
 		ioctl(ioctl_fd, VFDSETLED, &vfd_data);
 		close(ioctl_fd);
 	}
-
 	free(private);
+	return 0;
+}
 
+static int pRead(Context_t *context)
+{
+	unsigned char vData[cUFC960CommandLen];
+	eKeyType vKeyType = RemoteControl;
+	int vCurrentCode = -1;
+
+//	printf("%s >\n", __func__);
+	while (1)
+	{
+		read(context->fd, vData, cUFC960CommandLen);
+		if (vData[0] == 0xD2)
+		{
+			vKeyType = RemoteControl;
+		}
+		else if (vData[0] == 0xD1)
+		{
+			vKeyType = FrontPanel;
+		}
+		else
+		{
+			continue;
+		}
+		if (vKeyType == RemoteControl)
+		{
+			vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[1]);
+		}
+		else
+		{
+			vCurrentCode = getInternalCodeHex(context->r->Frontpanel, vData[1]);
+		}
+		if (vCurrentCode != 0)
+		{
+			unsigned int vNextKey = vData[4];
+			vCurrentCode += (vNextKey << 16);
+			break;
+		}
+	}
+//	printf("%s <\n", __func__);
+	return vCurrentCode;
+}
+
+static int pNotification(Context_t *context, const int cOn)
+{
+	int ioctl_fd = -1;
+	struct micom_ioctl_data vfd_data;
+	tUFC960Private *private = (tUFC960Private *)context->r->private;
+
+	if (private->disableFeedback)
+	{
+		return 0;
+	}
+	vfd_data.u.led.led_nr = 6;
+	if (cOn)
+	{
+		vfd_data.u.led.on = !private->toggleFeedback;
+	}
+	else
+	{
+		usleep(100000);
+		vfd_data.u.led.on = private->toggleFeedback;
+	}
+	ioctl_fd = open("/dev/vfd", O_RDONLY);
+	ioctl(ioctl_fd, VFDSETLED, &vfd_data);
+	close(ioctl_fd);
 	return 0;
 }
 
@@ -264,13 +254,19 @@ RemoteControl_t UFC960_RC =
 {
 	"Kathrein UFC960 RemoteControl",
 	Ufc960,
-	&pInit,
-	&pShutdown,
-	&pRead,
-	&pNotification,
 	cButtonUFC960,
 	cButtonUFC960Frontpanel,
 	NULL,
 	1,
-	&cLongKeyPressSupport,
+	&cLongKeyPressSupport
 };
+
+BoxRoutines_t UFC960_BR =
+{
+	&pInit,
+	&pShutdown,
+	&pRead,
+	&pNotification
+};
+// vim:ts=4
+

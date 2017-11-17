@@ -41,7 +41,7 @@
 /* ***************** some constants **************** */
 
 #define rcDeviceName "/dev/rc"
-#define cCNBOXDataLen    128
+#define cCNBOXDataLen 128
 
 typedef struct
 {
@@ -51,7 +51,7 @@ typedef struct
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
-	10, 140,
+	10, 140
 };
 
 static tButton cButtonCnbox[] =
@@ -70,7 +70,7 @@ static tButton cButtonCnbox[] =
 	{"REWIND"         , "1E", KEY_REWIND},
 	{"FASTFORWARD"    , "01", KEY_FASTFORWARD},
 	{"PLAY"           , "12", KEY_PLAY},
-//    {"PAUSE"          , "", KEY_PAUSE},
+//	{"PAUSE"          , ""  , KEY_PAUSE},
 	{"RECORD"         , "1C", KEY_RECORD},
 	{"STOP"           , "10", KEY_STOP},
 	{"POWER"          , "5F", KEY_POWER},
@@ -134,12 +134,9 @@ static int pInit(Context_t *context, int argc, char *argv[])
 	int vFd;
 	tCNBOXPrivate *private = malloc(sizeof(tCNBOXPrivate));
 
-	((RemoteControl_t *)context->r)->private = private;
-
+	context->r->private = private;
 	memset(private, 0, sizeof(tCNBOXPrivate));
-
 	vFd = open(rcDeviceName, O_RDWR);
-
 	if (argc >= 2)
 	{
 		cLongKeyPressSupport.period = atoi(argv[1]);
@@ -149,54 +146,46 @@ static int pInit(Context_t *context, int argc, char *argv[])
 	{
 		cLongKeyPressSupport.delay = atoi(argv[2]);
 	}
-
-	printf("period %d, delay %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
-
+	printf("[evremote2 cnbox] Period = %d, delay = %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
 	return vFd;
 }
 
-
 static int pRead(Context_t *context)
 {
-	unsigned char   vData[cCNBOXDataLen];
-	eKeyType        vKeyType = RemoteControl;
-	int             vCurrentCode = -1;
-	static   int    vNextKey = 0;
-	static   char   vOldButton = 0;
+	unsigned char vData[cCNBOXDataLen];
+	eKeyType vKeyType = RemoteControl;
+	int vCurrentCode = -1;
+	static int vNextKey = 0;
+	static char vOldButton = 0;
 
 	while (1)
 	{
+		read(context->fd, vData, cCNBOXDataLen);
 #if 0
-		int vLoop;
-		int n =
-#endif
-			read(context->fd, vData, cCNBOXDataLen);
-
-#if 0
-		printf("(len %d): ", n);
+		printf("[evremote2 cnbox] (len %d): ", n);
 
 		for (vLoop = 0; vLoop < n; vLoop++)
-			printf("0x%02X ", vData[vLoop]);
-
+		{
+			printf("[evremote2 cnbox] 0x%02X ", vData[vLoop]);
+		}
 		printf("\n");
 #endif
-
 		if (vData[0] == 0xF1)
+		{
 			vKeyType = RemoteControl;
+		}
 		else
+		{
 			continue;
-
+		}
 		if (vKeyType == RemoteControl)
 		{
-			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData[2] & ~0x80);
-
+			vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[2] & ~0x80);
 			if (vCurrentCode != 0)
 			{
 #if 0
 				vNextKey = (vData[5] & 0x80 == 0 ? vNextKey + 1 : vNextKey) % 0x100;
-
-				/* printf("nextFlag %d\n", vNextKey);*/
-
+//				printf("[evremote2 cnbox] nextFlag %d\n", vNextKey);
 				vCurrentCode += (vNextKey << 16);
 #endif
 				break;
@@ -204,20 +193,16 @@ static int pRead(Context_t *context)
 		}
 		else
 		{
-			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->Frontpanel, vData[3]);
-
+			vCurrentCode = getInternalCodeHex(context->r->Frontpanel, vData[3]);
 			if (vCurrentCode != 0)
 			{
 				vNextKey = (vOldButton != vData[3] ? vNextKey + 1 : vNextKey) % 0x100;
-
-				/* printf("nextFlag %d\n", vNextKey);*/
-
+//				printf("[evremote2 cnbox] nextFlag %d\n", vNextKey);
 				vCurrentCode += (vNextKey << 16);
 				break;
 			}
 		}
 	} /* for later use we make a dummy while loop here */
-
 	return vCurrentCode;
 }
 
@@ -233,7 +218,6 @@ static int pShutdown(Context_t *context)
 
 	close(context->fd);
 	free(private);
-
 	return 0;
 }
 
@@ -241,13 +225,19 @@ RemoteControl_t CNBOX_RC =
 {
 	"Crenova Remote2 RemoteControl",
 	CNBox,
-	&pInit,
-	&pShutdown,
-	&pRead,
-	&pNotification,
 	cButtonCnbox,
 	cButtonCnboxFrontpanel,
 	NULL,
 	1,
-	&cLongKeyPressSupport,
+	&cLongKeyPressSupport
 };
+
+BoxRoutines_t CNBOX_BR =
+{
+	&pInit,
+	&pShutdown,
+	&pRead,
+	&pNotification
+};
+// vim:ts=4
+

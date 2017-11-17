@@ -1,7 +1,7 @@
 #ifndef __adb_box__
 #define __adb_box__
 
-#define VFDICONDISPLAYONOFF		0xc0425a0a
+#define VFDICONDISPLAYONOFF 0xc0425a0a
 
 /* this setups the mode temporarily (for one ioctl)
  * to the desired mode. currently the "normal" mode
@@ -57,6 +57,6 @@ struct adb_box_ioctl_data
 		struct set_time_s time;
 	} u;
 };
-
-
 #endif
+// vim:ts=4
+

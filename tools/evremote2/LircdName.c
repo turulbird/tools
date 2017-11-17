@@ -40,57 +40,13 @@
 #include "map.h"
 #include "remotes.h"
 
-#define REPEATDELAY 130 // ms
-#define REPEATFREQ 20 // ms
+#define REPEATDELAY 130  // ms
+#define REPEATFREQ 20  // ms
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
-	REPEATDELAY, REPEATFREQ /*delay, period*/
+	REPEATDELAY, REPEATFREQ  // delay, period
 };
-
-static long long GetNow(void)
-{
-#define MIN_RESOLUTION 1 // ms
-	static bool initialized = false;
-	static bool monotonic = false;
-	struct timespec tp;
-
-	if (!initialized)
-	{
-		// check if monotonic timer is available and provides enough accurate resolution:
-		if (clock_getres(CLOCK_MONOTONIC, &tp) == 0)
-		{
-			//long Resolution = tp.tv_nsec;
-			// require a minimum resolution:
-			if (tp.tv_sec == 0 && tp.tv_nsec <= MIN_RESOLUTION * 1000000)
-			{
-				if (clock_gettime(CLOCK_MONOTONIC, &tp) == 0)
-				{
-					monotonic = true;
-				}
-			}
-		}
-
-		initialized = true;
-	}
-
-	if (monotonic)
-	{
-		if (clock_gettime(CLOCK_MONOTONIC, &tp) == 0)
-			return (long long)(tp.tv_sec) * 1000 + tp.tv_nsec / 1000000;
-
-		monotonic = false;
-		// fall back to gettimeofday()
-	}
-
-	struct timeval t;
-
-	if (gettimeofday(&t, NULL) == 0)
-		return (long long)(t.tv_sec) * 1000 + t.tv_usec / 1000;
-
-	return 0;
-}
-
 
 /* Key is recognized by name of it in lircd.conf */
 static tButton cButtons_LircdName[] =
@@ -220,16 +176,21 @@ static tButton cButtons_LircdName[] =
 
 	{"KEY_TWEN"         , "=>", KEY_TWEN},
 	{"KEY_BREAK"        , "=>", KEY_BREAK},
-	{"KEY_PLAYPAUSE"    , "=>"  , KEY_PLAYPAUSE},
+	{"KEY_PLAYPAUSE"    , "=>", KEY_PLAYPAUSE},
 	{"KEY_EXIT"         , "=>", KEY_EXIT},
 	{"KEY_SLEEP"        , "=>", KEY_SLEEP},
 	{"KEY_OPEN"         , "=>", KEY_OPEN},
+	{"KEY_POWERON"      , "=>", KEY_POWERON},
+	{"KEY_POWEROFF"     , "=>", KEY_POWEROFF},
+	{"KEY_STANDBYON"    , "=>", KEY_STANDBYON},
+	{"KEY_STANDBYOFF"   , "=>", KEY_STANDBYOFF},
 	{""                 , ""  , KEY_NULL},
 };
+
 /* fixme: move this to a structure and
  * use the private structure of RemoteControl_t
  */
-static struct sockaddr_un  vAddr;
+static struct sockaddr_un vAddr;
 
 static int LastKeyCode = -1;
 static char LastKeyName[30];
@@ -238,105 +199,136 @@ static int LircdBtnDelay = REPEATDELAY;
 static int KeyPowerCounter = 0;
 static int BlinkingIcon = -1;
 
+
+static long long GetNow(void)
+{
+#define MIN_RESOLUTION 1  // ms
+	static bool initialized = false;
+	static bool monotonic = false;
+	struct timespec tp;
+	struct timeval t;
+
+	if (!initialized)
+	{
+		// check if monotonic timer is available and provides enough accurate resolution:
+		if (clock_getres(CLOCK_MONOTONIC, &tp) == 0)
+		{
+			//long Resolution = tp.tv_nsec;
+			// require a minimum resolution:
+			if (tp.tv_sec == 0 && tp.tv_nsec <= MIN_RESOLUTION * 1000000)
+			{
+				if (clock_gettime(CLOCK_MONOTONIC, &tp) == 0)
+				{
+					monotonic = true;
+				}
+			}
+		}
+		initialized = true;
+	}
+	if (monotonic)
+	{
+		if (clock_gettime(CLOCK_MONOTONIC, &tp) == 0)
+		{
+			return (long long)(tp.tv_sec) * 1000 + tp.tv_nsec / 1000000;
+		}
+		monotonic = false;
+		// fall back to gettimeofday()
+	}
+	if (gettimeofday(&t, NULL) == 0)
+	{
+		return (long long)(t.tv_sec) * 1000 + t.tv_usec / 1000;
+	}
+	return 0;
+}
+
 static int pInit(Context_t *context, int argc, char *argv[])
 {
 	int vHandle;
 
 	vAddr.sun_family = AF_UNIX;
-
 	if (argc >= 4)
+	{
 		LircdBtnDelay = (atoi(argv[3]) == 0) ? REPEATDELAY : atoi(argv[3]);
+	}
 	if (argc >= 5)
 	{
 		BlinkingIcon = (atoi(argv[4]) == 0) ? 0 : atoi(argv[4]);
-		printf("[LircdName RCU] init delay %d ms, blinking ICON %i\n", LircdBtnDelay, BlinkingIcon);
+		printf("[evremote2 LircdName] Init delay = %d ms, feedback ICON: %i\n", LircdBtnDelay, BlinkingIcon);
 	}
 	else
-		printf("[LircdName RCU] init delay %d ms\n", LircdBtnDelay);
-
+	{
+		printf("[evremote2 LircdName] Init delay = %d ms\n", LircdBtnDelay);
+	}
 	// in new lircd its moved to /var/run/lirc/lircd by default and need use key to run as old version
 	if (access("/var/run/lirc/lircd", F_OK) == 0)
+	{
 		strcpy(vAddr.sun_path, "/var/run/lirc/lircd");
+	}
 	else
 	{
 		strcpy(vAddr.sun_path, "/dev/lircd");
 	}
-
 	vHandle = socket(AF_UNIX, SOCK_STREAM, 0);
-
 	if (vHandle == -1)
 	{
 		perror("socket");
 		return -1;
 	}
-
 	if (connect(vHandle, (struct sockaddr *)&vAddr, sizeof(vAddr)) == -1)
 	{
 		perror("connect");
 		return -1;
 	}
-
 	return vHandle;
 }
 
 static int pShutdown(Context_t *context)
 {
-
 	close(context->fd);
-
 	return 0;
 }
 
 static int pRead(Context_t *context)
 {
 	char vBuffer[128];
-//	char vData[3];
 	const int cSize = 128;
 	int vCurrentCode = -1;
-//	char *buffer;
-	char KeyName[30]; 	//For flexibility we use Lircd keys names
-	int LastKeyNameChar;	//for long detection on RCU sending different codes for short/long
+	char KeyName[30];  // For flexibility we use Lircd keys names
+	int LastKeyNameChar;  // for long detection on RCU sending different codes for short/long
 	int count;
 	tButton *cButtons = cButtons_LircdName;
 
-//	long long LastTime;
-
 	memset(vBuffer, 0, 128);
-
-	//wait for new command
+	// wait for new command
 	read(context->fd, vBuffer, cSize);
-
 	if (sscanf(vBuffer, "%*x %x %29s", &count, KeyName) != 2)  // '29' in '%29s' is LIRC_KEY_BUF-1!
 	{
-		printf("[LircdName RCU] Warning: unparseable lirc command: %s\n", vBuffer);
+		printf("[evremote2 LircdName] Warning: unparseable lirc command: %s\n", vBuffer);
 		return -1;
 	}
-
-	//some RCUs send different codes for single click and long push. This breakes e2 LONG detection, because lircd counter starts from beginning
-	//workarround is to define names for long codes ending '&' in lircd.conf and using this marker to copunt data correctly
+	// some RCUs send different codes for single click and long push. This breakes e2 LONG detection, because lircd counter starts from beginning
+	// workarround is to define names for long codes ending '&' in lircd.conf and using this marker to copunt data correctly
 	LastKeyNameChar = strlen(KeyName) - 1;
-	if (KeyName[LastKeyNameChar] == 0x26) //&
+	if (KeyName[LastKeyNameChar] == 0x26)  // &
 	{
-		//printf("[LircdName RCU] LONG detected\n");
+		//printf("[evremote2 LircdName] LONG detected\n");
 		count += 1;
 		KeyName[LastKeyNameChar] = 0;
 	}
-
 	vCurrentCode = getInternalCodeLircKeyName(cButtons, KeyName);
-
 	if (vCurrentCode != 0)
 	{
 		static int nextflag = 0;
 		if (count == 0)
 		{
-			//Emergency reboot after 5xPOWER, we count only presses within 2 seconds, not lONGs
+			// Emergency reboot after 5 times POWER, we count only presses within 2 seconds, not lONGs
 			if (!strncasecmp(LastKeyName, "KEY_POWER", 9) && !strncasecmp(KeyName, "KEY_POWER", 9)  && (GetNow() - LastKeyPressedTime < 2000))
 			{
 				KeyPowerCounter += 1;
-				printf("[LircdName RCU] KEY_POWER pressed %d time(s)\n", KeyPowerCounter);
+				printf("[evremote2 LircdName] KEY_POWER pressed %d time(s)\n", KeyPowerCounter);
 				if (KeyPowerCounter >= 5)
 				{
-					printf("[LircdName RCU] EMERGENCY REBOOT !!!\n");
+					printf("[evremote2 LircdName] EMERGENCY REBOOT !!!\n");
 					fflush(stdout);
 					system("init 6");
 					sleep(4);
@@ -345,69 +337,67 @@ static int pRead(Context_t *context)
 				}
 			}
 			else
+			{
 				KeyPowerCounter = 0;
-			//time checking
+			}
+			// time checking
 			if ((LastKeyCode == vCurrentCode) && (GetNow() - LastKeyPressedTime < LircdBtnDelay))   // (diffMilli(LastKeyPressedTime, CurrKeyPressedTime) <= REPEATDELAY) )
 			{
-				printf("[LircdName RCU] skiping next press of same key coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
+				printf("[evremote2 LircdName] Skipping next press of same key coming in too fast (%lld ms)\n", GetNow() - LastKeyPressedTime);
 				return -1;
 			}
 			else if (GetNow() - LastKeyPressedTime < LircdBtnDelay)
 			{
-				printf("[LircdName RCU] skiping different keys coming in too fast %lld ms\n", GetNow() - LastKeyPressedTime);
+				printf("[evremote2 LircdName] Skipping different keys coming in too fast (%lld ms)\n", GetNow() - LastKeyPressedTime);
 				return -1;
 			}
 			else
 			{
-				printf("[RCU LircdName] new KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
+				printf("[evremote2 LircdName] New KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
 			}
 			nextflag++;
-
 		}
 		else
-			printf("[RCU LircdName] same KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
-
+		{
+			printf("[evremote2 LircdName] Same KeyName: '%s', after %lld ms, LastKey: '%s', count: %i -> %s\n", KeyName, GetNow() - LastKeyPressedTime, LastKeyName, count, &vBuffer[0]);
+		}
 		LastKeyCode = vCurrentCode;
 		LastKeyPressedTime = GetNow();
 		strcpy(LastKeyName, KeyName);
-
 		vCurrentCode += (nextflag << 16);
 	}
 	else
-		printf("[RCU LircdName] unknown key -> %s\n", &vBuffer[0]);
-
+	{
+		printf("[evremote2 LircdName] Unknown key: %s\n", &vBuffer[0]);
+	}
 	return vCurrentCode;
-
-
 }
 
 static int pNotification(Context_t *context, const int cOn)
 {
-	if ((BlinkingIcon == -1)) // && (cOn == 1))
-	{
-		printf("[LircdName RCU] << end\n");
-		return 0;
-	}
-
-	//printf("[LircdName RCU] ICON %i %i\n", BlinkingIcon, cOn);
-
-	int file_vfd = -1;
-	char icon = BlinkingIcon;
-
-
+	int file_vfd;
+	char icon;
 	struct
 	{
 		unsigned char start;
 		unsigned char data[64];
 		unsigned char length;
 	} data;
-
 	struct
 	{
 		int icon_nr;
 		int on;
 	} vfd_icon;
 
+	if ((BlinkingIcon == -1)) // && (cOn == 1))
+	{
+		printf("[evremote2 LircdName] Notification disabled\n");
+		return 0;
+	}
+//	printf("[evremote2 LircdName] ICON %i %i\n", BlinkingIcon, cOn);
+
+	file_vfd = -1;
+	icon = BlinkingIcon;
 	data.start = 0x00;
 	data.data[0] = icon;
 	data.data[4] = cOn;
@@ -418,7 +408,7 @@ static int pNotification(Context_t *context, const int cOn)
 
 	if ((file_vfd = open("/dev/vfd", O_RDWR)) == -1)
 	{
-		printf("[LircdName]: could not open vfd-device!\n");
+		printf("[evremote2 LircdName] Could not open vfd-device!\n");
 	}
 	else
 	{
@@ -431,15 +421,22 @@ static int pNotification(Context_t *context, const int cOn)
 
 RemoteControl_t LircdName_RC =
 {
-	"LircdName Universal RemoteControl v.1.2",
+	"LircdName Universal RemoteControl V1.2",
 	LircdName,
-	&pInit,
-	&pShutdown,
-	&pRead,
-	&pNotification,
 	cButtons_LircdName,
 	NULL,
 	NULL,
 	1,
-	&cLongKeyPressSupport,
+	&cLongKeyPressSupport
 };
+
+BoxRoutines_t LircdName_BR =
+{
+	&pInit,
+	&pShutdown,
+	&pRead,
+	&pNotification
+};
+// vim:ts=4
+
+

@@ -46,81 +46,82 @@
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
-	10, 120,
+	10, 120
 };
 
 static tButton cButtonVitaminHD5000[] =
 {
-	{"POWER"	, "5F", KEY_POWER},
-	{"OK"		, "45", KEY_OK},
-	{"LEFT"		, "41", KEY_LEFT},
-	{"RIGHT"	, "49", KEY_RIGHT},
-	{"UP"		, "18", KEY_UP},
-	{"DOWN"		, "46", KEY_DOWN},
-	{"MENU"		, "1C", KEY_MENU},
-	{"EXIT"		, "4A", KEY_EXIT},		// KEY_BACK ?
-	{"INFO"		, "1D", KEY_INFO},  		// INFO
-	{"FEED"		, "16", KEY_F11},		// FEED
-	{"RECALL"	, "14", KEY_F12},		// RECALL
-	{"FAV"		, "4C", KEY_FAVORITES},
-	{"EPG"		, "1A", KEY_EPG},
-	{"VOLUP"	, "40", KEY_VOLUMEUP},
-	{"VOLDOWN"	, "44", KEY_VOLUMEDOWN},
-	{"CHUP"		, "03", KEY_PAGEUP},
-	{"CHDOWN"	, "07", KEY_PAGEDOWN},
-	{"TVRADIO"	, "19", KEY_TV}, 		// TV/RADIO
-	{"SATLIST"	, "17", KEY_F10},		// SAT LIST
-	{"MOSAIC"	, "15", KEY_WWW},		// MOSAIC
-	{"PLAYLIST"	, "42", KEY_MEDIA},
-	{"RED"		, "09", KEY_RED},
-	{"GREEN"	, "0D", KEY_GREEN},
-	{"YELLOW"	, "00", KEY_YELLOW},
-	{"BLUE"		, "0C", KEY_BLUE},
-	{"0"		, "1B", KEY_0},
-	{"1"		, "56", KEY_1},
-	{"2"		, "5A", KEY_2},
-	{"3"		, "5E", KEY_3},
-	{"4"		, "55", KEY_4},
-	{"5"		, "59", KEY_5},
-	{"6"		, "5D", KEY_6},
-	{"7"		, "54", KEY_7},
-	{"8"		, "58", KEY_8},
-	{"9"		, "5C", KEY_9},
-	{"F1"		, "11", KEY_F1},
-	{"F2"		, "12", KEY_F2},
-	{"TV_STB"	, "5B", KEY_TV2}, 		// TV/STB
-	{"MUTE"		, "57", KEY_MUTE},
-	{"TEXT"		, "48", KEY_F8},			// TEXT
-	{"SUBTITLE"	, "01", KEY_F9},			// SUBTITLE
-	{"SIGNAL"	, "1F", KEY_F3},			// SIGNAL
-	{"CAPTURE"	, "53", KEY_F4},			// CAPTURE
-	{"BOOK_M"	, "1E", KEY_F5},			// BOOK_M
-	{"BOOK_J"	, "02", KEY_F6},			// BOOK_J
-	{"PREV"		, "05", KEY_PREVIOUS},
-	{"REW"		, "06", KEY_REWIND},
-	{"FWD"		, "0A", KEY_FASTFORWARD},
-	{"NEXT"		, "0E", KEY_NEXT},
-	{"REPEAT"	, "08", KEY_F7},			// REPEAT
-	{"PLAY"		, "50", KEY_PLAY},
-	{"STOP"		, "52", KEY_STOP},
-	{"RECORD"	, "0F", KEY_RECORD},
-	{""         , "" , KEY_NULL},
+	{"POWER"            , "5F", KEY_POWER},
+	{"OK"               , "45", KEY_OK},
+	{"LEFT"             , "41", KEY_LEFT},
+	{"RIGHT"            , "49", KEY_RIGHT},
+	{"UP"               , "18", KEY_UP},
+	{"DOWN"             , "46", KEY_DOWN},
+	{"MENU"             , "1C", KEY_MENU},
+	{"EXIT"             , "4A", KEY_EXIT},		// KEY_BACK ?
+	{"INFO"             , "1D", KEY_INFO},  	// INFO
+	{"FEED"             , "16", KEY_F11},		// FEED
+	{"RECALL"           , "14", KEY_F12},		// RECALL
+	{"FAV"              , "4C", KEY_FAVORITES},
+	{"EPG"              , "1A", KEY_EPG},
+	{"VOLUP"            , "40", KEY_VOLUMEUP},
+	{"VOLDOWN"          , "44", KEY_VOLUMEDOWN},
+	{"CHUP"             , "03", KEY_PAGEUP},
+	{"CHDOWN"           , "07", KEY_PAGEDOWN},
+	{"TVRADIO"          , "19", KEY_TV}, 		// TV/RADIO
+	{"SATLIST"          , "17", KEY_F10},		// SAT LIST
+	{"MOSAIC"           , "15", KEY_WWW},		// MOSAIC
+	{"PLAYLIST"         , "42", KEY_MEDIA},
+	{"RED"              , "09", KEY_RED},
+	{"GREEN"            , "0D", KEY_GREEN},
+	{"YELLOW"           , "00", KEY_YELLOW},
+	{"BLUE"             , "0C", KEY_BLUE},
+	{"0"                , "1B", KEY_0},
+	{"1"                , "56", KEY_1},
+	{"2"                , "5A", KEY_2},
+	{"3"                , "5E", KEY_3},
+	{"4"                , "55", KEY_4},
+	{"5"                , "59", KEY_5},
+	{"6"                , "5D", KEY_6},
+	{"7"                , "54", KEY_7},
+	{"8"                , "58", KEY_8},
+	{"9"                , "5C", KEY_9},
+	{"F1"               , "11", KEY_F1},
+	{"F2"               , "12", KEY_F2},
+	{"TV_STB"           , "5B", KEY_TV2}, 		// TV/STB
+	{"MUTE"             , "57", KEY_MUTE},
+	{"TEXT"             , "48", KEY_F8},		// TEXT
+	{"SUBTITLE"         , "01", KEY_F9},		// SUBTITLE
+	{"SIGNAL"           , "1F", KEY_F3},		// SIGNAL
+	{"CAPTURE"          , "53", KEY_F4},		// CAPTURE
+	{"BOOK_M"           , "1E", KEY_F5},		// BOOK_M
+	{"BOOK_J"           , "02", KEY_F6},		// BOOK_J
+	{"PREV"             , "05", KEY_PREVIOUS},
+	{"REW"              , "06", KEY_REWIND},
+	{"FWD"              , "0A", KEY_FASTFORWARD},
+	{"NEXT"             , "0E", KEY_NEXT},
+	{"REPEAT"           , "08", KEY_F7},		// REPEAT
+	{"PLAY"             , "50", KEY_PLAY},
+	{"STOP"             , "52", KEY_STOP},
+	{"RECORD"           , "0F", KEY_RECORD},
+	{""                 , ""  , KEY_NULL},
 };
 
 /* ***************** our fp button assignment **************** */
 
 static tButton cButtonVitaminHD5000Frontpanel[] =
 {
-	{"FRONT_LEFT"	, "05", KEY_LEFT},
-	{"FRONT_OK"		, "06", KEY_OK},
-	{"FRONT_RIGHT"	, "02", KEY_RIGHT},
-	{"FRONT_UP"		, "04", KEY_UP},
-	{"FRONT_MENU"	, "01", KEY_MENU},
-	{"FRONT_DOWN"	, "03", KEY_DOWN},
-	{"FRONT_POWER"	, "00", KEY_POWER},
+	{"FRONT_LEFT"       , "05", KEY_LEFT},
+	{"FRONT_OK"         , "06", KEY_OK},
+	{"FRONT_RIGHT"      , "02", KEY_RIGHT},
+	{"FRONT_UP"         , "04", KEY_UP},
+	{"FRONT_MENU"       , "01", KEY_MENU},
+	{"FRONT_DOWN"       , "03", KEY_DOWN},
+	{"FRONT_POWER"      , "00", KEY_POWER},
 	{""	            , ""  , KEY_NULL}
 	/* Powerkey is used as HOME EXIT Button? */
 };
+
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
@@ -131,31 +132,30 @@ static int pInit(Context_t *context, int argc, char *argv[])
 	{
 		cLongKeyPressSupport.period = atoi(argv[1]);
 	}
-
 	if (argc >= 3)
 	{
 		cLongKeyPressSupport.delay = atoi(argv[2]);
 	}
-
-	printf("period %d, delay %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
-
+	printf("[evremote2 vitamin_hd5000] Period = %d, delay = %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
 	return vFd;
 }
 
+static int pShutdown(Context_t *context)
+{
+	close(context->fd);
+	return 0;
+}
 
 static int pRead(Context_t *context)
 {
-	unsigned char   vData[cVitaminHD5000CommandLen];
-//	eKeyType        vKeyType = RemoteControl;
-	int             vCurrentCode = -1;
+	unsigned char vData[cVitaminHD5000CommandLen];
+	int vCurrentCode = -1;
 
-	//printf("%s >\n", __func__);
-
+//	printf("%s >\n", __func__);
 	while (1)
 	{
 		read(context->fd, vData, cVitaminHD5000CommandLen);
-
-		printf("[remote] read: %02X %02X %02X %02X %02X \n", vData[0], vData[1], vData[2], vData[3], vData[4]);
+		printf("[evremote2 vitamin_hd5000] Read: %02X %02X %02X %02X %02X \n", vData[0], vData[1], vData[2], vData[3], vData[4]);
 
 		/*-----------------------------------------
 		* Vitamin HD5000 Remote Control
@@ -168,8 +168,7 @@ static int pRead(Context_t *context)
 		{
 			if ((vData[1] == 0x01) && (vData[2] == 0xFE) && (vData[4] == 0x00))
 			{
-//				vKeyType = RemoteControl;
-				vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData[3]);
+				vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[3]);
 			}
 		}
 		/*-----------------------------------------
@@ -180,14 +179,12 @@ static int pRead(Context_t *context)
 		 *-----------------------------------------*/
 		else if ((vData[0] == 0x10) && (vData[2] == 0x00))
 		{
-//			vKeyType = FrontPanel;
-			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->Frontpanel, vData[1]);
+			vCurrentCode = getInternalCodeHex(context->r->Frontpanel, vData[1]);
 		}
 		else
 		{
 			continue;
 		}
-
 		if (vCurrentCode != 0)
 		{
 			unsigned int vNextKey = vData[4];
@@ -195,23 +192,13 @@ static int pRead(Context_t *context)
 			break;
 		}
 	}
-
-	printf("%s < %08X\n", __func__, vCurrentCode);
-
+//	printf("%s < %08X\n", __func__, vCurrentCode);
 	return vCurrentCode;
 }
 
 static int pNotification(Context_t *context, const int cOn)
 {
-
-	return 0;
-}
-
-static int pShutdown(Context_t *context)
-{
-
-	close(context->fd);
-
+	/* noop: is handled from fp itself */
 	return 0;
 }
 
@@ -219,14 +206,19 @@ RemoteControl_t VitaminHD5000_RC =
 {
 	"Vitamin HD5000 RemoteControl",
 	VitaminHD5000,
-	&pInit,
-	&pShutdown,
-	&pRead,
-	&pNotification,
 	cButtonVitaminHD5000,
 	cButtonVitaminHD5000Frontpanel,
 	NULL,
 	1,
-	&cLongKeyPressSupport,
+	&cLongKeyPressSupport
 };
+
+BoxRoutines_t VitaminHD5000_BR =
+{
+	&pInit,
+	&pShutdown,
+	&pRead,
+	&pNotification
+};
+// vim:ts=4
 

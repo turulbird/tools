@@ -106,6 +106,7 @@ static tButton cButtonUFS912Frontpanel[] =
 	{""			, ""  , KEY_NULL}
 };
 
+
 static int ufs912SetRemote(unsigned int code)
 {
 	#define VFDSETRCCODE 0xc0425af6
@@ -139,12 +140,10 @@ static int pInit(Context_t *context, int argc, char *argv[])
 	{
 		cLongKeyPressSupport.period = atoi(argv[1]);
 	}
-
 	if (argc >= 3)
 	{
 		cLongKeyPressSupport.delay = atoi(argv[2]);
 	}
-
 	if (!access("/etc/.rccode", F_OK))
 	{
 		char buf[10];
@@ -159,40 +158,46 @@ static int pInit(Context_t *context, int argc, char *argv[])
 				if (val > 0 && val < 5)
 				{
 					cLongKeyPressSupport.rc_code = val;
-					printf("Selected RC Code: %d\n", cLongKeyPressSupport.rc_code);
+					printf("[evremote2 ufs912] Selected RC Code: %d\n", cLongKeyPressSupport.rc_code);
 					ufs912SetRemote(cLongKeyPressSupport.rc_code);
 				}
 			}
 			fclose(fd);
 		}
 	}
-
-	printf("period %d, delay %d, rc_code %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay, cLongKeyPressSupport.rc_code);
-
+	printf("[evremote2 ufs912] Period = %d, delay = %d, rc_code = %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay, cLongKeyPressSupport.rc_code);
 	return vFd;
 }
 
+static int pShutdown(Context_t *context)
+{
+	close(context->fd);
+	return 0;
+}
 
 static int pRead(Context_t *context)
 {
-	unsigned char   vData[cUFS912CommandLen];
-	eKeyType        vKeyType = RemoteControl;
-	int             vCurrentCode = -1;
-	int             rc = 1;
+	unsigned char vData[cUFS912CommandLen];
+	eKeyType vKeyType = RemoteControl;
+	int vCurrentCode = -1;
+	int rc = 1;
 
-	//printf("%s >\n", __func__);
-
+//	printf("%s >\n", __func__);
 	while (1)
 	{
 		read(context->fd, vData, cUFS912CommandLen);
-
 		if (vData[0] == 0xD2)
+		{
 			vKeyType = RemoteControl;
+		}
 		else if (vData[0] == 0xD1)
+		{
 			vKeyType = FrontPanel;
+		}
 		else
+		{
 			continue;
-
+		}
 		if (vKeyType == RemoteControl)
 		{
 			/* mask out for rc codes
@@ -203,15 +208,18 @@ static int pRead(Context_t *context)
 			rc = ((vData[4] & 0x30) >> 4) + 1;
 			printf("RC code: %d\n", rc);
 			if (rc == ((RemoteControl_t *)context->r)->LongKeyPressSupport->rc_code)
-				vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData[1]);
+			{
+				vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[1]);
+			}
 			else
+			{
 				break;
+			}
 		}
 		else
 		{
-			vCurrentCode = getInternalCodeHex((tButton *)((RemoteControl_t *)context->r)->Frontpanel, vData[1]);
+			vCurrentCode = getInternalCodeHex(context->r->Frontpanel, vData[1]);
 		}
-
 		if (vCurrentCode != 0)
 		{
 			unsigned int vNextKey = vData[4];
@@ -219,23 +227,13 @@ static int pRead(Context_t *context)
 			break;
 		}
 	}
-
-	//printf("%s < %08X\n", __func__, vCurrentCode);
-
+//	printf("%s < %08X\n", __func__, vCurrentCode);
 	return vCurrentCode;
 }
 
 static int pNotification(Context_t *context, const int cOn)
 {
-
-	return 0;
-}
-
-static int pShutdown(Context_t *context)
-{
-
-	close(context->fd);
-
+	/* noop: is handled from fp itself */
 	return 0;
 }
 
@@ -243,14 +241,19 @@ RemoteControl_t UFS912_RC =
 {
 	"Kathrein UFS912 RemoteControl",
 	Ufs912,
-	&pInit,
-	&pShutdown,
-	&pRead,
-	&pNotification,
 	cButtonUFS912,
 	cButtonUFS912Frontpanel,
 	NULL,
 	1,
-	&cLongKeyPressSupport,
+	&cLongKeyPressSupport
 };
+
+BoxRoutines_t UFS912_BR =
+{
+	&pInit,
+	&pShutdown,
+	&pRead,
+	&pNotification
+};
+// vim:ts=4
 

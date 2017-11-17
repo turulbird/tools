@@ -41,11 +41,11 @@
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
-	10, 120,
+	10, 120
 };
 
 /* Spider Box HL-101 RCU */
-static tButton cButtonsSpideroxHL101[] =
+static tButton cButtonsSpiderboxHL101[] =
 {
 	{"STANDBY"        , "f7", KEY_POWER},
 	{"MUTE"           , "77", KEY_MUTE},
@@ -64,7 +64,7 @@ static tButton cButtonsSpideroxHL101[] =
 	{"9BUTTON"        , "6f", KEY_9},
 
 	{"BACK"           , "0f", KEY_BACK},
-	{"INFO"           , "25", KEY_INFO}, //THIS IS WRONG SHOULD BE KEY_INFO
+	{"INFO"           , "25", KEY_INFO},  // THIS IS WRONG, SHOULD BE KEY_INFO
 	{"AUDIO"          , "35", KEY_AUDIO},
 
 	{"DOWN/P-"        , "a7", KEY_DOWN},
@@ -99,28 +99,26 @@ static tButton cButtonsSpideroxHL101[] =
 	{"STEPBACK"       , "95", KEY_PREVIOUS},
 	{"STEPFORWARD"    , "55", KEY_NEXT},
 	{"MARK"           , "4f", KEY_EPG},
-	{"TV/RADIO"       , "2f", KEY_TV2}, //WE USE TV2 AS TV/RADIO SWITCH BUTTON
+	{"TV/RADIO"       , "2f", KEY_TV2},  // WE USE TV2 AS TV/RADIO SWITCH BUTTON
 	{"USB"            , "a5", KEY_CLOSE},
 	{"TIMER"          , "b7", KEY_TIME},
 	{""               , ""  , KEY_NULL},
 };
+
 /* fixme: move this to a structure and
  * use the private structure of RemoteControl_t
  */
-static struct sockaddr_un  vAddr;
+static struct sockaddr_un vAddr;
+
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
-
 	int vHandle;
 
 	vAddr.sun_family = AF_UNIX;
 	// in new lircd its moved to /var/run/lirc/lircd by default and need use key to run as old version
-
 	strcpy(vAddr.sun_path, "/var/run/lirc/lircd");
-
 	vHandle = socket(AF_UNIX, SOCK_STREAM, 0);
-
 	if (vHandle == -1)
 	{
 		perror("socket");
@@ -132,41 +130,33 @@ static int pInit(Context_t *context, int argc, char *argv[])
 		perror("connect");
 		return -1;
 	}
-
 	return vHandle;
 }
 
 static int pShutdown(Context_t *context)
 {
-
 	close(context->fd);
-
 	return 0;
 }
 
 static int pRead(Context_t *context)
 {
-	char                vBuffer[128];
-	char                vData[10];
-	const int           cSize         = 128;
-	int                 vCurrentCode  = -1;
+	char vBuffer[128];
+	char vData[10];
+	const int cSize = 128;
+	int vCurrentCode  = -1;
 
 	memset(vBuffer, 0, 128);
-	//wait for new command
+	// wait for new command
 	read(context->fd, vBuffer, cSize);
 
-	//parse and send key event
-	vData[0] = vBuffer[17];
-	vData[1] = vBuffer[18];
-	vData[2] = '\0';
-
-
+	// parse and send key event
 	vData[0] = vBuffer[14];
 	vData[1] = vBuffer[15];
 	vData[2] = '\0';
 
-	printf("[RCU] key: %s -> %s\n", vData, &vBuffer[0]);
-	vCurrentCode = getInternalCode((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData);
+	printf("[evremote2 hl101] key: %s -> %s\n", vData, &vBuffer[0]);
+	vCurrentCode = getInternalCode(context->r->RemoteControl, vData);
 
 	if (vCurrentCode != 0)
 	{
@@ -176,10 +166,8 @@ static int pRead(Context_t *context)
 		{
 			nextflag++;
 		}
-
 		vCurrentCode += (nextflag << 16);
 	}
-
 	return vCurrentCode;
 }
 
@@ -189,24 +177,15 @@ static int pNotification(Context_t *context, const int cOn)
 	struct proton_ioctl_data vfd_data;
 	int ioctl_fd = -1;
 
-	if (cOn)
-	{
-		ioctl_fd = open("/dev/vfd", O_RDONLY);
-		vfd_data.u.icon.icon_nr = 35;
-		vfd_data.u.icon.on = 1;
-		ioctl(ioctl_fd, VFDICONDISPLAYONOFF, &vfd_data);
-		close(ioctl_fd);
-	}
-	else
+	vfd_data.u.icon.icon_nr = 35;
+	vfd_data.u.icon.on = cOn ? 1 : 0;
+	if (!cOn)
 	{
 		usleep(100000);
-		ioctl_fd = open("/dev/vfd", O_RDONLY);
-		vfd_data.u.icon.icon_nr = 35;
-		vfd_data.u.icon.on = 0;
-		ioctl(ioctl_fd, VFDICONDISPLAYONOFF, &vfd_data);
-		close(ioctl_fd);
 	}
-
+	ioctl_fd = open("/dev/vfd", O_RDONLY);
+	ioctl(ioctl_fd, VFDICONDISPLAYONOFF, &vfd_data);
+	close(ioctl_fd);
 	return 0;
 }
 
@@ -214,13 +193,19 @@ RemoteControl_t Hl101_RC =
 {
 	"Hl101 RemoteControl",
 	Hl101,
-	&pInit,
-	&pShutdown,
-	&pRead,
-	&pNotification,
-	cButtonsSpideroxHL101,
+	cButtonsSpiderboxHL101,
 	NULL,
 	NULL,
 	1,
 	&cLongKeyPressSupport,
 };
+
+BoxRoutines_t Hl101_BR =
+{
+	&pInit,
+	&pShutdown,
+	&pRead,
+	&pNotification
+};
+// vim:ts=4
+

@@ -81,6 +81,11 @@
 
 
 #endif  /* !defined(KEY_OK)  */
+/* discrete ON/OFF codes being in use by Neutrino */
+#define KEY_POWERON      KEY_FN_F1
+#define KEY_POWEROFF     KEY_FN_F2
+#define KEY_STANDBYON    KEY_FN_F3
+#define KEY_STANDBYOFF   KEY_FN_F4
 #endif  /* _INPUT_EXTENDED_H */
 
 

@@ -40,7 +40,7 @@
 
 static tButton cButtonsKathrein[] =
 {
-//    {"VFORMAT_FRONT"  , "4A", KEY_MENU}, // any idea?
+//	{"VFORMAT_FRONT"  , "4A", KEY_MENU},  // any idea?
 	{"MENU"           , "54", KEY_MENU},
 	{"MENU_FRONT"     , "49", KEY_MENU},
 	{"RED"            , "6D", KEY_RED},
@@ -102,7 +102,7 @@ static tButton cButtonsKathrein[] =
 	{"LCHANNELDOWN"   , "9F", KEY_PAGEDOWN},
 	{"LVOLUMEUP"      , "90", KEY_VOLUMEUP},
 	{"LVOLUMEDOWN"    , "91", KEY_VOLUMEDOWN},
-	{"LINFO"          , "8F", KEY_HELP}, //THIS IS WRONG SHOULD BE KEY_INFO
+	{"LINFO"          , "8F", KEY_HELP},  // THIS IS WRONG, SHOULD BE KEY_INFO
 	{"LOK"            , "DC", KEY_OK},
 	{"LUP"            , "D8", KEY_UP},
 	{"LRIGHT"         , "DB", KEY_RIGHT},
@@ -118,108 +118,102 @@ static tButton cButtonsKathrein[] =
 	{"L7BUTTON"       , "87", KEY_7},
 	{"L8BUTTON"       , "88", KEY_8},
 	{"L9BUTTON"       , "89", KEY_9},
-
 	{""               , ""  , KEY_NULL},
 };
 
 /* fixme: move this to a structure and
  * use the private structure of RemoteControl_t
  */
-static struct sockaddr_un  vAddr;
-static int                 vFdLed;
+static struct sockaddr_un vAddr;
+
+static int vFdLed;
+
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
-
 	int vHandle;
-	vFdLed  = open("/sys/class/leds/ufs910:green/brightness", O_WRONLY);
 
+	vFdLed = open("/sys/class/leds/ufs910:green/brightness", O_WRONLY);
 	vAddr.sun_family = AF_UNIX;
 	strcpy(vAddr.sun_path, "/var/run/lirc/lircd");
-
 	vHandle = socket(AF_UNIX, SOCK_STREAM, 0);
-
 	if (vHandle == -1)
 	{
 		perror("socket");
 		return -1;
 	}
-
 	if (connect(vHandle, (struct sockaddr *)&vAddr, sizeof(vAddr)) == -1)
 	{
 		perror("connect");
 		return -1;
 	}
-
 	return vHandle;
 }
 
 static int pShutdown(Context_t *context)
 {
-
 	close(context->fd);
-
 	return 0;
 }
 
 static int pRead(Context_t *context)
 {
+	char vBuffer[128];
+	char vData[10];
+	const int cSize = 128;
+	int vCurrentCode = -1;
 
-	char                vBuffer[128];
-	char                vData[10];
-	const int           cSize         = 128;
-	int                 vCurrentCode  = -1;
-
-	//wait for new command
+	// wait for new command
 	read(context->fd, vBuffer, cSize);
-
-	//parse and send key event
+	// parse and send key event
 	vData[0] = vBuffer[17];
 	vData[1] = vBuffer[18];
 	vData[2] = '\0';
-
 	//prell, we could detect a long press here if we want
 	if (atoi(vData) % 3 != 0)
+	{
 		return -1;
-
+	}
 	vData[0] = vBuffer[14];
 	vData[1] = vBuffer[15];
 	vData[2] = '\0';
-
-	vCurrentCode = getInternalCode((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData);
-
+	vCurrentCode = getInternalCode(context->r->RemoteControl, vData);
 	return vCurrentCode;
 }
 
 static int pNotification(Context_t *context, const int cOn)
 {
-
 	if (cOn)
 	{
-		//activate green led
+		// activate green led
 		write(vFdLed, "1", 1);
 	}
 	else
 	{
-		//deactivate green led
+		// deactivate green led
 		usleep(50000);
 		write(vFdLed, "0", 1);
 	}
-
 	return 0;
 }
 
 RemoteControl_t Ufs910_14W_RC =
 {
-	"Ufs910 14Watt RemoteControl",
+	"Kathrein UFS910 (14W) RemoteControl",
 	Ufs910_14W,
-	&pInit,
-	&pShutdown,
-	&pRead,
-	&pNotification,
 	cButtonsKathrein,
 	NULL,
 	NULL,
 	0,
-	NULL,
+	NULL
 };
+
+BoxRoutines_t Ufs910_14W_BR =
+{
+	&pInit,
+	&pShutdown,
+	&pRead,
+	&pNotification
+};
+// vim:ts=4
+

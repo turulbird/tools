@@ -43,13 +43,13 @@
 #ifdef UFS910_1W_LONGKEY
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
-	20, 106,
+	20, 106
 };
 #endif
 
 static tButton cButtonsKathrein[] =
 {
-//    {"VFORMAT_FRONT"  , "4A", KEY_MENU}, // any idea?
+//	{"VFORMAT_FRONT"  , "4A", KEY_MENU},  // any idea?
 	{"MENU"           , "54", KEY_MENU},
 	{"MENU_FRONT"     , "49", KEY_MENU},
 	{"RED"            , "6D", KEY_RED},
@@ -127,12 +127,14 @@ static tButton cButtonsKathrein[] =
 	{"L7BUTTON"       , "87", KEY_7},
 	{"L8BUTTON"       , "88", KEY_8},
 	{"L9BUTTON"       , "89", KEY_9},
-
 	{""               , ""  , KEY_NULL},
 };
 
-
-static int          vFd;
+static int vFd;
+#ifndef UFS910_1W_LONGKEY
+#else
+static int gNextKey = 0;
+#endif
 
 
 static int setTemFlagsKathrein(int fd)
@@ -144,125 +146,109 @@ static int setTemFlagsKathrein(int fd)
 	{
 		new_io = old_io;
 
-		printf("setting new flags\n");
+		printf("[evremote2 ufs910_1w] Setting new flags\n");
 		/* c_iflags ->input flags */
 		new_io.c_iflag &= ~(IMAXBEL | BRKINT | ICRNL);
-
 		/* c_lflags ->local flags*/
 		new_io.c_lflag &= ~(ECHO | IEXTEN);
-
 		/* c_oflags ->output flags*/
 		new_io.c_oflag &= ~(ONLCR);
-
 		/* c_cflags ->constant flags*/
 		new_io.c_cflag = B19200;
-
 		tcsetattr(fd, TCSANOW, &new_io);
-
 	}
 	else
-		printf("error set raw mode.\n");
-
+	{
+		printf("[evremote2 ufs910_1w] Error setting raw mode.\n");
+	}
 	return 0;
 }
 
-
 static int pInit(Context_t *context, int argc, char *argv[])
 {
-
-	vFd              = open("/dev/ttyAS1", O_RDWR);
+	vFd = open("/dev/ttyAS1", O_RDWR);
 	setTemFlagsKathrein(vFd);
-
 	return vFd;
 }
 
 static int pShutdown(Context_t *context)
 {
-
 	close(vFd);
-
 	return 0;
 }
 
 #ifndef UFS910_1W_LONGKEY
 static int pRead(Context_t *context)
 {
+	char vData[3];
+	const int cSize = 3;
+	int vCurrentCode = -1;
 
-	char         vData[3];
-	const int    cSize             = 3;
-	int          vCurrentCode      = -1;
-
-	//wait for new command
+	// wait for new command
 	read(vFd, vData, cSize);
-
-	//parse and send key event
+	// parse and send key event
 	vData[2] = '\0';
-
-	vCurrentCode = getInternalCode((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData);
-
+	vCurrentCode = getInternalCode(context->r->RemoteControl, vData);
 	return vCurrentCode;
 }
 #else
-
-static int gNextKey = 0;
-
 static int pRead(Context_t *context)
 {
+	char vData[3];
+	const int cSize = 3;
+	int vCurrentCode = -1;
 
-	char         vData[3];
-	const int    cSize             = 3;
-	int          vCurrentCode      = -1;
-
-	//wait for new command
+	// wait for new command
 	read(vFd, vData, cSize);
-
-	//parse and send key event
+	// parse and send key event
 	vData[2] = '\0';
-
-	vCurrentCode = getInternalCode((tButton *)((RemoteControl_t *)context->r)->RemoteControl, vData);
-
-	if ((vCurrentCode & 0x80) == 0) // new key
+	vCurrentCode = getInternalCode(context->r->RemoteControl, vData);
+	if ((vCurrentCode & 0x80) == 0)  // new key
 	{
 		gNextKey++;
 		gNextKey %= 20;
 	}
-
 	vCurrentCode += (gNextKey << 16);
-
 	return vCurrentCode;
 }
 #endif
 
 static int pNotification(Context_t *context, const int cOn)
 {
-
 	if (cOn)
+	{
 		write(vFd, "1\n1\n1\n1\n", 8);
+	}
 	else
 	{
 		usleep(50000);
 		write(vFd, "A\nA\nA\nA\n", 8);
 	}
-
 	return 0;
 }
 
 RemoteControl_t Ufs910_1W_RC =
 {
-	"Ufs910 1Watt RemoteControl",
+	"Kathrein UFS910 (1W) RemoteControl",
 	Ufs910_1W,
-	&pInit,
-	&pShutdown,
-	&pRead,
-	&pNotification,
 	cButtonsKathrein,
 	NULL,
 	NULL,
 #ifndef UFS910_1W_LONGKEY
 	0,
-	NULL,
+	NULL
 #else
 	1,
-	&cLongKeyPressSupport,
+	&cLongKeyPressSupport
 #endif
 };
+
+BoxRoutines_t Ufs910_1W_BR =
+{
+	&pInit,
+	&pShutdown,
+	&pRead,
+	&pNotification
+};
+// vim:ts=4
+
