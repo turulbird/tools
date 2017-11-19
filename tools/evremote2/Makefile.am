@@ -29,3 +29,4 @@ AM_LDFLAGS = -lrt -lpthread
 
 evtest_SOURCES = \
 	evtest.c
+
