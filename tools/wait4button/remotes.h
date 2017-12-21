@@ -6,26 +6,10 @@
 #include <stdlib.h>
 #include "global.h"
 
-#define getRCvalue(context, field) \
-	(((RemoteControl_t*) context->r)->field)
+int selectRemote(Context_t *context, eBoxType type);
 
-typedef struct RemoteControl_s
-{
-		char *Name;
-		eBoxType Type;
-		int (* Init)(Context_t *context, int argc, char *argv[]);
-		int (* Shutdown)(Context_t *context);
-		int (* Read)(Context_t *context);    // 00 NN 00 KK
-		int (* Notification)(Context_t *context, const int on);
+extern RemoteControl_t LircdName_RC;
 
-		void/*tButton*/ * RemoteControl;
-		void/*tButton*/ * Frontpanel;
-
-		void *private;
-		unsigned char supportsLongKeyPress;
-		tLongKeyPressSupport *LongKeyPressSupport;
-} RemoteControl_t;
-
-int selectRemote(Context_t  *context, eBoxType type);
-
+//extern BoxRoutines_t LircdName_BR;
 #endif
+// vim:ts=4

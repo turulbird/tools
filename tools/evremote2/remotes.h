@@ -45,3 +45,5 @@ extern BoxRoutines_t LircdName_BR;
 int selectRemote(Context_r_t *context_r, Context_t *context, eBoxType type);
 
 #endif
+// vim:ts=4
+

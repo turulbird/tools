@@ -41,42 +41,47 @@
 #include "remotes.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static unsigned int wait4KeyCode = 0;
 static unsigned int vCurrentCode = 0;
 
-int processSimple(Context_t *context, int argc, char *argv[])
+int processSimple(Context_r_t *context_r, Context_t *context, int argc, char *argv[])
 {
 
-	if (((RemoteControl_t *)context->r)->Init)
-		context->fd = (((RemoteControl_t *)context->r)->Init)(context, argc, argv);
+	if (context_r->br->Init)
+	{
+		context->fd = context_r->br->Init(context, argc, argv);
+	}
 	else
 	{
-		fprintf(stderr, "driver does not support init function\n");
+		fprintf(stderr, "[wait4button] driver does not support init function\n");
 		exit(1);
 	}
-
 	if (context->fd < 0)
 	{
-		fprintf(stderr, "error in device initialization\n");
+		fprintf(stderr, "[wait4button] error in device initialization\n");
 		exit(1);
 	}
-
 	while (true)
 	{
-
-		//wait for new command
-		if (((RemoteControl_t *)context->r)->Read)
-			vCurrentCode = ((RemoteControl_t *)context->r)->Read(context);
+		// wait for new command
+		if (context_r->br->Read)
+		{
+			vCurrentCode = context_r->br->Read(context);
+		}
 		if (vCurrentCode <= 0)
+		{
 			continue;
+		}
 		if ((wait4KeyCode > 0) && (wait4KeyCode != vCurrentCode))
+		{
 			continue;
-		printf("Read KeyCode:%i\n", vCurrentCode);
+		}
+		printf("[wait4button] Read KeyCode:%i\n", vCurrentCode);
 		break;
 	}
-
-	((RemoteControl_t *)context->r)->Shutdown(context);
+	context_r->br->Shutdown(context);
 	return 0;
 }
 
@@ -90,22 +95,23 @@ void ignoreSIGPIPE()
 
 	sigemptyset(&vAction.sa_mask);
 	vAction.sa_flags = 0;
-	sigaction(SIGPIPE,  &vAction, (struct sigaction *)NULL);
+	sigaction(SIGPIPE, &vAction, (struct sigaction *)NULL);
 }
-
 
 int main(int argc, char *argv[])
 {
 	eBoxType vBoxType = LircdName;
 	Context_t context;
+	Context_r_t context_r;
 
 	/* Dagobert: if tuxtxt closes the socket while
-	 * we are writing a sigpipe occures which kills
-	 * evremote/wait4button. so lets ignore it ...
+	 * we are writing a sigpipe occurence which kills
+	 * wait4button. so lets ignore it ...
 	 */
 	ignoreSIGPIPE();
 
-	if (argc >= 2 && (!strncmp(argv[1], "-h", 2) || !strncmp(argv[1], "--help", 6)))
+	if (argc >= 2
+	&& (!strncmp(argv[1], "-h", 2) || !strncmp(argv[1], "--help", 6)))
 	{
 		printf("USAGE:\n");
 		printf("wait4button [<button code>] returns code of pressed button on RC.\n");
@@ -113,30 +119,28 @@ int main(int argc, char *argv[])
 		printf("<button code> - defines specific button code to wait for\n");
 		return 0;
 	}
-
 	selectRemote(&context, vBoxType);
-
 	if (argc >= 2)
 	{
 		wait4KeyCode = atoi(argv[1]);
-		printf("Waiting for %i on %s\n", wait4KeyCode, ((RemoteControl_t *)context.r)->Name);
+		printf("[wait4button] Waiting for %i on %s\n", wait4KeyCode, ((RemoteControl_t *)context.r)->Name);
 	}
 	else
-		printf("Using %s\n", ((RemoteControl_t *)context.r)->Name);
-
-	if (((RemoteControl_t *)context.r)->RemoteControl != NULL)
 	{
-		printf("RemoteControl Map:\n");
-		printKeyMap((tButton *)((RemoteControl_t *)context.r)->RemoteControl);
+		printf("Using %s\n", context.r->Name);
 	}
-
-	if (((RemoteControl_t *)context.r)->Frontpanel != NULL)
+	if (context.r->RemoteControl != NULL)
 	{
-		printf("Frontpanel Map:\n");
-		printKeyMap((tButton *)((RemoteControl_t *)context.r)->Frontpanel);
+		printf("[wait4button] RemoteControl Map:\n");
+		printKeyMap(context.r->RemoteControl);
 	}
-
-	processSimple(&context, argc, argv);
-
+	if (context.r->Frontpanel != NULL)
+	{
+		printf("[wait4button] Frontpanel Map:\n");
+		printKeyMap(context.r->Frontpanel);
+	}
+	processSimple(&context_r, &context, argc, argv);
 	return vCurrentCode;
 }
+// vim:ts=4
+

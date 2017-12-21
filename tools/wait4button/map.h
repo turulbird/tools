@@ -9,7 +9,6 @@ typedef struct
 	char KeyWord[2];
 	int  KeyCode;
 } tButton;
-
-
-
 #endif //_MAP_H
+// vim:ts=4
+

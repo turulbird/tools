@@ -35,57 +35,53 @@
 #include <time.h>
 
 #include "global.h"
-#include "remotes.h"
-
 #include "map.h"
 
 #define DEVICENAME "TDT RC event driver"
 char eventPath[] = "/dev/input/event0";
 
-//Checks with event device is created by simubutton.ko
+// Checks which event device is created by simubutton.ko
 int getEventDevice()
 {
-	int     vFd             = -1;
-	int     vIterator       = 0;
-	bool    vDeviceFound    = false;
-	char    vName[256]      = "Unknown";
+	int vFd = -1;
+	int vIterator = 0;
+	bool vDeviceFound = false;
+	char vName[256] = "Unknown";
 
 	while (vIterator < 10 && vDeviceFound == false)
 	{
 		eventPath[16] = vIterator + 48;
 		vIterator++;
 		vFd = open(eventPath, O_RDONLY);
-
 		if (vFd <= 0)
+		{
 			continue;
-
+		}
 		ioctl(vFd, EVIOCGNAME(sizeof(vName)), vName);
-		printf("Input device name: \"%s\"\n", vName);
-
+		printf("[wait4button] Input device name: \"%s\"\n", vName);
 		if (!strcmp(DEVICENAME, vName))
+		{
 			vDeviceFound = true;
-
+		}
 		close(vFd);
 	}
-
 	return vDeviceFound;
 }
 
 // Translates lirc key name to known linux input key value
 int getInternalCodeLircKeyName(tButton *cButtons, const char cCode[30])
 {
-	int         vLoop       = 0;
+	int vLoop = 0;
 
 	for (vLoop = 0; cButtons[vLoop].KeyCode != KEY_NULL; vLoop++)
 	{
 		//printf("%20s - %2s - %3d\n", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode);
 		if (strcmp(cCode, cButtons[vLoop].KeyName) == 0)
 		{
-			//printf("KEY by name: %02X - %s\n", cButtons[vLoop].KeyCode, cButtons[vLoop].KeyName);
+			printf("[wait4button] KEY by name: %02X (%s)\n", cButtons[vLoop].KeyCode, cButtons[vLoop].KeyName);
 			return cButtons[vLoop].KeyCode;
 		}
 	}
-
 	return 0;
 }
 
@@ -95,18 +91,22 @@ int printKeyMap(tButton *cButtons)
 	int column = 0;
 
 	for (vLoop = 0; cButtons[vLoop].KeyCode != KEY_NULL; vLoop++)
+	{
 		if (!column)
 		{
-			printf("%20s %2s %3d\t", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode);
+			printf("[wait4button] %20s - %2s - %3d\t", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode);
 			column = 1;
 		}
 		else
 		{
-			printf("%20s %2s %3d\n", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode);
+			printf("[wait4button] %20s - %2s - %3d\n", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode);
 			column = 0;
 		}
+	}
 	if (column)
+	{
 		printf("\n");
+	}
 	printf("\n");
 	return 0;
 }
@@ -122,65 +122,60 @@ int checkTuxTxt(const int cCode)
 	if ((vTmpO = open("/tmp/block.tmp", O_RDONLY)) >= 0)
 	{
 		close(vTmpO);
-
-		//workaround if tuxtxt hangs
-		if (cCode == KEY_HOME) //EXIT
+		// workaround if tuxtxt hangs
+		if (cCode == KEY_HOME)  // EXIT
 		{
 			tuxtxt_exit_count++;
-
 			if (tuxtxt_exit_count > 1)
 			{
 				tuxtxt_exit_count = 0;
 				system("killall tuxtxt; sleep 3; killall -9 tuxtxt; rm -f /tmp/block.tmp");
 			}
 		}
-
-		fprintf(stderr, "Forwarding to Socket-> %u\n", sSockethandle);
-
+		fprintf(stderr, "[wait4button] Forwarding to Socket-> %u\n", sSockethandle);
 		if (sSockethandle <= 0)
 		{
 			struct sockaddr_un vAddr;
 			vAddr.sun_family = AF_UNIX;
 			strcpy(vAddr.sun_path, SocketName);
 			sSockethandle = socket(PF_UNIX, SOCK_STREAM, 0);
-
 			if (sSockethandle <= 0)
 			{
-				fprintf(stderr, "No RemoteControlSocket attached!\n");
+				fprintf(stderr, "[wait4button] No RemoteControlSocket attached!\n");
 				return 0;
-			};
-
+			}
 			if (connect(sSockethandle, (struct sockaddr *)&vAddr, sizeof(vAddr)) != 0)
 			{
 				close(sSockethandle);
 				sSockethandle = -1;
-				fprintf(stderr, "connect failed!\n");
+				fprintf(stderr, "[wait4button] connect failed!\n");
 				return 0;
 			}
 		}
-
 		if (sSockethandle > 0)
 		{
-			char *vTmpS = (char *) malloc(sizeof("00000000"));
+			char *vTmpS = (char *)malloc(sizeof("00000000"));
 			sprintf(vTmpS, "%08d", cCode);
 
-			if (write(sSockethandle, (void *) vTmpS, sizeof("00000000")) <= 0)
-				fprintf(stderr, "Error while forwarding!\n");
+			if (write(sSockethandle, (void *)vTmpS, sizeof("00000000")) <= 0)
+			{
+				fprintf(stderr, "[wait4button] Error while forwarding!\n");
+			}
 			free(vTmpS);
 		}
 		else
-			fprintf(stderr, "Error while forwarding!\n");
-
+		{
+			fprintf(stderr, "[wait4button] Error while forwarding!\n");
+		}
 		return 1;
 	}
-
 	tuxtxt_exit_count = 0;
-
 	if (sSockethandle != -1)
 	{
 		close(sSockethandle);
 		sSockethandle = -1;
 	}
-
 	return 0;
 }
+// vim:ts=4
+

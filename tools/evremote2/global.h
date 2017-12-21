@@ -1,4 +1,3 @@
-
 #ifndef GLOBAL_H_
 #define GLOBAL_H_
 
@@ -93,3 +92,4 @@ int selectRemote(Context_r_t *context_r, Context_t *context, eBoxType type);
 void setInputEventRepeatRate(unsigned int delay, unsigned int period);
 #endif
 // vim:ts=4
+

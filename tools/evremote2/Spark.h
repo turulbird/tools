@@ -2,6 +2,7 @@
 #define __spark__
 
 #define VFDICONDISPLAYONOFF 0xc0425a0a
+#define ICON_DOT2 35
 
 /* this sets up the mode temporarily (for one ioctl)
  * to the desired mode. currently the "normal" mode

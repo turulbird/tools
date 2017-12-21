@@ -1,5 +1,5 @@
 /*
- * evremote.c
+ * remotes.c
  *
  * (c) 2009 donald@teamducktales
  *
@@ -20,7 +20,6 @@
  */
 
 #include "remotes.h"
-extern RemoteControl_t LircdName_RC;
 
 static RemoteControl_t *AvailableRemoteControls[] =
 {
@@ -28,17 +27,19 @@ static RemoteControl_t *AvailableRemoteControls[] =
 	NULL
 };
 
-int selectRemote(Context_t  *context, eBoxType type)
+int selectRemote(Context_t *context, eBoxType type)
 {
 	int i;
 
 	for (i = 0; AvailableRemoteControls[i] != 0ull; i++)
-
+	{
 		if (AvailableRemoteControls[i]->Type == type)
 		{
 			context->r = AvailableRemoteControls[i];
 			return 0;
 		}
-
+	}
 	return -1;
 }
+// vim:ts=4
+

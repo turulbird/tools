@@ -306,7 +306,7 @@ static int pRead(Context_t *context)
 		printf("[evremote2 LircdName] Warning: unparseable lirc command: %s\n", vBuffer);
 		return -1;
 	}
-	// some RCUs send different codes for single click and long push. This breakes e2 LONG detection, because lircd counter starts from beginning
+	// some RCUs send different codes for single click and long push. This breaks e2 LONG detection, because lircd counter starts from beginning
 	// workarround is to define names for long codes ending '&' in lircd.conf and using this marker to copunt data correctly
 	LastKeyNameChar = strlen(KeyName) - 1;
 	if (KeyName[LastKeyNameChar] == 0x26)  // &
@@ -438,5 +438,4 @@ BoxRoutines_t LircdName_BR =
 	&pNotification
 };
 // vim:ts=4
-
 
