@@ -40,8 +40,7 @@ stamp-h1
 .libs/
 libs/libstgles/libltdl/
 tools/acinclude.m4
-tools/aio-grab-arm/grab
-tools/aio-grab-sh4/grab
+tools/aio-grab/grab
 tools/devinit/devinit
 tools/evremote2/evremote2
 tools/evremote2/evtest
