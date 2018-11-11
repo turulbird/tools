@@ -25,5 +25,6 @@ libeplayer3_a_SOURCES = \
 # writer/h263.cpp writer/vc1.cpp writer/pcm.cpp writer/aac.cpp
 
 LIBEPLAYER3_LIBS = libeplayer3.a
+#lib_LTLIBRARIES = libeplayer3.la
 # -lpthread -lavformat -lavcodec -lavutil -lswresample -lm
 

@@ -276,11 +276,11 @@ int main(int argc, char **argv)
 		char network_name_fin[31];
 		if (network_name[0] != 0)
 		{
-			snprintf("[showiframe] "network_name_fin, sizeof(network_name_fin), "%s", network_name);
+			snprintf(network_name_fin, sizeof(network_name_fin), "%s", network_name);
 		}
 		else
 		{
-			snprintf("[showiframe] "network_name_fin, sizeof(network_name_fin), "unknown");
+			snprintf(network_name_fin, sizeof(network_name_fin), "unknown");
 		}
 		if (nocolor)
 		{
