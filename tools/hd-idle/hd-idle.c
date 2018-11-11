@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
 	/* create default idle-time parameter entry */
 	if ((it = malloc(sizeof(*it))) == NULL)
 	{
-		fprintf(stderr, "out of memory\n");
+		fprintf(stderr, "[hd-idle] out of memory\n");
 		exit(1);
 	}
 	it->next = NULL;
@@ -189,15 +189,17 @@ int main(int argc, char *argv[])
 		{
 
 			case 't':
+			{
 				/* just spin-down the specified disk and exit */
 				spindown_disk(optarg);
 				return (0);
-
+			}
 			case 'a':
+			{
 				/* add a new set of idle-time parameters for this particular disk */
 				if ((it = malloc(sizeof(*it))) == NULL)
 				{
-					fprintf(stderr, "out of memory\n");
+					fprintf(stderr, "[hd-idle] out of memory\n");
 					return (2);
 				}
 				it->name = disk_name(optarg);
@@ -205,32 +207,39 @@ int main(int argc, char *argv[])
 				it->next = it_root;
 				it_root = it;
 				break;
-
+			}
 			case 'i':
+			{
 				/* set idle-time parameters for current (or default) disk */
 				it->idle_time = atoi(optarg);
 				break;
-
+			}
 			case 'l':
+			{
 				logfile = optarg;
 				have_logfile = 1;
 				break;
-
+			}
 			case 'd':
+			{
 				debug = 1;
 				break;
-
+			}
 			case 'h':
+			{
 				printf("usage: hd-idle [-t <disk>] [-a <name>] [-i <idle_time>] [-l <logfile>] [-d] [-h]\n");
 				return (0);
-
+			}
 			case ':':
-				fprintf(stderr, "error: option -%c requires an argument\n", optopt);
+			{
+				fprintf(stderr, "[hd-idle] error: option -%c requires an argument\n", optopt);
 				return (1);
-
+			}
 			case '?':
-				fprintf(stderr, "error: unknown option -%c\n", optopt);
+			{
+				fprintf(stderr, "[hd-idle] error: unknown option -%c\n", optopt);
 				return (1);
+			}
 		}
 	}
 
@@ -278,15 +287,14 @@ int main(int argc, char *argv[])
 				time_t now = time(NULL);
 
 				/* make sure this is a SCSI disk (sd[a-z]) */
-				if (tmp.name[0] != 's' ||
-						tmp.name[1] != 'd' ||
-						!isalpha(tmp.name[2]) ||
-						tmp.name[3] != '\0')
+				if (tmp.name[0] != 's'
+				||  tmp.name[1] != 'd'
+				||  !isalpha(tmp.name[2])
+				||  tmp.name[3] != '\0')
 				{
 					continue;
 				}
-
-				dprintf("probing %s: reads: %u, writes: %u\n", tmp.name, tmp.reads, tmp.writes);
+				dprintf("[hd-idle] probing %s: reads: %u, writes: %u\n", tmp.name, tmp.reads, tmp.writes);
 
 				/* get previous statistics for this disk */
 				ds = get_diskstats(tmp.name);
@@ -296,7 +304,7 @@ int main(int argc, char *argv[])
 					/* new disk; just add it to the linked list */
 					if ((ds = malloc(sizeof(*ds))) == NULL)
 					{
-						fprintf(stderr, "out of memory\n");
+						fprintf(stderr, "[hd-idle] out of memory\n");
 						return (2);
 					}
 					memcpy(ds, &tmp, sizeof(*ds));
@@ -318,7 +326,6 @@ int main(int argc, char *argv[])
 							break;
 						}
 					}
-
 				}
 				else if (ds->reads == tmp.reads && ds->writes == tmp.writes)
 				{
@@ -353,11 +360,9 @@ int main(int argc, char *argv[])
 				}
 			}
 		}
-
 		fclose(fp);
 		sleep(sleep_time);
 	}
-
 	return (0);
 }
 
@@ -370,7 +375,7 @@ static void daemonize(void)
 	/* fork #1: exit parent process and continue in the background */
 	if ((i = fork()) < 0)
 	{
-		perror("couldn't fork");
+		perror("could not fork");
 		exit(2);
 	}
 	else if (i > 0)
@@ -383,7 +388,7 @@ static void daemonize(void)
 	setsid();
 	if ((i = fork()) < 0)
 	{
-		perror("couldn't fork #2");
+		perror("could not fork #2");
 		exit(2);
 	}
 	else if (i > 0)
@@ -417,7 +422,6 @@ static DISKSTATS *get_diskstats(const char *name)
 			return (ds);
 		}
 	}
-
 	return (NULL);
 }
 
@@ -429,7 +433,7 @@ static void spindown_disk(const char *name)
 	char dev_name[100];
 	int fd;
 
-	dprintf("spindown: %s\n", name);
+	dprintf("[hd-idle] spindown: %s\n", name);
 
 	/* fabricate SCSI IO request */
 	memset(&io_hdr, 0x00, sizeof(io_hdr));
@@ -461,7 +465,7 @@ static void spindown_disk(const char *name)
 	}
 	else if (io_hdr.masked_status != 0)
 	{
-		fprintf(stderr, "error: SCSI command failed with status 0x%02x\n",
+		fprintf(stderr, "[hd-idle] error: SCSI command failed with status 0x%02x\n",
 			io_hdr.masked_status);
 		if (io_hdr.masked_status == CHECK_CONDITION)
 		{
@@ -570,7 +574,7 @@ static char *disk_name(char *path)
 
 	if (debug)
 	{
-		printf("using %s for %s\n", s, path);
+		printf("[hd-idle] using %s for %s\n", s, path);
 	}
 	return (s);
 }

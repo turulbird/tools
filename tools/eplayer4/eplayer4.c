@@ -1,5 +1,5 @@
 /*
- * eplayer3: command line playback using libeplayer3
+ * eplayer3: command line playback using gstreamer
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,11 +42,13 @@ int kbhit(void)
 	FD_SET(0, &read_fd);
 
 	if (select(1, &read_fd, NULL, NULL, &tv) == -1)
+	{
 		return 0;
-
+	}
 	if (FD_ISSET(0, &read_fd))
+	{
 		return 1;
-
+	}
 	return 0;
 }
 
@@ -55,18 +57,19 @@ int main(int argc, char *argv[])
 	int showInfos = 0, noinput = 0;
 	char file[255] = {""};
 	int speedmap = 0;
+	int flags;
 	gdouble speed = 1.0;
 	printf("%s >\n", __FILE__);
 
 	if (argc < 2)
 	{
-		printf("give me a filename please\n");
+		printf("[player4] give me a filename please\n");
 		exit(1);
 	}
 
 	strcat(file, argv[1]);
 
-	printf("File=%s\n", file);
+	printf("[player4] File: %s\n", file);
 
 	gst_init(&argc, &argv);
 
@@ -79,7 +82,7 @@ int main(int argc, char *argv[])
 	printf("URI=%s\n", uri);
 
 	g_object_set(G_OBJECT(m_gst_playbin), "uri", uri, NULL);
-	int flags = 0x47; // ( GST_PLAY_FLAG_VIDEO | GST_PLAY_FLAG_AUDIO | GST_PLAY_FLAG_NATIVE_VIDEO | GST_PLAY_FLAG_TEXT );
+	flags = 0x47; // ( GST_PLAY_FLAG_VIDEO | GST_PLAY_FLAG_AUDIO | GST_PLAY_FLAG_NATIVE_VIDEO | GST_PLAY_FLAG_TEXT );
 	g_object_set(G_OBJECT(m_gst_playbin), "flags", flags, NULL);
 	g_free(uri);
 
@@ -94,33 +97,40 @@ int main(int argc, char *argv[])
 		int Key = 0;
 
 		if (kbhit())
+		{
 			if (noinput == 0)
+			{
 				Key = getchar();
-
+			}
+		}
 		if (Key == 0 || Key == 0xA)
+		{
 			continue;
-
+		}
 		switch (Key)
 		{
 			case 'q': //STOP
+			{
 				gst_element_set_state(m_gst_playbin, GST_STATE_NULL);
 				break;
-
+			}
 			case 'c': //CONTINUE
+			{
 				gst_element_set_state(m_gst_playbin, GST_STATE_PLAYING);
 
 				speed = 1.0;
-				printf("Continue with speed %f\n", speed);
+				printf("[player4] Continue with speed %f\n", speed);
 				gst_element_seek(m_gst_playbin, speed, GST_FORMAT_TIME, GST_SEEK_FLAG_NONE,
 						 GST_SEEK_TYPE_NONE, 0,
 						 GST_SEEK_TYPE_NONE, -1);
 
 				break;
-
+			}
 			case 'p': //PAUSE
+			{
 				gst_element_set_state(m_gst_playbin, GST_STATE_PAUSED);
 				break;
-
+			}
 			case 'k':
 			{
 				int Key2 = getchar() - 48;
@@ -129,110 +139,126 @@ int main(int argc, char *argv[])
 				switch (Key2)
 				{
 					case 1:
+					{
 						sec = -15.0;
 						break;
+					}
 					case 4:
+					{
 						sec = -60.0;
 						break;
+					}
 					case 7:
+					{
 						sec = -300.0;
 						break;
+					}
 					case 3:
+					{
 						sec = 15.0;
 						break;
+					}
 					case 6:
+					{
 						sec = 60.0;
 						break;
+					}
 					case 9:
+					{
 						sec = 300.0;
 						break;
+					}
 				}
-
-				printf("seconds %d \n", Key2);
+				printf("[player4] seconds %d \n", Key2);
 				gint64 time_nanoseconds;
 				gint64 pos;
 				GstFormat fmt = GST_FORMAT_TIME;
 				gst_element_query_position(m_gst_playbin, &fmt, &pos);
 
 				time_nanoseconds = pos + (sec * 1000000000);
-				if (time_nanoseconds < 0) time_nanoseconds = 0;
-
+				if (time_nanoseconds < 0)
+				{
+					time_nanoseconds = 0;
+				}
 
 				double seekTo = 0;
+
 				seekTo = time_nanoseconds / 1000000000.0;
-				printf("SeekTo = %02d:%02d:%02d (%.4f sec)\n", (int)((seekTo / 60) / 60) % 60, (int)(seekTo / 60) % 60, (int)seekTo % 60, seekTo);
+				printf("[player4] SeekTo = %02d:%02d:%02d (%.4f sec)\n", (int)((seekTo / 60) / 60) % 60, (int)(seekTo / 60) % 60, (int)seekTo % 60, seekTo);
 
 				gst_element_seek(m_gst_playbin, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
 						 GST_SEEK_TYPE_SET, time_nanoseconds,
 						 GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
 				break;
 			}
-
 			case 'l':
 			{
 				double length = 0;
+
 				GstFormat fmt = GST_FORMAT_TIME; //Returns time in nanosecs
 				gint64 len;
 				gst_element_query_duration(m_gst_playbin, &fmt, &len);
 				length = len / 1000000000.0;
-				printf("Length = %02d:%02d:%02d (%.4f sec)\n", (int)((length / 60) / 60) % 60, (int)(length / 60) % 60, (int)length % 60, length);
+				printf("[player4] Length = %02d:%02d:%02d (%.4f sec)\n", (int)((length / 60) / 60) % 60, (int)(length / 60) % 60, (int)length % 60, length);
 				break;
 			}
 			case 'j':
 			{
 				double sec = 0;
+
 				GstFormat fmt = GST_FORMAT_TIME; //Returns time in nanosecs
 				gint64 pos;
 				gst_element_query_position(m_gst_playbin, &fmt, &pos);
 				sec = pos / 1000000000.0;
-				printf("Pts = %02d:%02d:%02d (%.4f sec)\n", (int)((sec / 60) / 60) % 60, (int)(sec / 60) % 60, (int)sec % 60, sec);
+				printf("[player4] Pts = %02d:%02d:%02d (%.4f sec)\n", (int)((sec / 60) / 60) % 60, (int)(sec / 60) % 60, (int)sec % 60, sec);
 				break;
 			}
-
 			case 'f':
 			{
 				if (speed < 1.0)
+				{
 					speed = 1.0;
-
+				}
 				speed++;
 
 				if (speed > 4.0)
+				{
 					speed = 1.0;
-
-				printf("FastForward with speed %f\n", speed);
+				}
+				printf("[player4] FastForward with speed %f\n", speed);
 				gst_element_seek(m_gst_playbin, speed, GST_FORMAT_TIME, GST_SEEK_FLAG_NONE,
 						 GST_SEEK_TYPE_NONE, 0,
 						 GST_SEEK_TYPE_NONE, -1);
 
 				break;
 			}
-
 			case 'b':
 			{
 				if (speed >= 1.0)
+				{
 					speed = 0.0;
-
+				}
 				speed--;
 
 				if (speed < -4.0)
+				{
 					speed = -1.0;
 
-				printf("Reverse with speed %f\n", speed);
+				}
+				printf("[player4] Reverse with speed %f\n", speed);
 				gst_element_seek(m_gst_playbin, speed, GST_FORMAT_TIME, GST_SEEK_FLAG_NONE,
 						 GST_SEEK_TYPE_NONE, 0,
 						 GST_SEEK_TYPE_NONE, -1);
 
 				break;
 			}
-
 			case 'i':
 			{
 				break;
 			}
-
 			default:
 			{
-				printf("Control: %x\n", Key);
+				printf("[player4] Control: %x\n", Key);
 				printf("al:       List audio tracks\n");
 				printf("ac:       List current audio track\n");
 				printf("a[id]     Select audio track\n");
@@ -253,8 +279,6 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
-
 	//printOutputCapabilities();
-
 	exit(0);
 }

@@ -42,22 +42,22 @@ int get_signal(struct signal *signal_data, int fe_fd)
 {
 	if (ioctl(fe_fd, FE_READ_BER, &signal_data->ber) < 0)
 	{
-		fprintf(stderr, "frontend ioctl - Can't read BER: %d\n", errno);
+		fprintf(stderr, "frontend ioctl - Cannot read BER: %d\n", errno);
 		return -1;
 	}
 	if (ioctl(fe_fd, FE_READ_SNR, &signal_data->snr) < 0)
 	{
-		fprintf(stderr, "frontend ioctl - Can't read SNR: %d\n", errno);
+		fprintf(stderr, "frontend ioctl - Cannot read SNR: %d\n", errno);
 		return -1;
 	}
 	if (ioctl(fe_fd, FE_READ_SIGNAL_STRENGTH, &signal_data->strength) < 0)
 	{
-		fprintf(stderr, "frontend ioctl - Can't read Signal Strength: %d\n", errno);
+		fprintf(stderr, "frontend ioctl - Cannot read Signal Strength: %d\n", errno);
 		return -1;
 	}
 	if (ioctl(fe_fd, FE_READ_STATUS, &signal_data->status) < 0)
 	{
-		fprintf(stderr, "frontend ioctl - Can't read Status: %d\n", errno);
+		fprintf(stderr, "frontend ioctl - Cannot read Status: %d\n", errno);
 		return -1;
 	}
 	return 0;
@@ -74,6 +74,7 @@ int signal_changed(struct signal *a, struct signal *b)
 void get_network_name_from_nit(char *network_name, unsigned char *nit, int len)
 {
 	unsigned char *ptr = nit + 10;
+
 	if (len <= 24)
 	{
 		network_name[0] = 0;
@@ -84,13 +85,17 @@ void get_network_name_from_nit(char *network_name, unsigned char *nit, int len)
 		if (ptr[0] == 0x40)
 		{
 			if (ptr[1] > 30)
+			{
 				ptr[1] = 30;
+			}
 			memmove(network_name, ptr + 2, ptr[1]);
 			network_name[ptr[1]] = 0;
 			return;
 		}
 		else
+		{
 			ptr += ptr[1] + 2;
+		}
 	}
 	network_name[0] = 0;
 }
@@ -114,6 +119,7 @@ int main(int argc, char **argv)
 	unsigned char buf[1024];
 	char network_name[31], old_name[31];
 	int x;
+
 	for (x = 1; x < argc; x++)
 	{
 		if ((!strcmp(argv[x], "--tune")))
@@ -146,26 +152,38 @@ int main(int argc, char **argv)
 	}
 	if ((dmx_fd = open(DMX, O_RDWR)) < 0)
 	{
-		perror("Can't open Demux!");
+		perror("Cannot open Demux!");
 		return 1;
 	}
 	if ((fe_fd = open(FE, O_RDONLY)) < 0)
 	{
-		perror("Can't open Tuner!");
+		perror("Cannot open Tuner!");
 		return 1;
 	}
 	if (ioctl(fe_fd, FE_GET_INFO, &info) < 0)
 	{
-		fprintf(stderr, "frontend ioctl - Can't read frontend info: %d\n", errno);
+		fprintf(stderr, "[showiframe] frontend ioctl - Cannot read frontend info: %d\n", errno);
 		return -1;
 	}
-	if (info.type == FE_QPSK) fe_type = "DVB-S";
-	else if (info.type == FE_QAM) fe_type = "DVB-C";
-	else if (info.type == FE_OFDM) fe_type = "DVB-T";
-	else fe_type = "DVB-?";
+	if (info.type == FE_QPSK)
+	{
+		fe_type = "DVB-S";
+	}
+	else if (info.type == FE_QAM)
+	{
+		fe_type = "DVB-C";
+	}
+	else if (info.type == FE_OFDM)
+	{
+		fe_type = "DVB-T";
+	}
+	else
+	{
+		fe_type = "DVB-?";
+	}
 	if (info.type != FE_QPSK && tune)
 	{
-		printf("\033[01;31m--tune only for DVB-S available.\033[00m\n");
+		printf("\033[01;31m[showiframe] --tune only available for DVB-S.\033[00m\n");
 		return -1;
 	}
 	memset(&old_signal, 0, sizeof(old_signal));
@@ -204,7 +222,9 @@ int main(int argc, char **argv)
 			{
 				/* got data */
 				if ((result = read(dmx_fd, buf, sizeof(buf))) > 0)
+				{
 					get_network_name_from_nit(network_name, buf, result);
+				}
 				/* zero or less read - we have to restart the DMX afaik*/
 				else
 				{
@@ -212,21 +232,29 @@ int main(int argc, char **argv)
 					ioctl(dmx_fd, DMX_STOP, 0);
 					ioctl(dmx_fd, DMX_START, 0);
 					int i;
+
 					for (i = 0; i < sizeof(network_name); i++)
+					{
 						network_name[i] = 0;
+					}
 				}
 				/* new networkname != "" */
 				if ((memcmp(network_name, old_name, sizeof(network_name)) != 0) && (network_name[0] != 0))
 				{
 					int count;
+
 					for (count = strlen(network_name); count <= 10; count++)
+					{
 						network_name[count] = 0x20;
+					}
 					network_name[count] = 0;
 					memmove(old_name, network_name, sizeof(old_name));
 				}
 			}
 			else
-				printf("that should never happen...\n");
+			{
+				printf("[showiframe] that should never happen...\n");
+			}
 		}
 		FD_ZERO(&rfds);
 		FD_SET(dmx_fd, &rfds);
@@ -242,27 +270,33 @@ int main(int argc, char **argv)
 		}
 		get_signal(&signal_quality, fe_fd);
 		if (!signal_changed(&signal_quality, &old_signal))
+		{
 			continue;
+		}
 		char network_name_fin[31];
 		if (network_name[0] != 0)
 		{
-			snprintf(network_name_fin, sizeof(network_name_fin), "%s", network_name);
+			snprintf("[showiframe] "network_name_fin, sizeof(network_name_fin), "%s", network_name);
 		}
 		else
 		{
-			snprintf(network_name_fin, sizeof(network_name_fin), "unknown");
+			snprintf("[showiframe] "network_name_fin, sizeof(network_name_fin), "unknown");
 		}
 		if (nocolor)
-			printf("Network (%s): %s, BER: %u (%u%%), SNR: %u (%u%%), SIG: %u (%u%%) - [%c%c]\n", fe_type, network_name_fin, signal_quality.ber, (signal_quality.ber / 655), signal_quality.snr, (signal_quality.snr / 655), signal_quality.strength, (signal_quality.strength / 655), signal_quality.status & FE_HAS_SIGNAL ? 'S' : ' ', signal_quality.status & FE_HAS_LOCK ? 'L' : ' ');
+		{
+			printf("[showiframe] Network (%s): %s, BER: %u (%u%%), SNR: %u (%u%%), SIG: %u (%u%%) - [%c%c]\n", fe_type, network_name_fin, signal_quality.ber, (signal_quality.ber / 655), signal_quality.snr, (signal_quality.snr / 655), signal_quality.strength, (signal_quality.strength / 655), signal_quality.status & FE_HAS_SIGNAL ? 'S' : ' ', signal_quality.status & FE_HAS_LOCK ? 'L' : ' ');
+		}
 		else
-			printf("\033[01;33mNetwork (%s): %s\033[00m \033[01;31mBER: %u (%u%%)\033[00m \033[01;34mSNR: %u (%u%%)\033[00m \033[01;32mSIG: %u (%u%%)\033[00m - \033[01;36m[%c%c]\033[00m\n", fe_type, network_name_fin, signal_quality.ber, (signal_quality.ber / 655), signal_quality.snr, (signal_quality.snr / 655), signal_quality.strength, (signal_quality.strength / 655), signal_quality.status & FE_HAS_SIGNAL ? 'S' : ' ', signal_quality.status & FE_HAS_LOCK ? 'L' : ' ');
+		{
+			printf("\033[01;33m[showiframe] Network (%s): %s\033[00m \033[01;31mBER: %u (%u%%)\033[00m \033[01;34mSNR: %u (%u%%)\033[00m \033[01;32mSIG: %u (%u%%)\033[00m - \033[01;36m[%c%c]\033[00m\n", fe_type, network_name_fin, signal_quality.ber, (signal_quality.ber / 655), signal_quality.snr, (signal_quality.snr / 655), signal_quality.strength, (signal_quality.strength / 655), signal_quality.status & FE_HAS_SIGNAL ? 'S' : ' ', signal_quality.status & FE_HAS_LOCK ? 'L' : ' ');
+		}
 		if (usevfd)
 		{
 			usleep(250);
 			FILE *out = fopen("/dev/vfd", "w");
 			if (!out)
 			{
-				printf("unable to write to /dev/vfd\n");
+				printf("[showiframe] unable to write to /dev/vfd\n");
 			}
 			else
 			{

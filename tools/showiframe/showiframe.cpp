@@ -44,14 +44,21 @@ ssize_t write_all(int fd, const void *buf, size_t count)
 	int retval;
 	char *ptr = (char *)buf;
 	size_t handledcount = 0;
+
 	while (handledcount < count)
 	{
 		retval = write(fd, &ptr[handledcount], count - handledcount);
 
-		if (retval == 0) return -1;
+		if (retval == 0)
+		{
+			return -1;
+		}
 		if (retval < 0)
 		{
-			if (errno == EINTR) continue;
+			if (errno == EINTR)
+			{
+				continue;
+			}
 			return retval;
 		}
 		handledcount += retval;
@@ -65,7 +72,7 @@ int showiframe(char *path, bool progress)
 	int m_video_clip_fd;
 	int f;
 
-	printf("showSinglePic %s\n", path);
+	printf("[showiframe] showSinglePic %s\n", path);
 
 	f = open(path, O_RDONLY);
 
@@ -76,8 +83,9 @@ int showiframe(char *path, bool progress)
 
 		m_video_clip_fd = open("/dev/dvb/adapter0/video0", O_WRONLY);
 		if (ioctl(m_video_clip_fd, VIDEO_SET_FORMAT, VIDEO_FORMAT_16_9) < 0)
-			printf("VIDEO_SET_FORMAT failed (%m)\n");
-
+		{
+			printf("[showiframe] ERROR: VIDEO_SET_FORMAT failed (%m)\n");
+		}
 		if (m_video_clip_fd >= 0)
 		{
 			bool seq_end_avail = false;
@@ -86,19 +94,21 @@ int showiframe(char *path, bool progress)
 			unsigned char seq_end[] = { 0x00, 0x00, 0x01, 0xB7 };
 			unsigned char iframe[s.st_size];
 			unsigned char stuffing[8192];
+
 			memset(stuffing, 0, 8192);
 			read(f, iframe, s.st_size);
 			ioctl(m_video_clip_fd, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_MEMORY);
-			printf("VIDEO_SELECT_SOURCE MEMORY (%m)\n");
+			printf("[showiframe] VIDEO_SELECT_SOURCE MEMORY (%m)\n");
 			ioctl(m_video_clip_fd, VIDEO_PLAY);
-			printf("VIDEO_PLAY (%m)\n");
+			printf("[showiframe] VIDEO_PLAY (%m)\n");
 			ioctl(m_video_clip_fd, VIDEO_CONTINUE);
-			printf("VIDEO_CONTINUE: (%m)\n");
+			printf("[showiframe] VIDEO_CONTINUE: (%m)\n");
 			ioctl(m_video_clip_fd, VIDEO_CLEAR_BUFFER);
-			printf("VIDEO_CLEAR_BUFFER: (%m)\n");
+			printf("[showiframe] VIDEO_CLEAR_BUFFER: (%m)\n");
 			while (pos <= (s.st_size - 4) && !(seq_end_avail = (!iframe[pos] && !iframe[pos + 1] && iframe[pos + 2] == 1 && iframe[pos + 3] == 0xB7)))
+			{
 				++pos;
-
+			}
 			if ((iframe[3] >> 4) != 0xE) // no pes header
 			{
 				write_all(m_video_clip_fd, pes_header, sizeof(pes_header));
@@ -109,7 +119,9 @@ int showiframe(char *path, bool progress)
 			}
 			write_all(m_video_clip_fd, iframe, s.st_size);
 			if (!seq_end_avail)
+			{
 				write_all(m_video_clip_fd, seq_end, sizeof(seq_end));
+			}
 			write_all(m_video_clip_fd, stuffing, 8192);
 
 			bool end = false;
@@ -135,15 +147,16 @@ int showiframe(char *path, bool progress)
 					 */
 					progress_ch[3] = '\0';
 					if (atoi(progress_ch) >= 98)
+					{
 						end = true;
-
+					}
 				}
 			}
 
-			printf("********** end showiframe\n");
+			printf("[showiframe] end\n");
 
 			ioctl(m_video_clip_fd, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_DEMUX);
-			printf("VIDEO_SELECT_SOURCE DEMUX (%m)\n");
+			printf("[showiframe] VIDEO_SELECT_SOURCE DEMUX (%m)\n");
 			close(m_video_clip_fd);
 
 		}
@@ -151,7 +164,7 @@ int showiframe(char *path, bool progress)
 	}
 	else
 	{
-		printf("could not open %s", path);
+		printf("[showiframe] could not open %s", path);
 		return -1;
 	}
 
