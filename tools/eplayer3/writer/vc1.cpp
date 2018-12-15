@@ -66,9 +66,11 @@ void WriterVC1::Init(int _fd, AVStream *_stream, Player *_player)
 bool WriterVC1::Write(AVPacket *packet, int64_t pts)
 {
 	if (!packet || !packet->data)
+	{
 		return false;
-
-	if (initialHeader) {
+	}
+	if (initialHeader)
+	{
 		initialHeader = false;
 		FrameHeaderSeen = false;
 
@@ -128,41 +130,49 @@ bool WriterVC1::Write(AVPacket *packet, int64_t pts)
 		iov[1].iov_len = PesPtr - PesPayload;
 		iov[0].iov_len = InsertPesHeader(PesHeader, iov[1].iov_len, VC1_VIDEO_PES_START_CODE, INVALID_PTS_VALUE, 0);
 		if (writev(fd, iov, 2) < 0)
+		{
 			return false;
-
+		}
 		/* For VC1 the codec private data is a standard vc1 sequence header so we just copy it to the output */
 		iov[0].iov_base = PesHeader;
 		iov[1].iov_base = stream->codec->extradata;
 		iov[1].iov_len = stream->codec->extradata_size;
 		iov[0].iov_len = InsertPesHeader(PesHeader, iov[1].iov_len, VC1_VIDEO_PES_START_CODE, INVALID_PTS_VALUE, 0);
 		if (writev(fd, iov, 2) < 0)
+		{
 			return false;
-
+		}
 		initialHeader = false;
 	}
 
-	if (packet->size > 0) {
+	if (packet->size > 0)
+	{
 		int Position = 0;
 		bool insertSampleHeader = true;
 
-		while (Position < packet->size) {
+		while (Position < packet->size)
+		{
 			int PacketLength = std::min(packet->size - Position, MAX_PES_PACKET_SIZE);
 			uint8_t PesHeader[PES_MAX_HEADER_SIZE];
 			int HeaderLength = InsertPesHeader(PesHeader, PacketLength, VC1_VIDEO_PES_START_CODE, pts, 0);
 
-			if (insertSampleHeader) {
+			if (insertSampleHeader)
+			{
 				const uint8_t Vc1FrameStartCode[] = { 0, 0, 1, VC1_FRAME_START_CODE };
 
 				if (!FrameHeaderSeen && (packet->size > 3) && (memcmp(packet->data, Vc1FrameStartCode, 4) == 0))
+				{
 					FrameHeaderSeen = true;
-				if (!FrameHeaderSeen) {
+				}
+				if (!FrameHeaderSeen)
+				{
 					memcpy(&PesHeader[HeaderLength], Vc1FrameStartCode, sizeof(Vc1FrameStartCode));
 					HeaderLength += sizeof(Vc1FrameStartCode);
 				}
 				insertSampleHeader = false;
 			}
-
 			struct iovec iov[2];
+
 			iov[0].iov_base = PesHeader;
 			iov[0].iov_len = HeaderLength;
 			iov[1].iov_base = packet->data + Position;
@@ -170,13 +180,13 @@ bool WriterVC1::Write(AVPacket *packet, int64_t pts)
 
 			ssize_t l = writev(fd, iov, 2);
 			if (l < 0)
+			{
 				return false;
-
+			}
 			Position += PacketLength;
 			pts = INVALID_PTS_VALUE;
 		}
 	}
-
 	return true;
 }
 
@@ -186,3 +196,4 @@ WriterVC1::WriterVC1()
 }
 
 static WriterVC1 writer_vc1 __attribute__ ((init_priority (300)));
+// vim:ts=4

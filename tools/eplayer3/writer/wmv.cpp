@@ -73,9 +73,11 @@ void WriterWMV::Init(int _fd, AVStream *_stream, Player *_player)
 bool WriterWMV::Write(AVPacket *packet, int64_t pts)
 {
 	if (!packet || !packet->data)
+	{
 		return false;
-
-	if (initialHeader) {
+	}
+	if (initialHeader)
+	{
 #define PES_MIN_HEADER_SIZE 9
 		uint8_t PesPacket[PES_MIN_HEADER_SIZE + 128];
 		uint8_t *PesPtr;
@@ -115,23 +117,25 @@ bool WriterWMV::Write(AVPacket *packet, int64_t pts)
 		int HeaderLength = InsertPesHeader(PesPacket, MetadataLength, VC1_VIDEO_PES_START_CODE, INVALID_PTS_VALUE, 0);
 
 		if (write(fd, PesPacket, HeaderLength + MetadataLength) < 0)
+		{
 			return false;
-
+		}
 		initialHeader = false;
 	}
-
-	if (packet->size > 0 && packet->data) {
+	if (packet->size > 0 && packet->data)
+	{
 		int Position = 0;
 		bool insertSampleHeader = true;
 
-		while (Position < packet->size) {
-
+		while (Position < packet->size)
+		{
 			int PacketLength = std::min(packet->size - Position, MAX_PES_PACKET_SIZE);
 
 			uint8_t PesHeader[PES_MAX_HEADER_SIZE] = { 0 };
 			int HeaderLength = InsertPesHeader(PesHeader, PacketLength, VC1_VIDEO_PES_START_CODE, pts, 0);
 
-			if (insertSampleHeader) {
+			if (insertSampleHeader)
+			{
 				unsigned int PesLength;
 				unsigned int PrivateHeaderLength;
 
@@ -151,13 +155,13 @@ bool WriterWMV::Write(AVPacket *packet, int64_t pts)
 			memcpy(PacketStart, PesHeader, HeaderLength);
 			memcpy(PacketStart + HeaderLength, packet->data + Position, PacketLength);
 			if (write(fd, PacketStart, PacketLength + HeaderLength) < 0)
+			{
 				return false;
-
+			}
 			Position += PacketLength;
 			pts = INVALID_PTS_VALUE;
 		}
 	}
-
 	return true;
 }
 
@@ -169,3 +173,4 @@ WriterWMV::WriterWMV()
 }
 
 static WriterWMV writer_wmv __attribute__ ((init_priority (300)));
+// vim:ts=4

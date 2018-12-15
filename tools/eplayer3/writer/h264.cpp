@@ -67,21 +67,26 @@ void WriterH264::Init(int _fd, AVStream *_stream, Player *_player)
 bool WriterH264::Write(AVPacket *packet, int64_t pts)
 {
 	if (!packet || !packet->data)
+	{
 		return false;
+	}
 	uint8_t PesHeader[PES_MAX_HEADER_SIZE];
 	struct iovec iov[512];
 
 	uint8_t *d = packet->data;
 
 	// byte-stream format
-	if ((packet->size > 3) && (   (d[0] == 0x00 && d[1] == 0x00 && d[2] == 0x00 && d[3] == 0x01) // first NAL unit
-			           || (d[0] == 0xff && d[1] == 0xff && d[2] == 0xff && d[3] == 0xff) // FIXME, needed???
-	)) {
+	if ((packet->size > 3)
+	&& (   (d[0] == 0x00 && d[1] == 0x00 && d[2] == 0x00 && d[3] == 0x01) // first NAL unit
+	    || (d[0] == 0xff && d[1] == 0xff && d[2] == 0xff && d[3] == 0xff) // FIXME, needed???
+	))
+	{
 		unsigned int FakeStartCode = /* (call->Version << 8) | */ PES_VERSION_FAKE_START_CODE;
 		int ic = 0;
 		iov[ic++].iov_base = PesHeader;
 		unsigned int len = 0;
-		if (initialHeader) {
+		if (initialHeader)
+		{
 			initialHeader = false;
 			iov[ic].iov_base = stream->codec->extradata;
 			iov[ic++].iov_len = stream->codec->extradata_size;
@@ -103,17 +108,19 @@ bool WriterH264::Write(AVPacket *packet, int64_t pts)
 	}
 
 	// convert NAL units without sync byte sequence to byte-stream format
-	if (initialHeader) {
+	if (initialHeader)
+	{
 		avcC_t *avcCHeader = (avcC_t *) stream->codec->extradata;
 
-		if (!avcCHeader) {
-			fprintf(stderr, "stream->codec->extradata == NULL\n");
+		if (!avcCHeader)
+		{
+			fprintf(stderr, "[eplayer3] stream->codec->extradata == NULL\n");
 			return false;
 		}
-
 		if (avcCHeader->Version != 1)
-			fprintf(stderr, "Error unknown avcC version (%x). Expect problems.\n", avcCHeader->Version);
-
+		{
+			fprintf(stderr, "[eplayer3] Error: unknown avcC version (%x). Expect problems.\n", avcCHeader->Version);
+		}
 		// The player will use FrameRate and TimeScale to calculate the default frame rate.
 		// FIXME: TimeDelta should be used instead of FrameRate. This is a historic implementation bug.
 		// Reference:  player/frame_parser/frame_parser_video_h264.cpp FrameParser_VideoH264_c::ReadPlayer2ContainerParameters()
@@ -133,7 +140,9 @@ bool WriterH264::Write(AVPacket *packet, int64_t pts)
 
 		#if 0
 		if (FrameRate == 0xffffffff)
+		{
 			FrameRate = (TimeScale > 1000) ? 1001 : 1;
+		}
 		#endif
 
 		Header[len++] = (TimeScale >> 24) & 0xff;	// Output the timescale
@@ -158,8 +167,9 @@ bool WriterH264::Write(AVPacket *packet, int64_t pts)
 		iov[ic].iov_base = Header;
 		iov[ic++].iov_len = len;
 		if (writev(fd, iov, ic) < 0)
+		{
 			return false;
-
+		}
 		ic = 0;
 		iov[ic++].iov_base = PesHeader;
 
@@ -169,7 +179,8 @@ bool WriterH264::Write(AVPacket *packet, int64_t pts)
 
 		// sequence parameter set
 		unsigned int ParamSets = avcCHeader->NumParamSets & 0x1f;
-		for (unsigned int i = 0; i < ParamSets; i++) {
+		for (unsigned int i = 0; i < ParamSets; i++)
+		{
 			unsigned int PsLength = (avcCHeader->Params[ParamOffset] << 8) | avcCHeader->Params[ParamOffset + 1];
 
 			iov[ic].iov_base = (uint8_t *) "\0\0\0\1";
@@ -184,7 +195,8 @@ bool WriterH264::Write(AVPacket *packet, int64_t pts)
 		// picture parameter set
 		ParamSets = avcCHeader->Params[ParamOffset++];
 
-		for (unsigned int i = 0; i < ParamSets; i++) {
+		for (unsigned int i = 0; i < ParamSets; i++)
+		{
 			unsigned int PsLength = (avcCHeader->Params[ParamOffset] << 8) | avcCHeader->Params[ParamOffset + 1];
 
 			iov[ic].iov_base = (uint8_t *) "\0\0\0\1";
@@ -199,34 +211,46 @@ bool WriterH264::Write(AVPacket *packet, int64_t pts)
 		iov[0].iov_len = InsertPesHeader(PesHeader, len, MPEG_VIDEO_PES_START_CODE, INVALID_PTS_VALUE, 0);
 		ssize_t l = writev(fd, iov, ic);
 		if (l < 0)
+		{
 			return false;
-
+		}
 		initialHeader = false;
 	}
 
 	uint8_t *de = d + packet->size;
-	do {
+	do
+	{
 		unsigned int len = 0;
-		switch (NalLengthBytes) {
+		switch (NalLengthBytes)
+		{
 			case 4:
+			{
 				len = *d;
 				d++;
+			}
 			case 3:
+			{
 				len <<= 8;
 				len |= *d;
 				d++;
+			}
 			case 2:
+			{
 				len <<= 8;
 				len |= *d;
 				d++;
+			}
 			default:
+			{
 				len <<= 8;
 				len |= *d;
 				d++;
+			}
 		}
 
-		if (d + len > de) {
-			fprintf(stderr, "NAL length past end of buffer - size %u frame offset %d left %d\n", len, (int) (d - packet->data), (int) (de - d));
+		if (d + len > de)
+		{
+			fprintf(stderr, "[eplayer3] NAL length past end of buffer - size %u frame offset %d left %d\n", len, (int) (d - packet->data), (int) (de - d));
 			break;
 		}
 
@@ -240,12 +264,14 @@ bool WriterH264::Write(AVPacket *packet, int64_t pts)
 		iov[0].iov_len = InsertPesHeader(PesHeader, len + 3, MPEG_VIDEO_PES_START_CODE, pts, 0);
 		ssize_t l = writev(fd, iov, ic);
 		if (l < 0)
+		{
 			return false;
-
+		}
 		d += len;
 		pts = INVALID_PTS_VALUE;
 
-	} while (d < de);
+	}
+	while (d < de);
 
 	return true;
 }
@@ -256,3 +282,4 @@ WriterH264::WriterH264()
 }
 
 static WriterH264 writerh264 __attribute__ ((init_priority (300)));
+// vim:ts=4

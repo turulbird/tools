@@ -42,11 +42,13 @@ class WriterMP3 : public Writer
 bool WriterMP3::Write(AVPacket *packet, int64_t pts)
 {
 	if (!packet || !packet->data)
+	{
 		return false;
-
+	}
 	uint8_t PesHeader[PES_MAX_HEADER_SIZE];
 
-	for (int pos = 0; pos < packet->size; ) {
+	for (int pos = 0; pos < packet->size; )
+	{
 		int PacketLength = std::min(packet->size - pos, MAX_PES_PACKET_SIZE);
 		struct iovec iov[2];
 		iov[0].iov_base = PesHeader;
@@ -56,7 +58,9 @@ bool WriterMP3::Write(AVPacket *packet, int64_t pts)
 
 		ssize_t l = writev(fd, iov, 2);
 		if (l < 0)
+		{
 			return false;
+		}
 		pos += PacketLength;
 		pts = INVALID_PTS_VALUE;
 	}
@@ -72,3 +76,4 @@ WriterMP3::WriterMP3()
 }
 
 static WriterMP3 writer_mp3 __attribute__ ((init_priority (300)));
+// vim:ts=4

@@ -70,18 +70,31 @@ Writer *Writer::GetWriter(enum AVCodecID id, enum AVMediaType codec_type)
 {
 	std::map<enum AVCodecID,Writer*>::iterator it = writers.find(id);
 	if (it != writers.end())
+	{
 		return it->second;
-	switch (codec_type) {
+	}
+	switch (codec_type)
+	{
 		case AVMEDIA_TYPE_AUDIO:
+		{
 			if (id == AV_CODEC_ID_INJECTPCM) // should not happen
+			{
 				break;
+			}
 			return GetWriter(AV_CODEC_ID_INJECTPCM, codec_type);
+		}
 		case AVMEDIA_TYPE_VIDEO:
+		{
 			if (id == AV_CODEC_ID_MPEG2TS) // should not happen
+			{
 				break;
+			}
 			return GetWriter(AV_CODEC_ID_MPEG2TS, codec_type);
+		}
 		default:
+		{
 			break;
+		}
 	}
 	return &writer;
 }
@@ -90,7 +103,9 @@ video_encoding_t Writer::GetVideoEncoding(enum AVCodecID id)
 {
 	std::map<enum AVCodecID,video_encoding_t>::iterator it = vencoding.find(id);
 	if (it != vencoding.end())
+	{
 		return it->second;
+	}
 	return VIDEO_ENCODING_AUTO;
 }
 
@@ -98,6 +113,9 @@ audio_encoding_t Writer::GetAudioEncoding(enum AVCodecID id)
 {
 	std::map<enum AVCodecID,audio_encoding_t>::iterator it = aencoding.find(id);
 	if (it != aencoding.end())
+	{
 		return it->second;
+	}
 	return AUDIO_ENCODING_LPCMA;
 }
+// vim:ts=4

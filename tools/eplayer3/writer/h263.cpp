@@ -39,7 +39,9 @@ class WriterH263 : public Writer
 bool WriterH263::Write(AVPacket *packet, int64_t pts)
 {
 	if (!packet || !packet->data)
+	{
 		return false;
+	}
 	uint8_t PesHeader[PES_MAX_HEADER_SIZE];
 
 	int HeaderLength = InsertPesHeader(PesHeader, packet->size, H263_VIDEO_PES_START_CODE, pts, 0);
@@ -72,3 +74,4 @@ WriterH263::WriterH263()
 }
 
 static WriterH263 writer_h263 __attribute__ ((init_priority (300)));
+// vim:ts=4

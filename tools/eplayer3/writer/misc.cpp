@@ -38,15 +38,20 @@ void PutBits(BitPacker_t * ld, unsigned int code, unsigned int length)
 
 #ifdef DEBUG_PUTBITS
 	if (ld->debug)
-		dprintf("code = %d, length = %d, bit_buf = 0x%x, bit_left = %d\n",
+	{
+		dprintf("[eplayer3] code = %d, length = %d, bit_buf = 0x%x, bit_left = %d\n",
 			code, length, bit_buf, bit_left);
+	}
 #endif
 
-	if (length < bit_left) {
+	if (length < bit_left)
+	{
 		/* fits into current buffer */
 		bit_buf = (bit_buf << length) | code;
 		bit_left -= length;
-	} else {
+	}
+	else
+	{
 		/* doesn't fit */
 		bit_buf <<= bit_left;
 		bit_buf |= code >> (length - bit_left);
@@ -63,7 +68,9 @@ void PutBits(BitPacker_t * ld, unsigned int code, unsigned int length)
 
 #ifdef DEBUG_PUTBITS
 	if (ld->debug)
-		dprintf("bit_left = %d, bit_buf = 0x%x\n", bit_left, bit_buf);
+	{
+		dprintf("[eplayer3] bit_left = %d, bit_buf = 0x%x\n", bit_left, bit_buf);
+	}
 #endif
 
 	/* writeback */
@@ -74,10 +81,13 @@ void PutBits(BitPacker_t * ld, unsigned int code, unsigned int length)
 void FlushBits(BitPacker_t * ld)
 {
 	ld->BitBuffer <<= ld->Remaining;
-	while (ld->Remaining < 32) {
+	while (ld->Remaining < 32)
+	{
 #ifdef DEBUG_PUTBITS
 		if (ld->debug)
-			dprintf("flushing 0x%2.2x\n", ld->BitBuffer >> 24);
+		{
+			dprintf("[eplayer3] flushing 0x%2.2x\n", ld->BitBuffer >> 24);
+		}
 #endif
 		*ld->Ptr++ = ld->BitBuffer >> 24;
 		ld->BitBuffer <<= 8;
@@ -86,3 +96,4 @@ void FlushBits(BitPacker_t * ld)
 	ld->Remaining = 32;
 	ld->BitBuffer = 0;
 }
+// vim:ts=4

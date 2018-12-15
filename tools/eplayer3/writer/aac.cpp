@@ -41,10 +41,13 @@
 static inline void Hexdump(unsigned char *Data, int length)
 {
 	int k;
-	for (k = 0; k < length; k++) {
+	for (k = 0; k < length; k++)
+	{
 		printf("%02x ", Data[k]);
 		if (((k + 1) & 31) == 0)
+		{
 			printf("\n");
+		}
 	}
 	printf("\n");
 
@@ -54,33 +57,61 @@ static inline void Hexdump(unsigned char *Data, int length)
 static inline int aac_get_sample_rate_index(uint32_t sample_rate)
 {
 	if (96000 <= sample_rate)
+	{
 		return 0;
+	}
 	else if (88200 <= sample_rate)
+	{
 		return 1;
+	}
 	else if (64000 <= sample_rate)
+	{
 		return 2;
+	}
 	else if (48000 <= sample_rate)
+	{
 		return 3;
+	}
 	else if (44100 <= sample_rate)
+	{
 		return 4;
+	}
 	else if (32000 <= sample_rate)
+	{
 		return 5;
+	}
 	else if (24000 <= sample_rate)
+	{
 		return 6;
+	}
 	else if (22050 <= sample_rate)
+	{
 		return 7;
+	}
 	else if (16000 <= sample_rate)
+	{
 		return 8;
+	}
 	else if (12000 <= sample_rate)
+	{
 		return 9;
+	}
 	else if (11025 <= sample_rate)
+	{
 		return 10;
+	}
 	else if (8000 <= sample_rate)
+	{
 		return 11;
+	}
 	else if (7350 <= sample_rate)
+	{
 		return 12;
+	}
 	else
+	{
 		return 13;
+	}
 }
 
 #if 0
@@ -119,9 +150,9 @@ void WriterAAC::Init(int _fd, AVStream *_stream, Player *_player)
 		chan_config = (stream->codec->extradata[1] >> 3) && 0xf;
 	}
 #if AAC_DEBUG
-	printf("aac object_type %d\n", object_type);
-	printf("aac sample_index %d\n", sample_index);
-	printf("aac chan_config %d\n", chan_config);
+	printf("[eplayer3] aac object_type %d\n", object_type);
+	printf("[eplayer3] aac sample_index %d\n", sample_index);
+	printf("[eplayer3] aac chan_config %d\n", chan_config);
 #endif
 	object_type -= 1;	// Cause of ADTS
 	aacbuflen = AAC_HEADER_LENGTH;
@@ -134,7 +165,7 @@ void WriterAAC::Init(int _fd, AVStream *_stream, Player *_player)
 	aacbuf[6] = 0xFC;
 	aacbuf[7] = 0x00;
 #if AAC_DEBUG
-	printf("AAC_HEADER -> ");
+	printf("[eplayer3] AAC_HEADER -> ");
 	Hexdump(aacbuf, 7);
 #endif
 }
@@ -142,8 +173,9 @@ void WriterAAC::Init(int _fd, AVStream *_stream, Player *_player)
 bool WriterAAC::Write(AVPacket *packet, int64_t pts)
 {
 	if (!packet || !packet->data)
+	{
 		return false;
-
+	}
 	uint8_t PesHeader[PES_MAX_HEADER_SIZE];
 	uint8_t ExtraData[AAC_HEADER_LENGTH];
 
@@ -167,10 +199,12 @@ bool WriterAAC::Write(AVPacket *packet, int64_t pts)
 
 		ssize_t l = writev(fd, iov, 3);
 #if AAC_DEBUG
-//		printf("Packet Size + AAC_HEADER_LENGTH= %d Packet Size= %d Written= %d\n", PacketLength, packet->size, l);
+//		printf("[eplayer3] Packet Size + AAC_HEADER_LENGTH= %d Packet Size= %d Written= %d\n", PacketLength, packet->size, l);
 #endif
 		if (l < 0)
+		{
 			return false;
+		}
 		pos += PacketLength;
 		pts = INVALID_PTS_VALUE;
 	}
@@ -183,3 +217,4 @@ WriterAAC::WriterAAC()
 }
 
 static WriterAAC writer_aac __attribute__ ((init_priority (300)));
+// vim:ts=4

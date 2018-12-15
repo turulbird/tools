@@ -55,8 +55,9 @@ void WriterDIVX::Init(int _fd, AVStream *_stream, Player *_player)
 bool WriterDIVX::Write(AVPacket *packet, int64_t pts)
 {
 	if (!packet || !packet->data)
+	{
 		return false;
-
+	}
 	uint8_t PesHeader[PES_MAX_HEADER_SIZE];
 	uint8_t FakeHeaders[64] = { 0 };	// 64bytes should be enough to make the fake headers
 	unsigned int FakeHeaderLength;
@@ -88,7 +89,8 @@ bool WriterDIVX::Write(AVPacket *packet, int64_t pts)
 	iov[ic].iov_base = FakeHeaders;
 	iov[ic++].iov_len = FakeHeaderLength;
 
-	if (initialHeader) {
+	if (initialHeader)
+	{
 		iov[ic].iov_base = stream->codec->extradata;
 		iov[ic++].iov_len = stream->codec->extradata_size;
 		initialHeader = false;
@@ -108,3 +110,4 @@ WriterDIVX::WriterDIVX()
 }
 
 static WriterDIVX writer_divx __attribute__ ((init_priority (300)));
+// vim:ts=4

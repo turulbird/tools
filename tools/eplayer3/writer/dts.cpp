@@ -43,8 +43,9 @@ class WriterDTS : public Writer
 bool WriterDTS::Write(AVPacket *packet, int64_t pts)
 {
 	if (!packet || !packet->data)
+	{
 		return false;
-
+	}
 	uint8_t PesHeader[PES_AUDIO_HEADER_SIZE];
 
 // #define DO_BYTESWAP
@@ -53,7 +54,8 @@ bool WriterDTS::Write(AVPacket *packet, int64_t pts)
 	memcpy(Data, packet->data, packet->size);
 
 	/* 16-bit byte swap all data before injecting it */
-	for (i = 0; i < packet->size; i += 2) {
+	for (i = 0; i < packet->size; i += 2)
+	{
 		uint8_t Tmp = Data[i];
 		Data[i] = Data[i + 1];
 		Data[i + 1] = Tmp;
@@ -80,3 +82,4 @@ WriterDTS::WriterDTS()
 }
 
 static WriterDTS writer_dts __attribute__ ((init_priority (300)));
+// vim:ts=4

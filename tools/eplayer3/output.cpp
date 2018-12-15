@@ -72,29 +72,31 @@ bool Output::Open()
 	ScopedLock a_lock(audioMutex);
 
 	if (videofd < 0)
+	{
 		videofd = open(VIDEODEV, O_RDWR);
-
+	}
 	if (videofd < 0)
+	{
 		return false;
-
+	}
 	ioctl(videofd, VIDEO_CLEAR_BUFFER, NULL);
 	dioctl(videofd, VIDEO_SELECT_SOURCE, (void *) VIDEO_SOURCE_MEMORY);
 	dioctl(videofd, VIDEO_SET_STREAMTYPE, (void *) STREAM_TYPE_PROGRAM);
 	dioctl(videofd, VIDEO_SET_SPEED, DVB_SPEED_NORMAL_PLAY);
 
 	if (audiofd < 0)
+	{
 		audiofd = open(AUDIODEV, O_RDWR);
-
-	if (audiofd < 0) {
+	}
+	if (audiofd < 0)
+	{
 		close(videofd);
 		videofd = -1;
 		return false;
 	}
-
 	ioctl(audiofd, AUDIO_CLEAR_BUFFER, NULL);
 	dioctl(audiofd, AUDIO_SELECT_SOURCE, (void *) AUDIO_SOURCE_MEMORY);
 	dioctl(audiofd, AUDIO_SET_STREAMTYPE, (void *) STREAM_TYPE_PROGRAM);
-
 	return true;
 }
 
@@ -105,18 +107,18 @@ bool Output::Close()
 	ScopedLock v_lock(videoMutex);
 	ScopedLock a_lock(audioMutex);
 
-	if (videofd > -1) {
+	if (videofd > -1)
+	{
 		close(videofd);
 		videofd = -1;
 	}
-	if (audiofd > -1) {
+	if (audiofd > -1)
+	{
 		close(audiofd);
 		audiofd = -1;
 	}
-
 	videoStream = NULL;
 	audioStream = NULL;
-
 	return true;
 }
 
@@ -129,20 +131,26 @@ bool Output::Play()
 
 	AVCodecContext *avcc;
 
-	if (videoStream && videofd > -1 && (avcc = videoStream->codec)) {
+	if (videoStream && videofd > -1 && (avcc = videoStream->codec))
+	{
 		videoWriter = Writer::GetWriter(avcc->codec_id, avcc->codec_type);
 		videoWriter->Init(videofd, videoStream, player);
 		if (dioctl(videofd, VIDEO_SET_ENCODING, videoWriter->GetVideoEncoding(avcc->codec_id))
 		||  dioctl(videofd, VIDEO_PLAY, NULL))
+		{
 			ret = false;
+		}
 	}
 
-	if (audioStream && audiofd > -1 && (avcc = audioStream->codec)) {
+	if (audioStream && audiofd > -1 && (avcc = audioStream->codec))
+	{
 		audioWriter = Writer::GetWriter(avcc->codec_id, avcc->codec_type);
 		audioWriter->Init(audiofd, audioStream, player);
 		if (dioctl(audiofd, AUDIO_SET_ENCODING, audioWriter->GetAudioEncoding(avcc->codec_id))
 		||  dioctl(audiofd, AUDIO_PLAY, NULL))
+		{
 			ret = false;
+		}
 	}
 	return ret;
 }
@@ -154,22 +162,26 @@ bool Output::Stop()
 	ScopedLock v_lock(videoMutex);
 	ScopedLock a_lock(audioMutex);
 
-	if (videofd > -1) {
+	if (videofd > -1)
+	{
 		ioctl(videofd, VIDEO_CLEAR_BUFFER, NULL);
 		/* set back to normal speed (end trickmodes) */
 		dioctl(videofd, VIDEO_SET_SPEED, DVB_SPEED_NORMAL_PLAY);
 		if (dioctl(videofd, VIDEO_STOP, NULL))
+		{
 			ret = false;
+		}
 	}
-
-	if (audiofd > -1) {
+	if (audiofd > -1)
+	{
 		ioctl(audiofd, AUDIO_CLEAR_BUFFER, NULL);
 		/* set back to normal speed (end trickmodes) */
 		dioctl(audiofd, AUDIO_SET_SPEED, DVB_SPEED_NORMAL_PLAY);
 		if (dioctl(audiofd, AUDIO_STOP, NULL))
+		{
 			ret = false;
+		}
 	}
-
 	return ret;
 }
 
@@ -180,16 +192,20 @@ bool Output::Pause()
 	ScopedLock v_lock(videoMutex);
 	ScopedLock a_lock(audioMutex);
 
-	if (videofd > -1) {
+	if (videofd > -1)
+	{
 		if (dioctl(videofd, VIDEO_FREEZE, NULL))
+		{
 			ret = false;
+		}
 	}
-
-	if (audiofd > -1) {
+	if (audiofd > -1)
+	{
 		if (dioctl(audiofd, AUDIO_PAUSE, NULL))
+		{
 			ret = false;
+		}
 	}
-
 	return ret;
 }
 
@@ -201,11 +217,13 @@ bool Output::Continue()
 	ScopedLock a_lock(audioMutex);
 
 	if (videofd > -1 && dioctl(videofd, VIDEO_CONTINUE, NULL))
+	{
 		ret = false;
-
+	}
 	if (audiofd > -1 && dioctl(audiofd, AUDIO_CONTINUE, NULL))
+	{
 		ret = false;
-
+	}
 	return ret;
 }
 
@@ -216,7 +234,6 @@ bool Output::Mute(bool b)
 	return audiofd > -1 && !dioctl(audiofd, b ? AUDIO_STOP : AUDIO_PLAY, NULL);
 }
 
-
 bool Output::Flush()
 {
 	bool ret = true;
@@ -225,9 +242,11 @@ bool Output::Flush()
 	ScopedLock a_lock(audioMutex);
 
 	if (videofd > -1 && ioctl(videofd, VIDEO_FLUSH, NULL))
+	{
 		ret = false;
-
-	if (audiofd > -1 && audioWriter) {
+	}
+	if (audiofd > -1 && audioWriter)
+	{
 		// flush audio decoder
 		AVPacket packet;
 		packet.data = NULL;
@@ -235,9 +254,10 @@ bool Output::Flush()
 		audioWriter->Write(&packet, 0);
 
 		if (ioctl(audiofd, AUDIO_FLUSH, NULL))
+		{
 			ret = false;
+		}
 	}
-
 	return ret;
 }
 
@@ -289,8 +309,9 @@ bool Output::GetFrameCount(int64_t &framecount)
 {
 	dvb_play_info_t playInfo;
 
-	if ((videofd > -1 && !dioctl(videofd, VIDEO_GET_PLAY_INFO, (void *) &playInfo)) ||
-	    (audiofd > -1 && !dioctl(audiofd, AUDIO_GET_PLAY_INFO, (void *) &playInfo))) {
+	if ((videofd > -1 && !dioctl(videofd, VIDEO_GET_PLAY_INFO, (void *) &playInfo))
+	||  (audiofd > -1 && !dioctl(audiofd, AUDIO_GET_PLAY_INFO, (void *) &playInfo)))
+	{
 		framecount = playInfo.frame_count;
 		return true;
 	}
@@ -301,19 +322,26 @@ bool Output::SwitchAudio(AVStream *stream)
 {
 	ScopedLock a_lock(audioMutex);
 	if (stream == audioStream)
+	{
 		return true;
-	if (audiofd > -1) {
+	}
+	if (audiofd > -1)
+	{
 		dioctl(audiofd, AUDIO_STOP, NULL);
 		ioctl(audiofd, AUDIO_CLEAR_BUFFER, NULL);
 	}
 	audioStream = stream;
-	if (stream) {
+	if (stream)
+	{
 		AVCodecContext *avcc = stream->codec;
 		if (!avcc)
+		{
 			return false;
+		}
 		audioWriter = Writer::GetWriter(avcc->codec_id, avcc->codec_type);
 		audioWriter->Init(audiofd, audioStream, player);
-		if (audiofd > -1) {
+		if (audiofd > -1)
+		{
 			dioctl(audiofd, AUDIO_SET_ENCODING, Writer::GetAudioEncoding(avcc->codec_id));
 			dioctl(audiofd, AUDIO_PLAY, NULL);
 		}
@@ -325,19 +353,26 @@ bool Output::SwitchVideo(AVStream *stream)
 {
 	ScopedLock v_lock(videoMutex);
 	if (stream == videoStream)
+	{
 		return true;
-	if (videofd > -1) {
+	}
+	if (videofd > -1)
+	{
 		dioctl(videofd, VIDEO_STOP, NULL);
 		ioctl(videofd, VIDEO_CLEAR_BUFFER, NULL);
 	}
 	videoStream = stream;
-	if (stream) {
+	if (stream)
+	{
 		AVCodecContext *avcc = stream->codec;
 		if (!avcc)
+		{
 			return false;
+		}
 		videoWriter = Writer::GetWriter(avcc->codec_id, avcc->codec_type);
 		videoWriter->Init(videofd, videoStream, player);
-		if (videofd > -1) {
+		if (videofd > -1)
+		{
 			dioctl(videofd, VIDEO_SET_ENCODING, Writer::GetVideoEncoding(avcc->codec_id));
 			dioctl(videofd, VIDEO_PLAY, NULL);
 		}
@@ -347,16 +382,22 @@ bool Output::SwitchVideo(AVStream *stream)
 
 bool Output::Write(AVStream *stream, AVPacket *packet, int64_t pts)
 {
-	switch (stream->codec->codec_type) {
-		case AVMEDIA_TYPE_VIDEO: {
+	switch (stream->codec->codec_type)
+	{
+		case AVMEDIA_TYPE_VIDEO:
+		{
 			ScopedLock v_lock(videoMutex);
 			return videofd > -1 && videoWriter && videoWriter->Write(packet, pts);
 		}
-		case AVMEDIA_TYPE_AUDIO: {
+		case AVMEDIA_TYPE_AUDIO:
+		{
 			ScopedLock a_lock(audioMutex);
 			return audiofd > -1 && audioWriter && audioWriter->Write(packet, pts);
 		}
 		default:
+		{
 			return false;
+		}
 	}
 }
+// vim:ts=4
