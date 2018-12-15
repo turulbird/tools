@@ -951,7 +951,7 @@ again:
 	if (context->playback->isHttp && !no_probe)
 		avContext->flags |= AVFMT_FLAG_NONBLOCK | AVIO_FLAG_NONBLOCK | AVFMT_NO_BYTE_SEEK;
 	if (no_probe || (context->playback->isHttp && n))
-#if (LIBAVFORMAT_VERSION_MAJOR == 57 && LIBAVFORMAT_VERSION_MINOR == 25)
+#if (LIBAVFORMAT_VERSION_MAJOR == 57 && LIBAVFORMAT_VERSION_MINOR >= 25)
 		if (no_probe)
 			avContext->max_analyze_duration = 1;
 		else
