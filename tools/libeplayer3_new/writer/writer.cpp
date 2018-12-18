@@ -68,8 +68,8 @@ static Writer writer __attribute__ ((init_priority (300)));
 
 Writer *Writer::GetWriter(enum AVCodecID id, enum AVMediaType codec_type, int track_type)
 {
-	if (track_type != 6) { // hack for ACC resampling
-	{
+	if (track_type != 6)
+	{ // hack for ACC resampling
 		std::map<enum AVCodecID,Writer*>::iterator it = writers.find(id);
 		if (it != writers.end())
 		{
