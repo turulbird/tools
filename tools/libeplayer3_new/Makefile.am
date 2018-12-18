@@ -1,0 +1,26 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
+AM_CPPFLAGS = -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS
+AM_CPPFLAGS += -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE
+AM_CPPFLAGS += -I./include
+AM_CPPFLAGS += -I../../../tufsbox/cdkroot/usr/include/libavcodec
+AM_CPPFLAGS += -I../../../tufsbox/cdkroot/usr/include/libavformat
+AM_CXXFLAGS = -fno-rtti -fno-exceptions -fno-strict-aliasing
+
+lib_LTLIBRARIES = libeplayer3.la
+
+libeplayer3_la_SOURCES = \
+	input.cpp output.cpp \
+	manager.cpp player.cpp \
+	libthread.cpp \
+	writer/writer.cpp \
+	writer/pes.cpp \
+	writer/misc.cpp
+
+# writer/wmv.cpp writer/ac3.cpp writer/divx.cpp
+# writer/dts.cpp writer/mpeg2.cpp writer/mp3.cpp
+# writer/h264.cpp
+# writer/h263.cpp writer/vc1.cpp writer/pcm.cpp writer/aac.cpp
+
+libeplayer3_la_LIBADD = -lavformat -lavcodec -lavutil -lswresample
+
