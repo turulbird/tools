@@ -741,6 +741,7 @@ void Get_StbId()
 	char *pch;
 	int fn = open("/proc/cmdline", O_RDONLY);
 
+//	printf("[evremote2 spark] %s >\n", __func__);
 	if (fn > -1)
 	{
 		char procCmdLine[1024];
@@ -749,11 +750,19 @@ void Get_StbId()
 		{
 			procCmdLine[len] = 0;
 			pch = strstr(procCmdLine, "STB_ID=");
-			strncpy(VendorStbId, pch + 7, 8);
-			printf("[evremote2 spark] Vendor STB-ID = %s\n", VendorStbId);
+			if (pch != NULL)
+			{
+				strncpy(VendorStbId, pch + 7, 8);
+				printf("[evremote2 spark] Vendor STB-ID = %s\n", VendorStbId);
+			}
+			else
+			{
+				printf("[evremote2 spark] No Vender STB-ID found\n");
+			}
 		}
 		close(fn);
 	}
+//	printf("[evremote2 spark] %s <\n", __func__);
 }
 
 static tButton *pSparkGetButton(char *pData)
@@ -893,7 +902,7 @@ static int pInit(Context_t *context, int argc, char *argv[])
 		perror("connect");
 		return -1;
 	}
-//	printf("[evremote2 spark] %s <\n", __func__);
+	printf("[evremote2 spark] %s <\n", __func__);
 	return vHandle;
 }
 
