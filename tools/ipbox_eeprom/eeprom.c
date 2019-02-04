@@ -49,7 +49,6 @@ char *tvmode_name[N_TVMODE] =
 	"1080I-50",	"1080I-60"
 };
 
-
 typedef enum
 {
 	db_key_null = 0,
@@ -85,26 +84,27 @@ static struct
 	{ db_key_vol,		"volume"  , 0},
 	{ db_key_lch,		"lastch"  , 0},
 	{ db_key_pcbver,	"pcbver"  , /*1 */ 0},
-#if defined(CONFIG_CUBEREVO) || defined(CONFIG_CUBEREVO_MINI)
+#if defined(CONFIG_CUBEREVO) \
+ || defined(CONFIG_CUBEREVO_MINI)
 	{ db_key_tvmode,	"tvmode"  , 0},
 	{ db_key_tuner,		"tuner"   , /*1 */ 0},
 	{ db_key_time,		"time"    , /*1 */ 0},
 #endif
 };
 
-#define CFG_EEPROM_ADD 0x50
-#define CFG_EEPROM_SIZE 512
+#define CFG_EEPROM_ADD   0x50
+#define CFG_EEPROM_SIZE  512
 
-#define db_name_tbl_size	(sizeof(db_name_tbl)/sizeof(db_name_tbl[0]))
+#define db_name_tbl_size (sizeof(db_name_tbl)/sizeof(db_name_tbl[0]))
 
-#define DB_MAGIC_SIZE		sizeof(unsigned short)
-#define DB_HEADE_SIZE		sizeof(db_item)
+#define DB_MAGIC_SIZE    sizeof(unsigned short)
+#define DB_HEADE_SIZE    sizeof(db_item)
 
 #define CFG_EEPROM_PAGE_WRITE_BITS 4
 #define CFG_EEPROM_PAGE_WRITE_DELAY_MS	11	/* 10ms. but give more */
 
-#define	EEPROM_PAGE_SIZE	(1 << CFG_EEPROM_PAGE_WRITE_BITS)
-#define	EEPROM_PAGE_OFFSET(x)	((x) & (EEPROM_PAGE_SIZE - 1))
+#define	EEPROM_PAGE_SIZE  (1 << CFG_EEPROM_PAGE_WRITE_BITS)
+#define	EEPROM_PAGE_OFFSET(x) ((x) & (EEPROM_PAGE_SIZE - 1))
 
 /* ********************************* i2c ************************************ */
 /*
@@ -112,23 +112,23 @@ static struct
  */
 struct i2c_msg
 {
-	unsigned short addr;		/* slave address			*/
+	unsigned short addr;		/* slave address       */
 	unsigned short flags;
-	unsigned short len;		/* msg length				*/
-	unsigned char  *buf;		/* pointer to msg data			*/
+	unsigned short len;		/* msg length          */
+	unsigned char  *buf;		/* pointer to msg data */
 };
 
 /* This is the structure as used in the I2C_RDWR ioctl call */
 struct i2c_rdwr_ioctl_data
 {
-	struct i2c_msg *msgs;	/* pointers to i2c_msgs */
-	unsigned int nmsgs;			/* number of i2c_msgs */
+	struct i2c_msg *msgs;   /* pointers to i2c_msgs */
+	unsigned int nmsgs;     /* number of i2c_msgs   */
 };
 
-#define I2C_SLAVE	0x0703	/* Change slave address			*/
+#define I2C_SLAVE 0x0703        /* Change slave address */
 /* Attn.: Slave address is 7 or 10 bits */
 
-#define I2C_RDWR	0x0707	/* Combined R/W transfer (one stop only)*/
+#define I2C_RDWR 0x0707         /* Combined R/W transfer (one stop only)*/
 
 int i2c_read(int fd_i2c, unsigned char addr, unsigned char reg, unsigned char *buffer, int len)
 {
@@ -136,7 +136,7 @@ int i2c_read(int fd_i2c, unsigned char addr, unsigned char reg, unsigned char *b
 	int	err;
 	unsigned char b0[] = { reg };
 
-	//printf("%s> 0x%0x - %d\n", __func__, reg, len);
+	//printf("%s > 0x%0x - %d\n", __func__, reg, len);
 
 	i2c_rdwr.nmsgs = 2;
 	i2c_rdwr.msgs = malloc(2 * sizeof(struct i2c_msg));
@@ -168,7 +168,7 @@ int i2c_read(int fd_i2c, unsigned char addr, unsigned char reg, unsigned char *b
 	free(i2c_rdwr.msgs[1].buf);
 	free(i2c_rdwr.msgs);
 
-//    printf("%s<\n", __func__);
+//	printf("%s <\n", __func__);
 	return 0;
 }
 
@@ -196,13 +196,10 @@ int i2c_write(int fd_i2c, unsigned char addr, unsigned char reg, unsigned char *
 		//printf("%s\n", strerror(errno));
 		free(i2c_rdwr.msgs[0].buf);
 		free(i2c_rdwr.msgs);
-
 		return -1;
 	}
-
 	free(i2c_rdwr.msgs);
-
-//    printf("%s<\n", __func__);
+//	printf("%s<\n", __func__);
 	return 0;
 }
 
@@ -219,7 +216,6 @@ int isRO(const char *name)
 			return db_name_tbl[a].isRO;
 		}
 	}
-
 	return 1;
 }
 
@@ -235,7 +231,6 @@ int get_keyvalue(const char *name, db_key *key)
 			return 0;
 		}
 	}
-
 	return 1;
 }
 
@@ -251,10 +246,8 @@ static int get_keyname(db_key key, char **name)
 			return 0;
 		}
 	}
-
 	//printf("unknown key %d\n", key);
 	*name = "unknown";
-
 	return 1;
 }
 
@@ -275,20 +268,21 @@ int eeprom_write(int fd, unsigned dev_addr, unsigned offset, unsigned char *buff
 		unsigned len;
 		unsigned char addr[2];
 
-		blk_off = offset & 0xFF;	/* block offset */
+		blk_off = offset & 0xFF;    /* block offset */
 
-		addr[0] = offset >> 8;		/* block number */
-		addr[1] = blk_off;		/* block offset */
+		addr[0] = offset >> 8;      /* block number */
+		addr[1] = blk_off;          /* block offset */
 //		alen	= 2;
-		addr[0] |= dev_addr;		/* insert device address */
+		addr[0] |= dev_addr;        /* insert device address */
 
 //		maxlen = EEPROM_PAGE_SIZE - EEPROM_PAGE_OFFSET(blk_off);
 
 		len = end - offset;
 
 		if (i2c_write(fd, addr[0], offset, buffer, len) != 0)
+		{
 			rcode = 1;
-
+		}
 		buffer += len;
 		offset += len;
 
@@ -304,7 +298,7 @@ int eeprom_read(int fd, unsigned dev_addr, unsigned offset, unsigned char *buffe
 	int rcode = 0;
 	int i;
 
-	//printf("%s> offset %d cnt %d\n", __func__, offset, cnt);
+	//printf("%s > offset %d cnt %d\n", __func__, offset, cnt);
 
 	while (offset < end)
 	{
@@ -312,11 +306,11 @@ int eeprom_read(int fd, unsigned dev_addr, unsigned offset, unsigned char *buffe
 		unsigned len;
 		unsigned char addr[2];
 
-		blk_off = offset & 0xFF;	/* block offset */
+		blk_off = offset & 0xFF;    /* block offset */
 
-		addr[0] = offset >> 8;		/* block number */
-		addr[1] = blk_off;		/* block offset */
-		addr[0] |= dev_addr;		/* insert device address */
+		addr[0] = offset >> 8;      /* block number */
+		addr[1] = blk_off;          /* block offset */
+		addr[0] |= dev_addr;        /* insert device address */
 
 		len = cnt;
 
@@ -328,11 +322,10 @@ int eeprom_read(int fd, unsigned dev_addr, unsigned offset, unsigned char *buffe
 				break;
 			}
 		}
-
 		buffer += len;
 		offset += len;
 	}
-	//printf("%s< %d\n", __func__, rcode);
+	//printf("%s < %d\n", __func__, rcode);
 	return rcode;
 }
 
@@ -341,32 +334,35 @@ static int read_item(int fd, int offset, db_key *key, unsigned char *buf, int *b
 	int rcode;
 	db_item item;
 
-	//printf("%s>\n", __func__);
+	//printf("% s>\n", __func__);
 
 	if (offset >= CFG_EEPROM_SIZE - DB_HEADE_SIZE)
+	{
 		return -1;
-
+	}
 	rcode = eeprom_read(fd, CFG_EEPROM_ADD, offset, (unsigned char *)&item, sizeof(item));
 	if (rcode)
+	{
 		return -1;
-
+	}
 	//printf("item.len %d\n", item.len);
 
 	if (item.len > 0 && buf != NULL)
 	{
 		if (*buflen > item.len)
+		{
 			*buflen = item.len;
-
+		}
 		rcode = eeprom_read(fd, CFG_EEPROM_ADD, offset + DB_HEADE_SIZE, buf, *buflen);
 		if (rcode)
+		{
 			return -1;
-
+		}
 		buf[*buflen] = 0;
 	}
-
 	*key = item.key;
 
-	//printf("%s< %d\n", __func__, item.len);
+	//printf("%s < %d\n", __func__, item.len);
 	return item.len;
 }
 
@@ -377,41 +373,39 @@ int search_item(int fd, int offset, db_key key, unsigned char *buf, unsigned cha
 	db_key keytmp;
 
 	//printf("key %d\n", key);
-
 	do
 	{
 		len = read_item(fd,  offset, &keytmp, NULL, NULL);
 		if (len < 0)
+		{
 			return 1;
-
+		}
 		if (keytmp == key)
 		{
 			/* found it */
 			if (offret != NULL)
+			{
 				*offret = offset;
+			}
 			if (lenret != NULL)
+			{
 				*lenret = len;
-
+			}
 			if (len > 0 && buf != NULL)
 			{
 				if (*buflen > len)
+				{
 					*buflen = len;
-
-				rcode = eeprom_read(
-						fd,
-						CFG_EEPROM_ADD,
-						offset + DB_HEADE_SIZE,
-						buf,
-						*buflen);
+				}
+				rcode = eeprom_read(fd, CFG_EEPROM_ADD, offset + DB_HEADE_SIZE, buf, *buflen);
 				if (rcode)
+				{
 					return 1;
-
+				}
 				buf[*buflen] = 0;
 			}
-
 			return 0;
 		}
-
 		offset += DB_HEADE_SIZE + len;
 	}
 	while (keytmp != db_key_end);
@@ -420,10 +414,13 @@ int search_item(int fd, int offset, db_key key, unsigned char *buf, unsigned cha
 	 * return the end key
 	 */
 	if (offret != NULL)
+	{
 		*offret = offset - (DB_HEADE_SIZE + len);
+	}
 	if (lenret != NULL)
+	{
 		*lenret = len;
-
+	}
 	return 2;
 }
 
@@ -432,7 +429,7 @@ static int save_item(int fd, int offset, db_key key, const char *buf, int len)
 	int rcode;
 	db_item item;
 
-	//printf("%s> %d - %s\n", __func__, key, buf);
+	//printf("%s > %d - %s\n", __func__, key, buf);
 
 	/* write item data */
 	if (buf != NULL && len != 0)
@@ -446,15 +443,16 @@ static int save_item(int fd, int offset, db_key key, const char *buf, int len)
 				len);
 
 		if (rcode)
+		{
 			return rcode;
+		}
 	}
-
 	/* write item header */
 	item.key = key;
 	item.len = len;
 	rcode = eeprom_write(fd, CFG_EEPROM_ADD, offset, (unsigned char *)&item, sizeof(item));
 
-	//printf("%s< rcode %d\n", __func__, rcode);
+	//printf("%s < rcode %d\n", __func__, rcode);
 	return rcode;
 }
 
@@ -481,8 +479,9 @@ static int del_item(int fd, db_key key)
 	{
 		len = read_item(fd, offset, &keytmp, NULL, NULL);
 		if (len < 0)
+		{
 			return -1;
-
+		}
 		if (keytmp == key)
 		{
 			/* merge with next one if it is null item */
@@ -491,16 +490,16 @@ static int del_item(int fd, db_key key)
 			if (next_len >= 0)
 			{
 				if (next_keytmp == db_key_null)
+				{
 					len += DB_HEADE_SIZE + next_len;
+				}
 			}
-
-			/* merge with privious one if it was null item */
+			/* merge with previous one if it was null item */
 			if (last_keytmp == db_key_null)
 			{
 				offset = last_offset;
 				len += last_len + DB_HEADE_SIZE;
 			}
-
 			return save_item(fd, offset, db_key_null, NULL, len);
 		}
 
@@ -524,10 +523,13 @@ int add_item(int fd, db_key key, const char *data)
 	int len;
 
 	if (data)
+	{
 		data_len = strlen(data);
+	}
 	else
+	{
 		data_len = 0;
-
+	}
 	/* delete same key */
 	del_item(fd, key);
 
@@ -537,28 +539,26 @@ int add_item(int fd, db_key key, const char *data)
 	{
 		rcode = search_item(fd,  offset, db_key_null, NULL, NULL, &offset, &len);
 		if (rcode == 1)	/* device error */
+		{
 			return 1;
+		}
 		if (rcode == 2)	/* it`s the end */
+		{
 			break;
-
+		}
 		if (len == data_len || len >= data_len + DB_HEADE_SIZE)
 		{
 			rcode = save_item(fd, offset, key, data, data_len);
 			if (rcode)
+			{
 				return rcode;
-
+			}
 			if (len > data_len)
-				rcode = save_item(
-						fd,
-						offset + DB_HEADE_SIZE + data_len,
-						db_key_null,
-						NULL,
-						len - data_len - DB_HEADE_SIZE
-					);
-
+			{
+				rcode = save_item(fd, offset + DB_HEADE_SIZE + data_len, db_key_null, NULL, len - data_len - DB_HEADE_SIZE);
+			}
 			return rcode;
 		}
-
 		offset += DB_HEADE_SIZE + len;
 	}
 	while (1);
@@ -576,10 +576,8 @@ int add_item(int fd, db_key key, const char *data)
 
 		rcode = save_item(fd, offset, db_key_end, NULL, 0);
 	}
-
 	return rcode;
 }
-
 
 int main(int argc, char *argv[])
 {
@@ -651,11 +649,11 @@ int main(int argc, char *argv[])
 				printf("found key %s ->value %s\n", name, buf);
 
 				if (strcmp(name, "tvmode") == 0)
+				{
 					return atoi((const char *) buf);
+				}
 			}
-
 			//printf( "%d\t%s\t%d\t%s\n", offset, name, rcode, (key == db_key_null) ? "" : buf );
-
 			offset += DB_HEADE_SIZE + rcode;
 		}
 		while (key != db_key_end);
@@ -665,3 +663,4 @@ failed:
 	printf("failed\n");
 	return -1;
 }
+// vim:ts=4
