@@ -58,7 +58,7 @@ static int setIcon(Context_t *context, int which, int on);
 #define cEVENT_DEVICE "/dev/input/event0"
 
 #define cMAXCharsFortis 12
-#define VFDGETWAKEUPTIME        0xc0425b03 // added by audioniek
+//#define VFDGETWAKEUPTIME 0xc0425b03 // added by audioniek /* moved to global.h */
 
 typedef struct
 {
@@ -67,7 +67,7 @@ typedef struct
 	char *arg_description;
 } tArgs;
 
-tArgs vSArgs[] =
+tArgs vFArgs[] =
 {
 	{ "-e", "  --setTimer         * ", "Args: [time date]  Format: HH:MM:SS dd-mm-YYYY" },
 	{ "", "                         ", "      No arg: Set the most recent timer from e2 or neutrino" },
@@ -189,13 +189,13 @@ static int usage(Context_t *context, char *prg_name, char *cmd_name)
 	fprintf(stderr, "%s argument [optarg1] [optarg2]\n", prg_name);
 	for (i = 0; ; i++)
 	{
-		if (vSArgs[i].arg == NULL)
+		if (vFArgs[i].arg == NULL)
 		{
 			break;
 		}
-		if ((cmd_name == NULL) || (strcmp(cmd_name, vSArgs[i].arg) == 0) || (strstr(vSArgs[i].arg_long, cmd_name) != NULL))
+		if ((cmd_name == NULL) || (strcmp(cmd_name, vFArgs[i].arg) == 0) || (strstr(vFArgs[i].arg_long, cmd_name) != NULL))
 		{
-			fprintf(stderr, "%s   %s   %s\n", vSArgs[i].arg, vSArgs[i].arg_long, vSArgs[i].arg_description);
+			fprintf(stderr, "%s   %s   %s\n", vFArgs[i].arg, vFArgs[i].arg_long, vFArgs[i].arg_description);
 		}
 	}
 	fprintf(stderr, "Options marked * should be the only calling argument.\n");
@@ -342,8 +342,8 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		if (fp_time[0] != '\0')
 		{
 			curTimeFP = (time_t)calcGetNuvotonTime(fp_time);
-			/* set FP-Time if system time is more than 1 hour off */
-			if (((curTimeFP - curTime) > 3600) || ((curTime - curTimeFP) > 3600))
+			/* set FP-Time if system time is more than 5 minutes off */
+			if (((curTimeFP - curTime) > 300) || ((curTime - curTimeFP) > 300))
 			{
 				printf("Time difference between fp and system: %+d seconds.\n", (int)(curTimeFP - curTime));
 				setTime(context, &curTime); // sync fp clock
@@ -490,7 +490,7 @@ static int reboot(Context_t *context, time_t *rebootTimeGMT)
 
 static int Sleep(Context_t *context, time_t *wakeUpGMT)
 {
-	// -p command, to be checked
+	// -p command
 	time_t curTime;
 	int gmt_offset;
 	struct tm *ts;
@@ -564,7 +564,7 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 
 static int setText(Context_t *context, char *theText)
 {
-	// -t command to check
+	// -t command
 	char vHelp[128];
 
 //	strncpy(vHelp, theText, cMAXCharsFortis);
@@ -577,13 +577,13 @@ static int setText(Context_t *context, char *theText)
 
 static int setLed(Context_t *context, int which, int level)
 {
-	// -l command, OK
+	// -l command
 	struct nuvoton_ioctl_data vData;
 
 	if (level < 0 || level > 31)
 	{
 		printf("Illegal brightness level %d (valid is 0..31)\n", level);
-		return 0;
+		return -1;
 	}
 
 	if (which < 8)
@@ -616,7 +616,7 @@ static int setLed(Context_t *context, int which, int level)
 
 static int setIcon(Context_t *context, int which, int on)
 {
-	// -i command, OK
+	// -i command
 	struct nuvoton_ioctl_data vData;
 
 	vData.u.icon.icon_nr = which;
@@ -652,7 +652,7 @@ static int setBrightness(Context_t *context, int brightness)
 
 static int Clear(Context_t *context)
 {
-	// -c command, OK
+	// -c command
 	int i;
 	int led_nr;
 

@@ -40,7 +40,7 @@ struct set_time_s
 	char time[5];
 };
 
-/* this sets up the mode temporarily (for one ioctl)
+/* this sets the mode temporarily (for one ioctl)
  * to the desired mode. currently the "normal" mode
  * is the compatible vfd mode
  */
@@ -78,5 +78,4 @@ struct nuvoton_ioctl_data
 #endif
 	} u;
 };
-
 #endif

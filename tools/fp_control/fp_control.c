@@ -35,7 +35,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Software version of fp_control, please increase on every change */
-static const char *sw_version = "1.09Audioniek 20171024.1";
+static const char *sw_version = "1.10Audioniek 20190212.1";
 static eWakeupReason reason = 0;
 
 typedef struct
@@ -69,12 +69,12 @@ tArgs vArgs[] =
 	{ "-gt", " --getWakeTime      * ", "Args: No arguments\n\tGet the frontcontroller wake up time" },
 	{ "-st", " --setWakeTime      * ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller wake up time" },
 	{ "-r", "  --reboot           * ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tReboot receiver via fc at given time" },
-	{ "-p", "  --sleep            * ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tReboot receiver via fc at given time" },
+	{ "-p", "  --sleep            * ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSleep receiver via fc until given time" },
 	{ "-t", "  --settext            ", "Arg : text\n\tSet text to frontpanel." },
 	{ "-l", "  --setLed             ", "Args: led on\n\tSet a led on or off" },
 	{ "-i", "  --setIcon            ", "Args: icon on\n\tSet an icon on or off" },
 	{ "-b", "  --setBrightness      ", "Arg : brightness 0..7\n\tSet display brightness" },
-	{ "-led", " --setLedBrightness   ", "Arg : brightness\n\tSet LED brightness" },
+	{ "-led", "--setLedBrightness   ", "Arg : brightness\n\tSet LED brightness" },
 	{ "-w", "  --getWakeupReason  * ", "Args: No arguments\n\tGet the wake-up reason" },
 	{ "-L", "  --setLight           ", "Arg : 0/1\n\tSet light" },
 	{ "-c", "  --clear              ", "Args: No arguments\n\tClear display, all icons and leds off" },
@@ -125,24 +125,32 @@ int usage(Context_t *context, char *prg, char *cmd)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void getTimeFromArg(char *timeStr, char *dateStr, time_t *theTime)
-{
+{ // timeStr, dateStr -> time_t
 	struct tm thetempTime;
+	int mjd;
 
 	sscanf(timeStr, "%d:%d:%d", &thetempTime.tm_hour, &thetempTime.tm_min, &thetempTime.tm_sec);
 	sscanf(dateStr, "%d-%d-%d", &thetempTime.tm_mday, &thetempTime.tm_mon, &thetempTime.tm_year);
-	thetempTime.tm_year -= 1900;
+	//printf("%s > input: %02d:%02d:%02d %02d-%02d-%02d\n", __func__, thetempTime.tm_hour, thetempTime.tm_min, thetempTime.tm_sec, thetempTime.tm_mday, thetempTime.tm_mon, thetempTime.tm_year);
 	thetempTime.tm_mon  -= 1;
-#if 0
+ 	thetempTime.tm_year -= 1900;
+
 	thetempTime.tm_isdst = -1; /* say mktime that we do not know */
 //	/* FIXME: hmm this is not a gmt or, isn't it? */
-	theTime = mktime(&thetempTime);
-#else
+//	theTime = mktime(&thetempTime);
 	/* FIXED: indeed, but this one is... */
-	*theTime = modJulianDate(&thetempTime) * 86400;
-	*theTime += thetempTime.tm_hour * 3600;
-	*theTime += thetempTime.tm_min * 60;
-	*theTime += thetempTime.tm_sec;
-#endif
+	mjd = (int)modJulianDate(&thetempTime);
+	//printf("%s date seconds: %d (time_t)\n", __func__, mjd);
+	mjd *= 86400; // MJD * seconds per day
+	//printf("%s date seconds: %d (time_t)\n", __func__, mjd);
+	mjd += thetempTime.tm_hour * 3600;
+	//printf("%s date + hour seconds: %d (time_t)\n", __func__, mjd);
+	mjd += thetempTime.tm_min * 60;
+	//printf("%s date + hour + min seconds: %d (time_t)\n", __func__, mjd);
+	mjd += thetempTime.tm_sec;
+	//printf("%s date + hour + min seconds: %d (time_t)\n", __func__, mjd);
+	*theTime = mjd;
+	//printf("%s < output: %d (time_t)\n", __func__, (int)*theTime);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

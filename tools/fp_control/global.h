@@ -34,6 +34,7 @@
 #define VFDDISPLAYCLR           0xc0425b00
 #define VFDGETLOOPSTATE         0xc0425b01 /* Spark specific */
 #define VFDSETLOOPSTATE         0xc0425b02 /* Spark specific */
+#define VFDGETWAKEUPTIME        0xc0425b03 /* Fortis/nuvoton, Cuberevo/micom specific */
 #define VFDSETTIMEFORMAT        0xc0425b04 /* Fortis specific */
 #define VFDGETTIMEFORMAT        0xc0425b05 /* Fortis specific */
 
