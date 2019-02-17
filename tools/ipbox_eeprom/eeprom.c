@@ -63,6 +63,9 @@ typedef enum
 	db_key_tvmode,
 	db_key_tuner,
 	db_key_time,
+	db_key_10,
+	db_key_11,
+	db_key_12
 } db_key;
 
 typedef struct
@@ -79,19 +82,22 @@ static struct
 	int    isRO;
 } db_name_tbl[] =
 {
-	{ db_key_null,		"null"    , /*1 */ 0}, // 0
-	{ db_key_end,		"end"     , /*1 */ 0}, // 1
-	{ db_key_ethaddr,	"ethaddr" , 0},        // 2
-	{ db_key_prodnum,	"prodnum" , /*1 */ 0}, // 3
-	{ db_key_vol,		"volume"  , 0},        // 4
-	{ db_key_lch,		"lastch"  , 0},        // 5
-	{ db_key_pcbver,	"pcbver"  , /*1 */ 0}, // 6
+	{ db_key_null,		"null",    0}, // 0
+	{ db_key_end,		"end",     0}, // 1
+	{ db_key_ethaddr,	"ethaddr", 0}, // 2
+	{ db_key_prodnum,	"prodnum", 0}, // 3
+	{ db_key_vol,		"volume",  0}, // 4
+	{ db_key_lch,		"lastch",  0}, // 5
+	{ db_key_pcbver,	"pcbver",  0}, // 6
 #if defined(CONFIG_CUBEREVO) \
  || defined(CONFIG_CUBEREVO_MINI) \
  || defined(CONFIG_CUBEREVO_MINI2)
-	{ db_key_tvmode,	"tvmode"  , 0},        // 7
-	{ db_key_tuner,		"tuner"   , /*1 */ 0}, // 8
-	{ db_key_time,		"time"    , /*1 */ 0}, // 9
+	{ db_key_tvmode,	"tvmode", 0}, // 7
+	{ db_key_tuner,		"tuner",  0}, // 8
+	{ db_key_time,		"time",   0}, // 9
+	{ db_key_10,		"key_10", 0}, // 10
+	{ db_key_11,		"key_11", 0}, // 11
+	{ db_key_12,		"key_12", 0}, // 12
 #endif
 };
 
@@ -131,11 +137,11 @@ struct i2c_rdwr_ioctl_data
 #define I2C_SLAVE 0x0703    /* Change slave address */
 /* Attn.: Slave address is 7 or 10 bits */
 
-#define I2C_RDWR 0x0707     /* Combined R/W transfer (one stop only)*/
+#define I2C_RDWR 0x0707     /* Combined R/W transfer (one stop only) */
 
 int i2c_read(int fd_i2c, unsigned char addr, unsigned char reg, unsigned char *buffer, int len)
 {
-	struct 	i2c_rdwr_ioctl_data i2c_rdwr;
+	struct i2c_rdwr_ioctl_data i2c_rdwr;
 	int	err;
 	unsigned char b0[] = { reg };
 
@@ -549,7 +555,7 @@ int add_item(int fd, db_key key, const char *data)
 		{
 			return 1;
 		}
-		if (rcode == 2)	/* it`s the end */
+		if (rcode == 2)	/* it is the end */
 		{
 			break;
 		}
@@ -591,7 +597,7 @@ int main(int argc, char *argv[])
 {
 	int fd_i2c;
 //	unsigned char reg = sizeof(unsigned short); //DB_MAGIC_SIZE
-//	int vLoop, ret = 0;
+	int vLoop;
 //	db_item item;
 //	unsigned char *buffer = (unsigned char *) &item;
 	db_key key;
@@ -633,47 +639,70 @@ int main(int argc, char *argv[])
 	}
 	else if (argc > 1) // read key and display name and value
 	{
-		printf("offset   key     len     data\n");
-		printf("-----------------------------\n");
-		do
+		if (strcmp(argv[1], "-d") == 0)
 		{
-			int rcode;
-			char *name;
+			int i, rcode = 0;
 			unsigned char buf[256];
-			int buflen;
 
-			buf[0] = 0;
-			buflen = 255;
-//			printf("[eeprom] read_item start\n");
-			rcode = read_item(fd_i2c, offset, &key, buf, &buflen);
-//			printf("[eeprom] read_item end\n");
-			if (rcode < 0)
+			rcode |= eeprom_read(fd_i2c, CFG_EEPROM_ADD, 0, buf, 0x100);
+			printf("EEPROM dump\n");
+			printf("Addr  0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F\n");
+			printf("-----------------------------------------------------\n");
+			for (vLoop = 0; vLoop < 0x100; vLoop += 0x10)
 			{
-				rcode = 1;
-				goto failed;
-			}
-			get_keyname(key, &name);
-			if (strcmp(name, argv[1]) == 0)
-			{
-				printf("found key %s -> value %s\n", name, buf);
-
-				if (strcmp(name, "tvmode") == 0)
+				printf(" %02x ", vLoop);
+				for (i = 0; i < 0x10; i++)
 				{
-					printf("return value: %d\n", atoi((const char *)buf));
-					return atoi((const char *)buf);
+					printf(" %02x",	buf[vLoop + i]);
 				}
+				printf("\n");
 			}
-			printf( "%3d     %s\t%d\t%s\n", offset, name, rcode, (char *)((key == db_key_null) ? "-" : buf) );
-			offset += DB_HEADE_SIZE + rcode;
 		}
-		while (key != db_key_end);
+		else
+		{
+			printf("offset  key     len     data\n");
+			printf("-------------------------------------\n");
+			do
+			{
+				int rcode;
+				char *name;
+				unsigned char buf[256];
+				int buflen;
+
+				buf[0] = 0;
+				buflen = 255;
+				rcode = read_item(fd_i2c, offset, &key, buf, &buflen);
+
+				if (rcode < 0)
+				{
+					rcode = 1;
+					goto failed;
+				}
+				get_keyname(key, &name);
+
+				if (strcmp(name, argv[1]) == 0)
+				{
+					printf("found key %s -> value %s\n", name, buf);
+	
+					if (strcmp(name, "tvmode") == 0)
+					{
+						printf("return value: %d\n", atoi((const char *)buf));
+						return atoi((const char *)buf);
+					}
+				}
+				printf( "%02x      %s\t %2d\t%s\n", offset, name, rcode, (char *)((key == db_key_null) ? "-" : buf) );
+				offset += DB_HEADE_SIZE + rcode;
+			}
+			while (key != db_key_end);
+		}
 	}
 	else // no arguments; show usage
 	{
-		printf("%s version 1.0\n\n", argv[0]);
+		printf("%s version 1.1\n\n", argv[0]);
 		printf(" Usage:\n");
-		printf("%s [key name [value]]\n\n", argv[0]);
+		printf("%s -d | [key name [value]]\n\n", argv[0]);
 		printf(" no args: show this usage\n");
+		printf(" -d: hex dump eeprom contents\n");
 		printf(" only key name: if present, show key name and value\n");
 		printf(" key name and value: write new value for key name\n");
 	}
