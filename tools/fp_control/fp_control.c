@@ -35,7 +35,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Software version of fp_control, please increase on every change */
-static const char *sw_version = "1.10Audioniek 20190212.1";
+static const char *sw_version = "1.10Audioniek 20190227.1";
 static eWakeupReason reason = 0;
 
 typedef struct
@@ -643,7 +643,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 			{
 				int j;
 				char len;
-				char testdata[16];
+				unsigned char testdata[16];
 
 				len = argc - 2;
 
@@ -651,7 +651,7 @@ void processCommand(Context_t *context, int argc, char *argv[])
 				{
 					if (i + len <= argc)
 					{
-						memset(testdata, 0, 18);						
+						memset(testdata, 0, sizeof(testdata));						
 
 						for (j = 1; j <= len; j++)
 						{

@@ -58,7 +58,6 @@ static int setIcon(Context_t *context, int which, int on);
 #define cEVENT_DEVICE "/dev/input/event0"
 
 #define cMAXCharsFortis 12
-//#define VFDGETWAKEUPTIME 0xc0425b03 // added by audioniek /* moved to global.h */
 
 typedef struct
 {
@@ -80,7 +79,7 @@ tArgs vFArgs[] =
 	{ "-r", "  --reboot           * ", "Args: None" },
 	{ "", "                         ", "      No arg: Reboot immediately" },
 	{ "", "                         ", "      Arg time date: Reboot at given time/date" },
-	{ "-g", "  --getTime          *  ", "Args: None        Display currently set frontprocessor time" },
+	{ "-g", "  --getTime          * ", "Args: None        Display currently set frontprocessor time" },
 	{ "-gs", " --getTimeAndSet    * ", "Args: None" },
 	{ "", "                         ", "      Set system time to current frontprocessor time" },
 	{ "", "                         ", "      WARNING: system date will be 01-01-1970!" },
@@ -100,7 +99,7 @@ tArgs vFArgs[] =
 	{ "-L", "  --setLight           ", "Arg : 0|1         Set display on/off" },
 	{ "-c", "  --clear              ", "Args: None        Clear display, all icons and LEDs off" },
 	{ "-v", "  --version            ", "Args: None        Get version info from frontprocessor" },
-	{ "-tm", " --time_mode          ", "Args: 0/1         Set time mode" },
+	{ "-tm", " --time_mode          ", "Arg : 0/1         Set time mode" },
 #if defined MODEL_SPECIFIC
 	{ "-ms", " --model_specific     ", "Args: int1 [int2] [int3] ... [int16]   (note: input in hex)" },
 	{ "", "                         ", "                  Model specific test function" },
@@ -216,6 +215,29 @@ static int setTime(Context_t *context, time_t *theGMTTime)
 	return 0;
 }
 
+static int getTime(Context_t *context, time_t *theGMTTime)
+{
+	// -g command
+	char fp_time[8];
+
+	if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
+	{
+		perror("Get time");
+		return -1;
+	}
+	/* if we get the fp time */
+	if (fp_time[0] != '\0')
+	{
+		*theGMTTime = (time_t)calcGetNuvotonTime(fp_time);
+	}
+	else
+	{
+		fprintf(stderr, "Error reading time from fp\n");
+		*theGMTTime = 0;
+	}
+	return 0;
+}
+
 static int setSTime(Context_t *context, time_t *theGMTTime)
 {
 	// -sst command
@@ -262,29 +284,6 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 	fclose(proc_fs_file);
 	printf("Note: /proc/stb/fp/rtc_offset set to: %+d seconds.\n", gmt_offset);
 
-	return 0;
-}
-
-static int getTime(Context_t *context, time_t *theGMTTime)
-{
-	// -g command
-	char fp_time[8];
-
-	if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
-	{
-		perror("Get time");
-		return -1;
-	}
-	/* if we get the fp time */
-	if (fp_time[0] != '\0')
-	{
-		*theGMTTime = (time_t)calcGetNuvotonTime(fp_time);
-	}
-	else
-	{
-		fprintf(stderr, "Error reading time from fp\n");
-		*theGMTTime = 0;
-	}
 	return 0;
 }
 
@@ -752,7 +751,7 @@ static int setTimeMode(Context_t *context, int timemode)
 }
 
 #if defined MODEL_SPECIFIC
-static int modelSpecific(Context_t *context, char len, char *data)
+static int modelSpecific(Context_t *context, char len, unsigned char *data)
 {
 	//-ms command
 	int i, res;
@@ -768,7 +767,7 @@ static int modelSpecific(Context_t *context, char len, char *data)
 	}
 	printf("EOP\n");
 
-	memset(data, 0, 9);
+	memset(data, 0, sizeof(data));
 
 //	setMode(context->fd); //set mode 1
 

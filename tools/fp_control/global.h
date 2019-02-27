@@ -39,7 +39,7 @@
 #define VFDGETTIMEFORMAT        0xc0425b05 /* Fortis specific */
 
 //Comment next line if you do not want the -ms option
-//#define MODEL_SPECIFIC 1
+#define MODEL_SPECIFIC 1
 
 struct vfd_ioctl_data
 {
@@ -91,31 +91,31 @@ typedef struct Model_s
 	int	(*SetDisplayTime)   (Context_t *context, int on);
 	int	(*SetTimeMode)      (Context_t *context, int twentyFour);
 #if defined MODEL_SPECIFIC
-	int	(*ModelSpecific)    (Context_t *context, char len, char *testdata); /* added by audioniek */
+	int	(*ModelSpecific)    (Context_t *context, char len, unsigned char *testdata); /* added by audioniek */
 #endif
 	void	*private;
 } Model_t;
 
-extern Model_t Ufs910_1W_model;
-extern Model_t Ufs910_14W_model;
-extern Model_t UFS912_model;
-extern Model_t UFS922_model;
-extern Model_t UFC960_model;
-extern Model_t Fortis_model;
-extern Model_t HL101_model;
-extern Model_t VIP2_model;
-extern Model_t Hs5101_model;
-extern Model_t Spark_model;
-extern Model_t Adb_Box_model;
-extern Model_t Cuberevo_model;
-extern Model_t CNBOX_model;
+extern	Model_t Ufs910_1W_model;
+extern	Model_t Ufs910_14W_model;
+extern	Model_t UFS912_model;
+extern	Model_t UFS922_model;
+extern	Model_t UFC960_model;
+extern	Model_t Fortis_model;
+extern	Model_t HL101_model;
+extern	Model_t VIP2_model;
+extern	Model_t Hs5101_model;
+extern	Model_t Spark_model;
+extern	Model_t Adb_Box_model;
+extern	Model_t Cuberevo_model;
+extern	Model_t CNBOX_model;
 
-double modJulianDate(struct tm *theTime);
-int get_GMT_offset(struct tm theTime);
-time_t read_timers_utc(time_t curTime);
-time_t read_fake_timer_utc(time_t curTime);
-int searchModel(Context_t *context, eBoxType type);
-int checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeup);
+double	modJulianDate(struct tm *theTime);
+int	get_GMT_offset(struct tm theTime);
+time_t	read_timers_utc(time_t curTime);
+time_t	read_fake_timer_utc(time_t curTime);
+int	searchModel(Context_t *context, eBoxType type);
+int	checkConfig(int *display, int *display_custom, char **timeFormat, int *wakeup);
 
 int getWakeupReasonPseudo(eWakeupReason *reason);
 int syncWasTimerWakeup(eWakeupReason reason);
