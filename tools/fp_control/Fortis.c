@@ -767,7 +767,7 @@ static int modelSpecific(Context_t *context, char len, unsigned char *data)
 	}
 	printf("EOP\n");
 
-	memset(data, 0, sizeof(data));
+	memset(data, 0, 18);
 
 //	setMode(context->fd); //set mode 1
 

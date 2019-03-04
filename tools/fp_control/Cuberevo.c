@@ -197,11 +197,16 @@ static time_t getMicomTime(char* TimeString)
 	the_tm.tm_min  = min;
 	the_tm.tm_sec  = sec;
 	the_tm.tm_isdst = -1; // struct tm in local time, convert to UTC
+//	printf("Converted time: %02d:%02d:%02d %02d-%02d-20%02d (seconds ignored)\n", the_tm.tm_hour, the_tm.tm_min, the_tm.tm_sec, the_tm.tm_mday,
+//		the_tm.tm_mon + 1, the_tm.tm_year - 100);
 	convertedTime = mktime(&the_tm); // twice local due to mktime...
 	tz_time_local_tm = localtime(&convertedTime);
 	hour = tz_time_local_tm->tm_hour;
 	tz_time_utc_tm = gmtime(&convertedTime);
+//	printf("Converted time2: %02d:%02d:%02d %02d-%02d-20%02d (seconds ignored)\n", tz_time_utc_tm->tm_hour, tz_time_utc_tm->tm_min, tz_time_utc_tm->tm_sec, tz_time_utc_tm->tm_mday,
+//		tz_time_utc_tm->tm_mon + 1, tz_time_utc_tm->tm_year - 100);
 	convertedTime += ((hour - tz_time_utc_tm->tm_hour) * 3600); 
+//	printf("Addition: %d\n",  ((hour - tz_time_utc_tm->tm_hour) * 3600));
 	return convertedTime;
 }
 
@@ -371,7 +376,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	{
 		/* shut down immedately */
 		printf("No timers set or 1st timer more than 300 days ahead,\nor all timer(s) in the past.\n");
-		wakeupTime = LONG_MAX;
+		wakeupTime = 946684800u; // 00:00:00 01-01-2000 -> timer icon off
 	}
 	else // wake up time valid and in the coming 300 days
 	{
@@ -453,7 +458,7 @@ static int setWakeupTime(Context_t *context, time_t *theGMTTime)
 
 	if (ioctl(context->fd, VFDSETWAKEUPTIME_CUB, &vData) < 0)
 	{
-		perror("Set wake up time time");
+		perror("Set wake up time");
 		return -1;
 	}
 	return 0;
@@ -918,7 +923,7 @@ static int modelSpecific(Context_t *context, char len, unsigned char *data)
 	}
 	printf("\n");
 
-	memset(data, 0, sizeof(data));
+	memset(data, 0, 18);
 
 //	setMode(context->fd); //set mode 1
 
