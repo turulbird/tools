@@ -202,6 +202,10 @@ static time_t getMicomTime(char* TimeString)
 	convertedTime = mktime(&the_tm); // twice local due to mktime...
 	tz_time_local_tm = localtime(&convertedTime);
 	hour = tz_time_local_tm->tm_hour;
+	if (hour == 0)
+	{
+		hour = 24;
+	}
 	tz_time_utc_tm = gmtime(&convertedTime);
 //	printf("Converted time2: %02d:%02d:%02d %02d-%02d-20%02d (seconds ignored)\n", tz_time_utc_tm->tm_hour, tz_time_utc_tm->tm_min, tz_time_utc_tm->tm_sec, tz_time_utc_tm->tm_mday,
 //		tz_time_utc_tm->tm_mon + 1, tz_time_utc_tm->tm_year - 100);
@@ -376,7 +380,8 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	{
 		/* shut down immedately */
 		printf("No timers set or 1st timer more than 300 days ahead,\nor all timer(s) in the past.\n");
-		wakeupTime = 946684800u; // 00:00:00 01-01-2000 -> timer icon off
+//		wakeupTime = 946684800u; // 00:00:00 01-01-2000 -> timer icon off
+		vData.u.wakeup_time.time[0] = '\0';
 	}
 	else // wake up time valid and in the coming 300 days
 	{
@@ -425,7 +430,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	setMicomTime(wakeupTime, vData.u.wakeup_time.time, 0); // ignore seconds
 	fflush(stdout);
 	fflush(stderr);
-	sleep(1);
+	sleep(2);
 	if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
 	{
 		perror("Shut down");
