@@ -35,7 +35,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Software version of fp_control, please increase on every change */
-static const char *sw_version = "1.10Audioniek 20190308.1";
+static const char *sw_version = "1.11Audioniek 20190618.1";
 static eWakeupReason reason = 0;
 
 typedef struct
@@ -66,7 +66,7 @@ tArgs vArgs[] =
 	{ "-gw", " --getWakeupTime    * ", "Args: No arguments\n\tReturn current wakeup time" },
 	{ "-s", "  --setTime          * ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller time" },
 	{ "-sst", "--setSystemTime    * ", "Args: No arguments\n\tSet the frontcontroller time equal to system time" },
-	{ "-gt", " --getWakeTime      * ", "Args: No arguments\n\tGet the frontcontroller wake up time" },
+//	{ "-gt", " --getWakeTime      * ", "Args: No arguments\n\tGet the frontcontroller wake up time" },
 	{ "-st", " --setWakeTime      * ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSet the frontcontroller wake up time" },
 	{ "-r", "  --reboot           * ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tReboot receiver via fc at given time" },
 	{ "-p", "  --sleep            * ", "Args: time date Format: HH:MM:SS dd-mm-YYYY\n\tSleep receiver via fc until given time" },
@@ -89,7 +89,6 @@ tArgs vArgs[] =
 #endif
 	{ NULL, NULL, NULL }
 };
-
 
 int usage(Context_t *context, char *prg, char *cmd)
 {
@@ -229,29 +228,14 @@ void processCommand(Context_t *context, int argc, char *argv[])
 					}
 				}
 			}
-			else if ((strcmp(argv[i], "-gt") == 0) || (strcmp(argv[i], "--getWakeTime") == 0))
-			{
-				time_t theGMTTime;
-
-				/* get the current wake up time from frontcontroller */
-				if (((Model_t *)context->m)->GetWTime)
-				{
-					if (((Model_t *)context->m)->GetWTime(context, &theGMTTime) == 0)
-					{
-						struct tm *gmt = gmtime(&theGMTTime);
-						fprintf(stderr, "Current wake up time: %02d:%02d:%02d %02d-%02d-%04d\n",
-								gmt->tm_hour, gmt->tm_min, gmt->tm_sec, gmt->tm_mday, gmt->tm_mon + 1, gmt->tm_year + 1900);
-					}
-				}
-			}
 			else if ((strcmp(argv[i], "-gw") == 0) || (strcmp(argv[i], "--getWakeupTime") == 0))
 			{
 				time_t theGMTTime;
 
 				/* get the frontcontroller wakeup time */
-				if (((Model_t*)context->m)->GetWakeupTime)
+				if (((Model_t*)context->m)->GetWTime)
 				{
-					if (((Model_t*)context->m)->GetWakeupTime(context, &theGMTTime) == 0)
+					if (((Model_t*)context->m)->GetWTime(context, &theGMTTime) == 0)
 					{
 						struct tm *gmt = gmtime(&theGMTTime);
 
@@ -837,6 +821,11 @@ int getModel()
 		    || (!strncasecmp(vName, "cuberevo-3000hd", 14)))
 			{
 				vBoxType = Cuberevo;
+			}
+		else
+			if (!strncasecmp(vName, "vitamin_hd5000", 14))
+			{
+				vBoxType = Vitamin_HD5000;
 			}
 		else
 		{

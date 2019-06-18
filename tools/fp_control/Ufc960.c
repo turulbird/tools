@@ -540,7 +540,6 @@ Model_t UFC960_model =
 	.GetVersion       = getVersion,
 	.SetRF            = NULL,
 	.SetFan           = NULL,
-	.GetWakeupTime    = NULL,
 	.SetDisplayTime   = NULL,
 	.SetTimeMode      = NULL,
 #if defined MODEL_SPECIFIC

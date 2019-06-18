@@ -632,7 +632,6 @@ Model_t UFS912_model =
 	.GetVersion       = getVersion,
 	.SetRF            = NULL,
 	.SetFan           = NULL,
-	.GetWakeupTime    = NULL,
 	.SetDisplayTime   = NULL,
 	.SetTimeMode      = NULL,
 #if defined MODEL_SPECIFIC

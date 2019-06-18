@@ -58,6 +58,7 @@ static Model_t *AvailableModels[] =
 	&Adb_Box_model,
 	&Cuberevo_model,
 	&CNBOX_model,
+	&Vitamin_model,
 	NULL
 };
 

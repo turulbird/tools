@@ -457,7 +457,6 @@ Model_t VIP2_model =
 	.GetVersion       = NULL,
 	.SetRF            = NULL,
 	.SetFan           = NULL,
-	.GetWakeupTime    = NULL,
 	.SetDisplayTime   = NULL,
 	.SetTimeMode      = NULL,
 #if defined MODEL_SPECIFIC

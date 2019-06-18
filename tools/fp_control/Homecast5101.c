@@ -525,7 +525,6 @@ Model_t Hs5101_model =
 	.GetVersion       = NULL,
 	.SetRF            = NULL,
 	.SetFan           = NULL,
-	.GetWakeupTime    = NULL,
 	.SetDisplayTime   = NULL,
 	.SetTimeMode      = NULL,
 #if defined MODEL_SPECIFIC

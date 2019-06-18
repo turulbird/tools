@@ -904,7 +904,6 @@ Model_t Spark_model =
 	.GetVersion       = Spark_getVersion,
 	.SetRF            = Spark_setRF,
 	.SetFan           = Spark_setFan,
-	.GetWakeupTime    = NULL,
 	.SetDisplayTime   = Spark_setDisplayTime,
 	.SetTimeMode      = Spark_setTimeMode,
 #if defined MODEL_SPECIFIC

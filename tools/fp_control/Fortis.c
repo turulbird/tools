@@ -653,13 +653,11 @@ static int Clear(Context_t *context)
 {
 	// -c command
 	int i;
-	int led_nr;
 
 	setText(context, "            ");  //show no text
-	led_nr = 1;
 	for (i = 0; i <= 7; i++)
 	{
-		setLed(context, led_nr, 0); //all leds off
+		setLed(context, i, 0); //all leds off
 	}
 	for (i = 1; i < 40; i++) //all icons off
 	{
@@ -827,7 +825,6 @@ Model_t Fortis_model =
 	.GetVersion       = getVersion,
 	.SetRF            = NULL,
 	.SetFan           = NULL,
-	.GetWakeupTime    = getWTime,
 	.SetDisplayTime   = NULL,
 	.SetTimeMode      = setTimeMode,
 #if defined MODEL_SPECIFIC
