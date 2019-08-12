@@ -345,7 +345,7 @@ bool Player::SlowMotion(int repeats)
 		output.SlowMotion(repeats);
 		return true;
 	}
-	fprintf(stderr, "[player.cpp] slowmotion not possible\n");
+	fprintf(stderr, "[player.cpp] slow motion not possible\n");
 	return false;
 }
 
