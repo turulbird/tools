@@ -39,8 +39,45 @@ static int setText(Context_t *context, char *theText);
 /* ******************* constants ************************ */
 
 #define cVFD_DEVICE "/dev/vfd"
-
 #define cMAXCharsADB_BOX 16
+#define VFDSETFAN 0xc0425af6
+
+typedef struct
+{
+	char *arg;
+	char *arg_long;
+	char *arg_description;
+} tArgs;
+
+tArgs vAArgs[] =
+{
+	{ "-e", "  --setTimer         * ", "Args: [time date]  Format: HH:MM:SS dd-mm-YYYY" },
+	{ "", "                         ", "      No arg: Set the most recent timer from e2 or neutrino" },
+	{ "", "                         ", "      to the frontcontroller and shutdown" },
+	{ "", "                         ", "      Arg time date: Set frontcontroller wake up time to" },
+	{ "", "                         ", "      time, shutdown, and wake up at given time" },
+	{ "-d", "  --shutdown         * ", "Args: None or [time date]  Format: HH:MM:SS dd-mm-YYYY" },
+	{ "", "                         ", "      No arg: Shut down immediately" },
+	{ "", "                         ", "      Arg time date: Shut down at given time/date" },
+	{ "-r", "  --reboot           * ", "Args: None" },
+	{ "", "                         ", "      No arg: Reboot immediately" },
+	{ "", "                         ", "      Arg time date: Reboot at given time/date" },
+	{ "-p", "  --sleep            * ", "Args: time date   Format: HH:MM:SS dd-mm-YYYY" },
+	{ "", "                         ", "      Reboot receiver via fp at given time" },
+	{ "-t", "  --settext            ", "Args: text        Set text to frontpanel" },
+	{ "-l", "  --setLed             ", "Args: LED# int    LED#: int=colour or on/off (0..3)" },
+	{ "-i", "  --setIcon            ", "Args: icon# 1|0   Set an icon on or off" },
+	{ "-b", "  --setBrightness      ", "Arg : 0..7        Set display brightness" },
+	{ "-led", "--setLedBrightness   ", "Arg : brightness  Set LED brightness (0..7)" },
+	{ "-L", "  --setLight           ", "Arg : 0|1         Set display on/off" },
+	{ "-c", "  --clear              ", "Args: None        Clear display, all icons and LEDs off" },
+	{ "-sf", " --setFan             ", "Arg : 0..255      Set fan speed" },
+#if defined MODEL_SPECIFIC
+	{ "-ms", " --model_specific     ", "Args: int1 [int2] [int3] ... [int16]   (note: input in hex)" },
+	{ "", "                         ", "                  Model specific test function" },
+#endif
+	{ NULL, NULL, NULL }
+};
 
 typedef struct
 {
@@ -53,6 +90,17 @@ typedef struct
 } tADB_BOXPrivate;
 
 /* ******************* helper/misc functions ****************** */
+
+static void setMode(int fd)
+{
+	struct adb_box_ioctl_data adb_box_fp;
+
+	adb_box_fp.u.mode.compat = 1;
+	if (ioctl(fd, VFDSETMODE, &adb_box_fp) < 0)
+	{
+		perror("Set compatibility mode");
+	}
+}
 
 /* Calculate the time value which we can pass to
  * the adb_box fp. its a mjd time (mjd=modified
@@ -94,7 +142,7 @@ static int init(Context_t *context)
 {
 	tADB_BOXPrivate *private = malloc(sizeof(tADB_BOXPrivate));
 	int vFd;
-	printf("%s\n", __func__);
+
 	vFd = open(cVFD_DEVICE, O_RDWR);
 	if (vFd < 0)
 	{
@@ -109,8 +157,23 @@ static int init(Context_t *context)
 
 static int usage(Context_t *context, char *prg_name, char *cmd_name)
 {
-	fprintf(stderr, "%s: not implemented\n", __func__);
-	return -1;
+	int i;
+
+	fprintf(stderr, "Usage:\n\n");
+	fprintf(stderr, "%s argument [optarg1] [optarg2]\n", prg_name);
+	for (i = 0; ; i++)
+	{
+		if (vAArgs[i].arg == NULL)
+		{
+			break;
+		}
+		if ((cmd_name == NULL) || (strcmp(cmd_name, vAArgs[i].arg) == 0) || (strstr(vAArgs[i].arg_long, cmd_name) != NULL))
+		{
+			fprintf(stderr, "%s   %s   %s\n", vAArgs[i].arg, vAArgs[i].arg_long, vAArgs[i].arg_description);
+		}
+	}
+	fprintf(stderr, "Options marked * should be the only calling argument.\n");
+	return 0;
 }
 
 static int setTime(Context_t *context, time_t *theGMTTime)
@@ -126,6 +189,7 @@ static int setTime(Context_t *context, time_t *theGMTTime)
 	return 0;
 }
 
+#if 0
 static int getTime(Context_t *context, time_t *theGMTTime)
 {
 	char fp_time[8];
@@ -150,6 +214,7 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 	}
 	return 0;
 }
+#endif
 
 static int setTimer(Context_t *context, time_t *theGMTTime)
 {
@@ -216,11 +281,13 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	return 0;
 }
 
+#if 0
 static int getWTime(Context_t *context, time_t *theGMTTime)
 {
 	fprintf(stderr, "%s: not implemented\n", __func__);
 	return -1;
 }
+#endif
 
 static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 {
@@ -315,6 +382,28 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 	return 0;
 }
 
+static int setFan(Context_t *context, int speed)
+{
+	// -sf command
+	struct adb_box_ioctl_data vData;
+//	int version;
+
+//	getVersion(context, &version);
+//	if (version >= 2)
+//	{
+//		printf("This model cannot control the fan.\n");
+//		return 0;
+//	}
+	vData.u.fan.speed = speed;
+	setMode(context->fd);
+	if (ioctl(context->fd, VFDSETFAN, &vData) < 0)
+	{
+		perror("setFan");
+		return -1;
+	}
+	return 0;
+}
+
 static int setText(Context_t *context, char *theText)
 {
 	char vHelp[cMAXCharsADB_BOX + 1];
@@ -330,6 +419,7 @@ static int setLed(Context_t *context, int which, int on)
 	struct adb_box_ioctl_data vData;
 	vData.u.led.led_nr = which;
 	vData.u.led.on = on;
+	setMode(context->fd);
 	if (ioctl(context->fd, VFDSETLED, &vData) < 0)
 	{
 		perror("setLed: ");
@@ -343,6 +433,7 @@ static int setIcon(Context_t *context, int which, int on)
 	struct adb_box_ioctl_data vData;
 	vData.u.icon.icon_nr = which;
 	vData.u.icon.on = on;
+	setMode(context->fd);
 	if (ioctl(context->fd, VFDICONDISPLAYONOFF, &vData) < 0)
 	{
 		perror("setIcon: ");
@@ -359,7 +450,7 @@ static int setBrightness(Context_t *context, int brightness)
 		return -1;
 	}
 	vData.u.brightness.level = brightness;
-	printf("%d\n", context->fd);
+	setMode(context->fd);
 	if (ioctl(context->fd, VFDBRIGHTNESS, &vData) < 0)
 	{
 		perror("setBrightness: ");
@@ -368,17 +459,41 @@ static int setBrightness(Context_t *context, int brightness)
 	return 0;
 }
 
-static int setLight(Context_t *context, int on)
+static int setLedBrightness(Context_t *context, int brightness)
 {
-	if (on)
+	struct adb_box_ioctl_data vData;
+
+	if (brightness < 0 || brightness > 7)
 	{
-		setBrightness(context, 7);
+		return -1;
 	}
-	else
+	vData.u.brightness.level = brightness;
+	setMode(context->fd);
+	if (ioctl(context->fd, VFDLEDBRIGHTNESS, &vData) < 0)
 	{
-		setBrightness(context, 0);
+		perror("setLedBrightness: ");
+		return -1;
 	}
 	return 0;
+}
+
+static int setLight(Context_t *context, int onoff)
+{
+#if 1
+	struct adb_box_ioctl_data vData;
+
+	vData.u.light.onoff = (onoff == 0 ? 0 : 1);
+	setMode(context->fd);
+	if (ioctl(context->fd, VFDDISPLAYWRITEONOFF, &vData) < 0)
+	{
+		perror("setLight");
+		return -1;
+	}
+	return 0;
+#else
+	setBrightness(context, on ? 7 : 0);
+	return 0;
+#endif
 }
 
 static int Exit(Context_t *context)
@@ -405,15 +520,15 @@ static int Clear(Context_t *context)
 
 Model_t Adb_Box_model =
 {
-	.Name             = "B4Team ADB_BOX frontpanel control utility",
+	.Name             = "ADB ITI-5800S(X) front panel control utility",
 	.Type             = Adb_Box,
 	.Init             = init,
 	.Clear            = Clear,
 	.Usage            = usage,
 	.SetTime          = setTime,
-	.GetTime          = getTime,
+	.GetTime          = NULL,
 	.SetTimer         = setTimer,
-	.GetWTime         = getWTime,
+	.GetWTime         = NULL,
 	.SetWTime         = NULL,
 	.Shutdown         = shutdown,
 	.Reboot           = reboot,
@@ -424,10 +539,10 @@ Model_t Adb_Box_model =
 	.SetBrightness    = setBrightness,
 	.GetWakeupReason  = NULL,
 	.SetLight         = setLight,
-	.SetLedBrightness = NULL,
+	.SetLedBrightness = setLedBrightness,
 	.GetVersion       = NULL,
 	.SetRF            = NULL,
-	.SetFan           = NULL,
+	.SetFan           = setFan,
 	.SetDisplayTime   = NULL,
 	.SetTimeMode      = NULL,
 #if defined MODEL_SPECIFIC
