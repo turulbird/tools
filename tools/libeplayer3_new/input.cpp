@@ -36,13 +36,14 @@
 
 static const char *FILENAME = "eplayer/input.cpp";
 
-#define averror(_err,_fun) ({                                                                 \
-	if (_err < 0) {                                                                           \
-		char _error[512];                                                                     \
-		av_strerror(_err, _error, sizeof(_error));                                            \
+#define averror(_err,_fun) ({ \
+	if (_err < 0) \
+	{  \
+		char _error[512]; \
+		av_strerror(_err, _error, sizeof(_error)); \
 		fprintf(stderr, "[input.cpp] line %d: %s: %d (%s)\n", __LINE__, #_fun, _err, _error); \
-	}                                                                                         \
-	_err;                                                                                     \
+	} \
+	_err; \
 })
 
 Input::Input()

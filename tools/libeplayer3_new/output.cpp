@@ -51,9 +51,9 @@ static const char *FILENAME = "eplayer/output.cpp";
 /* Send message to enigma2 */
 extern void libeplayerMessage(int);
 
-#define dioctl(fd,req,arg) ({		\
+#define dioctl(fd,req,arg) ({ \
 	int _r = ioctl(fd,req,arg); \
-	if (_r)				\
+	if (_r) \
 		fprintf(stderr, "%s %d: ioctl '%s' failed: %d (%s)\n", FILENAME, __LINE__, #req, errno, strerror(errno)); \
 	_r; \
 })
