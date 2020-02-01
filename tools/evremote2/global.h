@@ -23,15 +23,16 @@ typedef enum
 	Hl101,          //  6
 	Vip2,           //  7
 	Fortis,         //  8
-	Hs5101,         //  9
-	Ufs912,         // 10
-	Spark,          // 11
-	Cuberevo,       // 12
-	Adb_Box,        // 13
-	Ipbox,          // 14
-	CNBox,          // 15
-	VitaminHD5000,  // 16
-	LircdName       // 17
+	Fortis_4G,      //  9
+	Hs5101,         // 10
+	Ufs912,         // 11
+	Spark,          // 12
+	Cuberevo,       // 13
+	Adb_Box,        // 14
+	Ipbox,          // 15
+	CNBox,          // 16
+	VitaminHD5000,  // 17
+	LircdName       // 18
 } eBoxType;
 
 typedef enum

@@ -478,6 +478,18 @@ int getModel()
 		{
 			vBoxType = Fortis;
 		}
+		else if ((!strncasecmp(vName, "dp2010", 6))  // Fortis 4G models use LIRC
+		     ||  (!strncasecmp(vName, "dp6010", 6))
+		     ||  (!strncasecmp(vName, "dp7000", 6))
+		     ||  (!strncasecmp(vName, "dp7001", 6))
+		     ||  (!strncasecmp(vName, "dp7050", 6))
+		     ||  (!strncasecmp(vName, "ep8000", 6))
+		     ||  (!strncasecmp(vName, "epp8000", 7))
+		     ||  (!strncasecmp(vName, "fx6010", 6))
+		     ||  (!strncasecmp(vName, "gpv8000", 7)))
+		{
+			vBoxType = Fortis_4G;
+		}
 		else if ((!strncasecmp(vName, "atemio520", 9))
 		     ||  (!strncasecmp(vName, "atemio530", 9)))
 		{

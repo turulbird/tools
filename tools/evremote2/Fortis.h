@@ -1,4 +1,5 @@
-#ifndef _fortis_
-#define _fortis_
+#ifndef _fortis_h_
+#define _fortis_h_
 
-#endif
+
+#endif  // _fortis_h_

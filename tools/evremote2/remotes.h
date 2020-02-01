@@ -14,6 +14,7 @@ extern RemoteControl_t Vip2_RC;
 extern RemoteControl_t UFS922_RC;
 extern RemoteControl_t UFC960_RC;
 extern RemoteControl_t Fortis_RC;
+extern RemoteControl_t Fortis_4G_RC;
 extern RemoteControl_t Hs5101_RC;
 extern RemoteControl_t UFS912_RC;
 extern RemoteControl_t Spark_RC;
@@ -32,6 +33,7 @@ extern BoxRoutines_t Vip2_BR;
 extern BoxRoutines_t UFS922_BR;
 extern BoxRoutines_t UFC960_BR;
 extern BoxRoutines_t Fortis_BR;
+extern BoxRoutines_t Fortis_4G_BR;
 extern BoxRoutines_t Hs5101_BR;
 extern BoxRoutines_t UFS912_BR;
 extern BoxRoutines_t Spark_BR;
@@ -44,6 +46,6 @@ extern BoxRoutines_t LircdName_BR;
 
 int selectRemote(Context_r_t *context_r, Context_t *context, eBoxType type);
 
-#endif
+#endif  // REMOTES_H_
 // vim:ts=4
 
