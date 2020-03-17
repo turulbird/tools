@@ -35,7 +35,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Software version of fp_control, please increase on every change */
-static const char *sw_version = "1.11Audioniek 20190814.1";
+static const char *sw_version = "1.11Audioniek 20200317.1";
 static eWakeupReason reason = 0;
 
 typedef struct
@@ -786,7 +786,15 @@ int getModel()
 			|| (!strncasecmp(vName, "hs7810a", 7))
 			|| (!strncasecmp(vName, "hs7119", 6))
 			|| (!strncasecmp(vName, "hs7429", 6))
-			|| (!strncasecmp(vName, "hs7819", 6)))
+			|| (!strncasecmp(vName, "hs7819", 6))
+			|| (!strncasecmp(vName, "dp2010", 6))
+			|| (!strncasecmp(vName, "dp6010", 6))
+			|| (!strncasecmp(vName, "dp7000", 6))
+			|| (!strncasecmp(vName, "dp7001", 6))
+			|| (!strncasecmp(vName, "dp7050", 6))
+			|| (!strncasecmp(vName, "ep8000", 6))
+			|| (!strncasecmp(vName, "epp8000", 7))
+			|| (!strncasecmp(vName, "gpv8000", 7)))
 			{
 				vBoxType = Fortis;
 			}
