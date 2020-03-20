@@ -1,10 +1,12 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
+ACLOCAL_AMFLAGS = -I m4
+
 AM_CPPFLAGS = -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS
 AM_CPPFLAGS += -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE
 AM_CPPFLAGS += -I./include
-AM_CPPFLAGS += -I../../../tufsbox/cdkroot/usr/include/libavcodec
-AM_CPPFLAGS += -I../../../tufsbox/cdkroot/usr/include/libavformat
+AM_CPPFLAGS += -I../../tufsbox/cdkroot/usr/include/libavcodec
+AM_CPPFLAGS += -I../../tufsbox/cdkroot/usr/include/libavformat
 AM_CXXFLAGS = -fno-rtti -fno-exceptions -fno-strict-aliasing
 
 lib_LTLIBRARIES = libeplayer3.la
