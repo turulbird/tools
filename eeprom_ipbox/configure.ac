@@ -1,4 +1,4 @@
-AC_INIT([grab],[1.0],[],[grab])
+AC_INIT([eeprom_ipbox],[1.0],[],[eeprom_ipbox])
 AM_INIT_AUTOMAKE
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 m4_ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
