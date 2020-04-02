@@ -101,7 +101,8 @@ int processSimple(Context_r_t *context_r, Context_t *context, int argc, char *ar
 		// activate visual notification
 		if (context_r->br->Notification)
 		{
-			context_r->br->Notification(context, 1);		}
+			context_r->br->Notification(context, 1);
+		}
 		// Check if tuxtxt is running
 		if (checkTuxTxt(vCurrentCode) == false)
 		{
@@ -500,6 +501,7 @@ int getModel()
 			vBoxType = Hs5101;
 		}
 		else if ((!strncasecmp(vName, "adb_box", 7))
+		     ||  (!strncasecmp(vName, "adb_2850", 8))
 		     ||  (!strncasecmp(vName, "sagemcom88", 10))
 		     ||  (!strncasecmp(vName, "esi_88", 6))
 		     ||  (!strncasecmp(vName, "esi88", 5))

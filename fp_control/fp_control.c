@@ -778,28 +778,28 @@ int getModel()
 			vBoxType = Vip2;
 		}
 		else if ((!strncasecmp(vName, "hdbox", 5))
-		      || (!strncasecmp(vName, "octagon1008", 11))
-		      || (!strncasecmp(vName, "atevio7500", 10))
-		      || (!strncasecmp(vName, "hs7110", 6))
-		      || (!strncasecmp(vName, "hs7420", 6))
-		      || (!strncasecmp(vName, "hs7810a", 7))
-		      || (!strncasecmp(vName, "hs7119", 6))
-		      || (!strncasecmp(vName, "hs7429", 6))
-		      || (!strncasecmp(vName, "hs7819", 6))
-		      || (!strncasecmp(vName, "dp2010", 6))
-		      || (!strncasecmp(vName, "dp6010", 6))
-		      || (!strncasecmp(vName, "fx6010", 6))
-		      || (!strncasecmp(vName, "dp7000", 6))
-		      || (!strncasecmp(vName, "dp7001", 6))
-		      || (!strncasecmp(vName, "dp7050", 6))
-		      || (!strncasecmp(vName, "ep8000", 6))
-		      || (!strncasecmp(vName, "epp8000", 7))
-		      || (!strncasecmp(vName, "gpv8000", 7)))
+		     ||  (!strncasecmp(vName, "octagon1008", 11))
+		     ||  (!strncasecmp(vName, "atevio7500", 10))
+		     ||  (!strncasecmp(vName, "hs7110", 6))
+		     ||  (!strncasecmp(vName, "hs7420", 6))
+		     ||  (!strncasecmp(vName, "hs7810a", 7))
+		     ||  (!strncasecmp(vName, "hs7119", 6))
+		     ||  (!strncasecmp(vName, "hs7429", 6))
+		     ||  (!strncasecmp(vName, "hs7819", 6))
+		     ||  (!strncasecmp(vName, "dp2010", 6))
+		     ||  (!strncasecmp(vName, "dp6010", 6))
+		     ||  (!strncasecmp(vName, "fx6010", 6))
+		     ||  (!strncasecmp(vName, "dp7000", 6))
+		     ||  (!strncasecmp(vName, "dp7001", 6))
+		     ||  (!strncasecmp(vName, "dp7050", 6))
+		     ||  (!strncasecmp(vName, "ep8000", 6))
+		     ||  (!strncasecmp(vName, "epp8000", 7))
+		     ||  (!strncasecmp(vName, "gpv8000", 7)))
 		{
 			vBoxType = Fortis;
 		}
 		else if ((!strncasecmp(vName, "atemio520", 9))
-		      || (!strncasecmp(vName, "atemio530", 9)))
+		     ||v (!strncasecmp(vName, "atemio530", 9)))
 		{
 			vBoxType = CNBox;
 		}
@@ -808,22 +808,23 @@ int getModel()
 			vBoxType = Hs5101;
 		}
 		else if ((!strncasecmp(vName, "spark", 5))
-		      || (!strncasecmp(vName, "spark7162", 9)))
+		     ||  (!strncasecmp(vName, "spark7162", 9)))
 		{
 			vBoxType = Spark;
 		}
-		else if (!strncasecmp(vName, "adb_box", 7))
+		else if ((!strncasecmp(vName, "adb_box", 7))
+		     ||  (!strncasecmp(vName, "adb_2850", 8)))
 		{
 			vBoxType = Adb_Box;
 		}
 		else if ((!strncasecmp(vName, "cuberevo", 8))
-		      || (!strncasecmp(vName, "cuberevo-mini", 13))
-		      || (!strncasecmp(vName, "cuberevo-mini2", 14))
-		      || (!strncasecmp(vName, "cuberevo-mini-fta", 17))
-		      || (!strncasecmp(vName, "cuberevo-250hd", 14))
-		      || (!strncasecmp(vName, "cuberevo-2000hd", 15))
-		      || (!strncasecmp(vName, "cuberevo-9500hd", 15))
-		      || (!strncasecmp(vName, "cuberevo-3000hd", 14)))
+		     ||  (!strncasecmp(vName, "cuberevo-mini", 13))
+		     ||  (!strncasecmp(vName, "cuberevo-mini2", 14))
+		     ||  (!strncasecmp(vName, "cuberevo-mini-fta", 17))
+		     ||  (!strncasecmp(vName, "cuberevo-250hd", 14))
+		     ||  (!strncasecmp(vName, "cuberevo-2000hd", 15))
+		     ||  (!strncasecmp(vName, "cuberevo-9500hd", 15))
+		     ||  (!strncasecmp(vName, "cuberevo-3000hd", 14)))
 		{
 			vBoxType = Cuberevo;
 		}
