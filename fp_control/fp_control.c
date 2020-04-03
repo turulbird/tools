@@ -799,7 +799,7 @@ int getModel()
 			vBoxType = Fortis;
 		}
 		else if ((!strncasecmp(vName, "atemio520", 9))
-		     ||v (!strncasecmp(vName, "atemio530", 9)))
+		     ||  (!strncasecmp(vName, "atemio530", 9)))
 		{
 			vBoxType = CNBox;
 		}
