@@ -236,10 +236,10 @@ AC_ARG_WITH(boxtype,
 
 AC_ARG_WITH(boxmodel,
 	AS_HELP_STRING([--with-boxmodel], [valid for generic: raspi])
-AS_HELP_STRING([], [valid for duckbox: adb_box, adb2850, ufs910, ufs912, ufs913, ufs922, ufc960, atevio7500, fortis_hdbox, octagon1008, hs7110, hs7119, hs7420, hs7429, hs7810a, hs7819, cuberevo, cuberevo_mini, cuberevo_mini2, cuberevo_250hd, cuberevo_2000hd, cuberevo_3000hd, ipbox9900, ipbox99, ipbox55, atemio520, atemio530, vip1_v2, vip2_v1, hl101, sagemcom88, arivalink200, pace7241, tf7700, vitamin_hd5000])
+AS_HELP_STRING([], [valid for duckbox: adb_box, adb_2850, ufs910, ufs912, ufs913, ufs922, ufc960, atevio7500, fortis_hdbox, octagon1008, hs7110, hs7119, hs7420, hs7429, hs7810a, hs7819, cuberevo, cuberevo_mini, cuberevo_mini2, cuberevo_250hd, cuberevo_2000hd, cuberevo_3000hd, ipbox9900, ipbox99, ipbox55, atemio520, atemio530, vip1_v2, vip2_v1, hl101, sagemcom88, arivalink200, pace7241, tf7700, vitamin_hd5000])
 AS_HELP_STRING([], [valid for spark: spark, spark7162]),
 	[case "${withval}" in
-		adb_box|adb2850|ufs910|ufs912|ufs913|ufs922|ufc960|atevio7500|fortis_hdbox|octagon1008|hs7110|hs7119|hs7420|hs7429|hs7810a|hs7819|cuberevo|cuberevo_mini|cuberevo_mini2|cuberevo_250hd|cuberevo_2000hd|cuberevo_3000hd|ipbox9900|ipbox99|ipbox55|atemio520|atemio530|vip1_v2|vip2_v1|hl101|sagemcom88|arivalink200|pace7241|tf7700|vitamin_hd5000)
+		adb_box|adb_2850|ufs910|ufs912|ufs913|ufs922|ufc960|atevio7500|fortis_hdbox|octagon1008|hs7110|hs7119|hs7420|hs7429|hs7810a|hs7819|cuberevo|cuberevo_mini|cuberevo_mini2|cuberevo_250hd|cuberevo_2000hd|cuberevo_3000hd|ipbox9900|ipbox99|ipbox55|atemio520|atemio530|vip1_v2|vip2_v1|hl101|sagemcom88|arivalink200|pace7241|tf7700|vitamin_hd5000)
 			if test "$BOXTYPE" = "duckbox"; then
 				BOXMODEL="$withval"
 			else
@@ -298,7 +298,7 @@ AM_CONDITIONAL(BOXMODEL_ATEMIO530, test "$BOXMODEL" = "atemio530")
 AM_CONDITIONAL(BOXMODEL_VIP1_V2, test "$BOXMODEL" = "vip1_v2")
 AM_CONDITIONAL(BOXMODEL_VIP2_V1, test "$BOXMODEL" = "vip2_v1")
 AM_CONDITIONAL(BOXMODEL_ADB_BOX, test "$BOXMODEL" = "adb_box")
-AM_CONDITIONAL(BOXMODEL_ADB2850, test "$BOXMODEL" = "adb2850")
+AM_CONDITIONAL(BOXMODEL_ADB_2850, test "$BOXMODEL" = "adb_2850")
 AM_CONDITIONAL(BOXMODEL_VITAMIN_HD5000, test "$BOXMODEL" = "vitamin_hd5000")
 AM_CONDITIONAL(BOXMODEL_SAGEMCOM88, test "$BOXMODEL" = "sagemcom88")
 AM_CONDITIONAL(BOXMODEL_ARRIVALINK200, test "$BOXMODEL" = "arivalink200")
@@ -379,8 +379,8 @@ elif test "$BOXMODEL" = "vip1_v2"; then
 	AC_DEFINE(BOXMODEL_VIP2_V1, 1, [vip2_v1])
 elif test "$BOXMODEL" = "adb_box"; then
 	AC_DEFINE(BOXMODEL_ADB_BOX, 1, [adb_box])
-elif test "$BOXMODEL" = "adb2850"; then
-	AC_DEFINE(BOXMODEL_ADB2850, 1, [adb2850])
+elif test "$BOXMODEL" = "adb_2850"; then
+	AC_DEFINE(BOXMODEL_ADB_2850, 1, [adb_2850])
 elif test "$BOXMODEL" = "vitamin_hd5000"; then
 	AC_DEFINE(BOXMODEL_VITAMIN_HD5000, 1, [vitamin_hd5000])
 elif test "$BOXMODEL" = "sagemcom88"; then
