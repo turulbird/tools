@@ -25,6 +25,8 @@
  * --------------------------------------------------------------------------
  * 20190210 Audioniek       CubeRevo specific usage added.
  * 20190212 Audioniek       Completely tested through and improved/expanded.
+ * 20200621 Audioniek       Wakeuptime changed to LONG_MAX in case no timers
+ *                          are set as RTC century is always 20.
  *
  ****************************************************************************/
 
@@ -300,14 +302,14 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 	int proc_fs;
 	FILE *proc_fs_file;
 
-	time(&curTime); // get system time in UTC
+	time(&curTime);  // get system time in UTC
 	ts_gmt = gmtime(&curTime);
 	gmt_offset = get_GMT_offset(*ts_gmt);
 	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d (local)\n",
 		ts_gmt->tm_hour + (gmt_offset / 3600), ts_gmt->tm_min, ts_gmt->tm_sec,
 		ts_gmt->tm_mday, ts_gmt->tm_mon + 1, ts_gmt->tm_year + 1900);
 	curTime += gmt_offset;
-	curTime += 3506716800u; // start of MJD
+	curTime += 3506716800u;  // start of MJD
 	setTime(context, &curTime); // set fp clock to local time
 	sleep(2); // allow FP time to process the new time
 
@@ -317,6 +319,7 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 		perror("Gettime");
 		return -1;
 	}
+//	printf("Micom time: %02x:%02x:%02x %02x-%02x-%04x (local)\n", fp_time[2], fp_time[1], fp_time[0], fp_time[3], fp_time[4], fp_time[5] + 1900);
 	curTimeFP = (time_t)getMicomTime(fp_time);
 	ts_gmt = gmtime(&curTimeFP);
 	printf("Front panel time set to: %02d:%02d:%02d %02d-%02d-%04d (local)\n", ts_gmt->tm_hour, ts_gmt->tm_min, ts_gmt->tm_sec,
@@ -381,6 +384,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		/* shut down immedately */
 		printf("No timers set or 1st timer more than 300 days ahead,\nor all timer(s) in the past.\n");
 //		wakeupTime = 946684800u; // 00:00:00 01-01-2000 -> timer icon off
+		wakeupTime = LONG_MAX; // maximum in the future, as century is always 20 in RTC
 		vData.u.wakeup_time.time[0] = '\0';
 	}
 	else // wake up time valid and in the coming 300 days

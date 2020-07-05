@@ -39,7 +39,7 @@
 #define VFDGETTIMEFORMAT        0xc0425b05 /* Fortis specific */
 
 //Comment next line if you do not want the -ms option
-#define MODEL_SPECIFIC 1
+//#define MODEL_SPECIFIC 1
 
 struct vfd_ioctl_data
 {

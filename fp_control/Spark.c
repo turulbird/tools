@@ -118,10 +118,10 @@ typedef struct
 /* ******************* helper/misc functions ****************** */
 
 /* Calculate the time value which we can pass to
-    * the aotom fp. it is a mjd time (mjd=modified
-    * julian date). mjd is relative to gmt so theGMTTime
-    * must be in GMT/UTC.
-    */
+ * the aotom fp. It is a mjd time (mjd=modified
+ * julian date). mjd is relative to gmt so theGMTTime
+ * must be in GMT/UTC.
+ */
 void Spark_calcAotomTime(time_t theGMTTime, char *destString)
 {
 	/* from u-boot aotom */
@@ -144,7 +144,7 @@ void Spark_calcAotomTime(time_t theGMTTime, char *destString)
 unsigned long Spark_getAotomTime(char *aotomTimeString)
 {
 	unsigned int  mjd   = ((aotomTimeString[1] & 0xff) * 256) + (aotomTimeString[2] & 0xff);
-	unsigned long epoch = ((mjd - 40587) * 86400); //01-01-1970
+	unsigned long epoch = ((mjd - 40587) * 86400);  // 01-01-1970
 	unsigned int  hour  = aotomTimeString[3] & 0xff;
 	unsigned int  min   = aotomTimeString[4] & 0xff;
 	unsigned int  sec   = aotomTimeString[5] & 0xff;
@@ -191,7 +191,7 @@ static int Spark_init(Context_t *context)
 
 	if (ioctl(vFd, VFDGETDISPLAYTIME, &t_mode) < 0)
 	{
-		time_mode = 1; //if no support from aotom, assume clock on
+		time_mode = 1;  // if no support from aotom, assume clock on
 	}
 	else
 	{
@@ -236,7 +236,7 @@ static int Spark_usage(Context_t *context, char *prg_name, char *cmd_name)
 
 static int Spark_setTimer(Context_t *context, time_t *timerTime)
 {
-	//-e command, rewritten, tested on Spark7162
+	// -e command, rewritten, tested on Spark7162
 	struct aotom_ioctl_data vData;
 	time_t curTime;
 	time_t iTime;
@@ -332,7 +332,7 @@ static int Spark_setTimer(Context_t *context, time_t *timerTime)
 
 static int Spark_shutdown(Context_t *context, time_t *shutdownTimeGMT)
 {
-	//-d command, partially rewritten
+	// -d command, partially rewritten
 	struct aotom_ioctl_data vData;
 	time_t curTime;
 	time_t wakeupTime;
@@ -380,7 +380,7 @@ static int Spark_shutdown(Context_t *context, time_t *shutdownTimeGMT)
 
 static int Spark_reboot(Context_t *context, time_t *rebootTimeGMT)
 {
-	//-r command, partially rewritten
+	// -r command, partially rewritten
 	// Note: aotom does not have a particular reboot command
 	time_t curTime;
 
@@ -453,7 +453,7 @@ static int Spark_getWTime(Context_t *context, time_t *theGMTTime)
 
 static int Spark_setTime(Context_t *context, time_t *theGMTTime)
 {
-	//-s command
+	// -s command
 	time_t sTime;
 	struct tm *s_tm;
 
@@ -555,7 +555,7 @@ static int Spark_setSTime(Context_t *context, time_t *theGMTTime)
 
 static int Spark_setText(Context_t *context, char *theText)
 {
-	//-t command
+	// -t command
 	char text[cMAXCharsSpark + 1];
 	int disp_size;
 
@@ -652,7 +652,7 @@ static int Spark_setIcon(Context_t *context, int which, int on)
 
 static int Spark_setBrightness(Context_t *context, int brightness)
 {
-	//-b command
+	// -b command
 	struct aotom_ioctl_data vData;
 
 	if (brightness < 0 || brightness > 7)
@@ -671,7 +671,7 @@ static int Spark_setBrightness(Context_t *context, int brightness)
 
 static int Spark_setLight(Context_t *context, int on)
 {
-	//-L command
+	// -L command
 	struct aotom_ioctl_data vData;
 	if (on < 0 || on > 1)
 	{
