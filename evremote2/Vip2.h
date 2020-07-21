@@ -1,9 +1,9 @@
-#ifndef __vip2__
-#define __vip2__
+#ifndef __vip2_h__
+#define __vip2_h__
 
-#define VFDICONDISPLAYONOFF		0xc0425a0a
+#define VFDICONDISPLAYONOFF 0xc0425a0a
 
-/* this setups the mode temporarily (for one ioctl)
+/* this sets up the mode temporarily (for one ioctl)
  * to the desired mode. currently the "normal" mode
  * is the compatible vfd mode
  */
@@ -58,4 +58,5 @@ struct aotom_ioctl_data
 	} u;
 };
 
-#endif
+#endif // __vip2_h__
+// vim:ts=4
