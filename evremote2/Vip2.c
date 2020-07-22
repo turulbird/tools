@@ -69,7 +69,7 @@ static tButton cButtonsEdisionVip2[] =
 	{ "Tms",         "E5",  KEY_T },           // 0xyyyy1AE5
 	{ "PIP",         "ED",  KEY_SCREEN },      // 0xyyyy12ED
 	{ "F1",          "CD",  KEY_F1 },          // 0xyyyy32CD
-	{ "TV_SAT",      "C5",  KEY_SAT2 },        // 0xyyyy3AC5
+	{ "TV_SAT",      "C5",  KEY_AUX },         // 0xyyyy3AC5
 	{ "1BUTTON",     "B5",  KEY_1 },           // 0xyyyy4AB5
 	{ "2BUTTON",     "95",  KEY_2 },           // 0xyyyy6A95
 	{ "3BUTTON",     "BD",  KEY_3 },           // 0xyyyy42BD
