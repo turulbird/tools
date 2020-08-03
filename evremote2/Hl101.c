@@ -1,5 +1,5 @@
 /*
- * Hl101.c
+ * HL101.c
  *
  * (c) 2010 duckbox project
  *
@@ -47,62 +47,74 @@ static tLongKeyPressSupport cLongKeyPressSupport =
 /* Spider Box HL-101 RCU */
 static tButton cButtonsSpiderboxHL101[] =
 {
-	{"STANDBY"        , "f7", KEY_POWER},
-	{"MUTE"           , "77", KEY_MUTE},
-	{"V.FORMAT"       , "e7", KEY_V},
-	{"AUX"            , "37", KEY_AUX},
+	// Note order is same as on Opticum 9500HD remote
+	{ "STANDBY",         "f7", KEY_POWER },
 
-	{"0BUTTON"        , "ff", KEY_0},
-	{"1BUTTON"        , "7f", KEY_1},
-	{"2BUTTON"        , "bf", KEY_2},
-	{"3BUTTON"        , "3f", KEY_3},
-	{"4BUTTON"        , "df", KEY_4},
-	{"5BUTTON"        , "5f", KEY_5},
-	{"6BUTTON"        , "9f", KEY_6},
-	{"7BUTTON"        , "1f", KEY_7},
-	{"8BUTTON"        , "ef", KEY_8},
-	{"9BUTTON"        , "6f", KEY_9},
+	{ "TIMER",           "b7", KEY_TIME },
+	{ "U",               "d7", KEY_U },
+	{ "V.FORMAT",        "e7", KEY_V },
+	{ "MUTE",            "77", KEY_MUTE },
 
-	{"BACK"           , "0f", KEY_BACK},
-	{"INFO"           , "25", KEY_INFO},  // THIS IS WRONG, SHOULD BE KEY_INFO
-	{"AUDIO"          , "35", KEY_AUDIO},
+	{ "TV/SAT",          "37", KEY_AUX },
+	{ "TV/RADIO",        "2f", KEY_TV2 },
+	{ "FIND",            "17", KEY_FIND },
+	{ "FAV",             "85", KEY_FAVORITES },
 
-	{"DOWN/P-"        , "a7", KEY_DOWN},
-	{"UP/P+"          , "67", KEY_UP},
-	{"RIGHT/V+"       , "c7", KEY_RIGHT},
-	{"LEFT/V-"        , "27", KEY_LEFT},
-	{"OK/LIST"        , "47", KEY_OK},
-	{"MENU"           , "af", KEY_MENU},
-	{"GUIDE"          , "4f", KEY_EPG},
-	{"EXIT"           , "cf", KEY_HOME},
-	{"FAV"            , "85", KEY_FAVORITES},
+	{ "1BUTTON",         "7f", KEY_1 },
+	{ "2BUTTON",         "bf", KEY_2 },
+	{ "3BUTTON",         "3f", KEY_3 },
 
-	{"RED"            , "3d", KEY_RED},
-	{"GREEN"          , "fd", KEY_GREEN},
-	{"YELLOW"         , "6d", KEY_YELLOW},
-	{"BLUE"           , "8d", KEY_BLUE},
+	{ "4BUTTON",         "df", KEY_4 },
+	{ "5BUTTON",         "5f", KEY_5 },
+	{ "6BUTTON",         "9f", KEY_6 },
 
-	{"SLOW"           , "cd", KEY_SLOW},
-	{"F1"             , "07", KEY_F1},
-	{"F2"             , "2d", KEY_F2},
-	{"FIND"           , "17", KEY_FIND},
-	{"U"              , "d7", KEY_U},
-	{"REWIND"         , "65", KEY_REWIND},
-	{"PAUSE"          , "87", KEY_PAUSE},
-	{"PLAY"           , "57", KEY_PLAY},
-	{"FASTFORWARD"    , "9d", KEY_FASTFORWARD},
-	{"RECORD"         , "8f", KEY_RECORD},
-	{"STOP"           , "d5", KEY_STOP},
-	{"SLOWMOTION"     , "97", KEY_SLOW},
-	{"ARCHIVE"        , "15", KEY_ARCHIVE},
-	{"SAT"            , "b5", KEY_SAT},
-	{"STEPBACK"       , "95", KEY_PREVIOUS},
-	{"STEPFORWARD"    , "55", KEY_NEXT},
-	{"MARK"           , "4f", KEY_EPG},
-	{"TV/RADIO"       , "2f", KEY_TV2},  // WE USE TV2 AS TV/RADIO SWITCH BUTTON
-	{"USB"            , "a5", KEY_CLOSE},
-	{"TIMER"          , "b7", KEY_TIME},
-	{""               , ""  , KEY_NULL},
+	{ "7BUTTON",         "1f", KEY_7 },
+	{ "8BUTTON",         "ef", KEY_8 },
+	{ "9BUTTON",         "6f", KEY_9 },
+
+	{ "MENU",            "af", KEY_MENU },
+	{ "0BUTTON",         "ff", KEY_0 },
+	{ "INFO",            "25", KEY_INFO },
+
+	{ "EPG",             "4f", KEY_EPG },
+	{ "EXIT",            "cf", KEY_HOME },
+
+	{ "UP/P+",           "67", KEY_UP },
+	{ "LEFT/V-",         "27", KEY_LEFT },
+	{ "OK/LIST",         "47", KEY_OK },
+	{ "RIGHT/V+",        "c7", KEY_RIGHT },
+	{ "DOWN/P-",         "a7", KEY_DOWN },
+
+	{ "RECALL",          "0f", KEY_BACK },
+	{ "RECORD",          "8f", KEY_RECORD },
+
+	{ "PLAY",            "57", KEY_PLAY },
+	{ "REWIND",          "97", KEY_REWIND },
+	{ "PAUSE",           "87", KEY_PAUSE },
+	{ "FASTFORWARD",     "9d", KEY_FASTFORWARD },
+
+	{ "STOP",            "d5", KEY_STOP },
+	{ "SLOW",            "cd", KEY_SLOW },
+	{ "PREVIOUS",        "95", KEY_PREVIOUS },
+	{ "NEXT",            "55", KEY_NEXT },
+
+	{ "ARCHIVE",         "15", KEY_ARCHIVE },
+	{ "PIPSWAP",         "e5", KEY_OPTION },
+	{ "PLAYMODE",        "65", KEY_W },
+	{ "USB",             "a5", KEY_CLOSE },
+
+	{ "AUDIO",           "35", KEY_AUDIO },
+	{ "SAT",             "b5", KEY_SAT },
+	{ "F1",              "07", KEY_F1 },
+	{ "F2",              "2d", KEY_F2 },
+
+	{ "RED",             "3d", KEY_RED },
+	{ "GREEN",           "fd", KEY_GREEN },
+	{ "YELLOW",          "6d", KEY_YELLOW },
+	{ "BLUE",            "8d", KEY_BLUE },
+
+//	{ "SELECT",          "47", KEY_EPG },
+	{ "",                "",   KEY_NULL },
 };
 
 /* fixme: move this to a structure and
@@ -191,7 +203,7 @@ static int pNotification(Context_t *context, const int cOn)
 
 RemoteControl_t Hl101_RC =
 {
-	"Hl101 RemoteControl",
+	"HL101 RemoteControl",
 	Hl101,
 	cButtonsSpiderboxHL101,
 	NULL,
