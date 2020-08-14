@@ -658,7 +658,7 @@ static int Spark_setBrightness(Context_t *context, int brightness)
 	if (brightness < 0 || brightness > 7)
 	{
 		printf("Illegal brightness level %d (valid is 0..7)\n", brightness);
-		return 0;
+		return -1;
 	}
 	vData.u.brightness.level = brightness;
 	if (ioctl(context->fd, VFDBRIGHTNESS, &vData) < 0)
@@ -673,6 +673,7 @@ static int Spark_setLight(Context_t *context, int on)
 {
 	// -L command
 	struct aotom_ioctl_data vData;
+
 	if (on < 0 || on > 1)
 	{
 		printf("Illegal light value %d (valid is 0 | 1)\n", on);
