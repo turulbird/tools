@@ -51,7 +51,6 @@ static Model_t *AvailableModels[] =
 	&Fortis_model,
 	&HL101_model,
 	&VIP2_model,
-	&Hs5101_model,
 	&UFS912_model,
 	&UFC960_model,
 	&Spark_model,

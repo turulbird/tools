@@ -66,7 +66,7 @@ static tButton cButtonsTopfield7700HDPVR[] =
 	{"9BUTTON"        , "19", KEY_9},
 
 	{"BACK"           , "1E", KEY_BACK},
-	{"INFO"           , "1D", KEY_HELP},  // THIS IS WRONG, SHOULD BE KEY_INFO
+	{"INFO"           , "1D", KEY_INFO},
 	{"AUDIO"          , "05", KEY_LANGUAGE},
 	{"SUBTITLE"       , "07", KEY_SUBTITLE},
 	{"TEXT"           , "47", KEY_TEXT},

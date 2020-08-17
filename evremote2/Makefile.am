@@ -17,7 +17,6 @@ evremote2_SOURCES = \
 	Ufc960.c \
 	Fortis.c \
 	Fortis_4G.c \
-	Homecast5101.c \
 	Cuberevo.c \
 	Adb_Box.c \
 	Ipbox.c \

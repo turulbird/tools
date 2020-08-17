@@ -61,7 +61,6 @@ typedef enum
 	Hl101,
 	Vip2,
 	Fortis,
-	Hs5101,
 	Ufs912,
 	Spark,
 	Cuberevo,
@@ -121,7 +120,6 @@ extern	Model_t UFC960_model;
 extern	Model_t Fortis_model;
 extern	Model_t HL101_model;
 extern	Model_t VIP2_model;
-extern	Model_t Hs5101_model;
 extern	Model_t Spark_model;
 extern	Model_t Adb_Box_model;
 extern	Model_t Cuberevo_model;
