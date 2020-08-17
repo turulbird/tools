@@ -146,19 +146,16 @@ int showiframe(char *path, bool progress)
 					 * Under some circumstance this is enough time for e2 to try to open the video device itself.
 					 */
 					progress_ch[3] = '\0';
-					if (atoi(progress_ch) >= 98)
+					if (atoi(progress_ch) >= 90)  // original value was 98
 					{
 						end = true;
 					}
 				}
 			}
-
 			printf("[showiframe] end\n");
-
 			ioctl(m_video_clip_fd, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_DEMUX);
 			printf("[showiframe] VIDEO_SELECT_SOURCE DEMUX (%m)\n");
 			close(m_video_clip_fd);
-
 		}
 		close(f);
 	}
@@ -167,7 +164,6 @@ int showiframe(char *path, bool progress)
 		printf("[showiframe] could not open %s", path);
 		return -1;
 	}
-
 	return 0;
 }
 
@@ -185,7 +181,9 @@ int main(int argc, char *argv[])
 		showiframe(argv[1], false);
 	}
 	else
+	{
 		usage(argv[0]);
-
+	}
 	return 0;
 }
+// vim:ts=4
