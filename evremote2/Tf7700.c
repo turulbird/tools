@@ -47,75 +47,75 @@ static tLongKeyPressSupport cLongKeyPressSupport =
 
 static tButton cButtonsTopfield7700HDPVR[] =
 {
-	{"STANDBY"        , "0A", KEY_POWER}, // This is the real power key, but sometimes we only get 0x0C FP
-	{"MUTE"           , "0C", KEY_MUTE},
+	{ "POWER",       "0A", KEY_POWER },  // This is the real power key, but sometimes we only get 0x0C FP
+	{ "MUTE",        "0C", KEY_MUTE },
 
-	{"V.FORMAT"       , "42", KEY_ZOOM},
-	{"A/R"            , "43", KEY_SCREEN},
-	{"AUX"            , "08", KEY_AUX},
+	{ "V.FORMAT",    "42", KEY_SWITCHVIDEOMODE },
+	{ "A/R",         "43", KEY_ZOOM },
+	{ "AUX",         "08", KEY_AUX },
 
-	{"0BUTTON"        , "10", KEY_0},
-	{"1BUTTON"        , "11", KEY_1},
-	{"2BUTTON"        , "12", KEY_2},
-	{"3BUTTON"        , "13", KEY_3},
-	{"4BUTTON"        , "14", KEY_4},
-	{"5BUTTON"        , "15", KEY_5},
-	{"6BUTTON"        , "16", KEY_6},
-	{"7BUTTON"        , "17", KEY_7},
-	{"8BUTTON"        , "18", KEY_8},
-	{"9BUTTON"        , "19", KEY_9},
+	{ "0",           "10", KEY_0 },
+	{ "1",           "11", KEY_1 },
+	{ "2",           "12", KEY_2 },
+	{ "3",           "13", KEY_3 },
+	{ "4",           "14", KEY_4 },
+	{ "5",           "15", KEY_5 },
+	{ "6",           "16", KEY_6 },
+	{ "7",           "17", KEY_7 },
+	{ "8",           "18", KEY_8 },
+	{ "9",           "19", KEY_9 },
 
-	{"BACK"           , "1E", KEY_BACK},
-	{"INFO"           , "1D", KEY_INFO},
-	{"AUDIO"          , "05", KEY_LANGUAGE},
-	{"SUBTITLE"       , "07", KEY_SUBTITLE},
-	{"TEXT"           , "47", KEY_TEXT},
+	{ "BACK",        "1E", KEY_BACK },
+	{ "INFO",        "1D", KEY_INFO },
+	{ "AUDIO",       "05", KEY_AUDIO },
+	{ "SUBTITLE",    "07", KEY_SUBTITLE },
+	{ "TEXT",        "47", KEY_TEXT },
 
-	{"DOWN/P-"        , "01", KEY_DOWN},
-	{"UP/P+"          , "00", KEY_UP},
-	{"RIGHT/V+"       , "02", KEY_RIGHT},
-	{"LEFT/V-"        , "03", KEY_LEFT},
-	{"OK/LIST"        , "1F", KEY_OK},
-	{"MENU"           , "1A", KEY_MENU},
-	{"GUIDE"          , "1B", KEY_EPG},
-	{"EXIT"           , "1C", KEY_HOME},
-	{"FAV"            , "09", KEY_FAVORITES},
+	{ "DOWN",        "01", KEY_DOWN },
+	{ "UP",          "00", KEY_UP },
+	{ "RIGHT",       "02", KEY_RIGHT },
+	{ "LEFT",        "03", KEY_LEFT },
+	{ "OK",          "1F", KEY_OK },
+	{ "MENU",        "1A", KEY_MENU },
+	{ "GUIDE",       "1B", KEY_EPG },
+	{ "EXIT",        "1C", KEY_EXIT },
+	{ "FAV",         "09", KEY_FAVORITES },
 
-	{"RED"            , "4D", KEY_RED},
-	{"GREEN"          , "0D", KEY_GREEN},
-	{"YELLOW"         , "0E", KEY_YELLOW},
-	{"BLUE"           , "0F", KEY_BLUE},
+	{ "RED",         "4D", KEY_RED },
+	{ "GREEN",       "0D", KEY_GREEN },
+	{ "YELLOW",      "0E", KEY_YELLOW },
+	{ "BLUE",        "0F", KEY_BLUE },
 
-	{"REWIND"         , "45", KEY_REWIND},
-	{"PAUSE"          , "06", KEY_PAUSE},
-	{"PLAY"           , "46", KEY_PLAY},
-	{"FASTFORWARD"    , "48", KEY_FASTFORWARD},
-	{"RECORD"         , "4B", KEY_RECORD},
-	{"STOP"           , "4A", KEY_STOP},
-	{"SLOWMOTION"     , "49", KEY_SLOW},
-	{"RECORDLIST"     , "51", KEY_LIST},
-	{"SAT"            , "5E", KEY_SAT},
-	{"STEPBACK"       , "50", KEY_PREVIOUS},
-	{"STEPFORWARD"    , "52", KEY_NEXT},
-	{"MARK"           , "4C", KEY_OPTION},
-	{"TV/RADIO"       , "04", KEY_TV2},  // WE USE TV2 AS TV/RADIO SWITCH BUTTON
-	{"USB"            , "40", KEY_ARCHIVE},
-	{"TIMER"          , "44", KEY_TIME},
-	{""               , ""  , KEY_NULL},
+	{ "REWIND",      "45", KEY_REWIND },
+	{ "PAUSE",       "06", KEY_PAUSE },
+	{ "PLAY",        "46", KEY_PLAY },
+	{ "FASTFORWARD", "48", KEY_FASTFORWARD },
+	{ "RECORD",      "4B", KEY_RECORD },
+	{ "STOP",        "4A", KEY_STOP },
+	{ "SLOW",        "49", KEY_SLOW },
+	{ "LIST",        "51", KEY_FILE },
+	{ "SAT",         "5E", KEY_SAT },
+	{ "STEPBACK",    "50", KEY_PREVIOUS },
+	{ "STEPFORWARD", "52", KEY_NEXT },
+	{ "MARK",        "4C", KEY_SCREEN },  // White
+	{ "TV/RADIO",    "04", KEY_TV2 },
+	{ "USB",         "40", KEY_MEDIA },
+	{ "TIMER",       "44", KEY_PROGRAM },
+	{ "",            "",   KEY_NULL },
 };
 
 /* ***************** our fp button assignment **************** */
 
 static tButton cButtonsTopfield7700HDPVRFrontpanel[] =
 {
-	{"CHANNELDOWN"    , "02", KEY_PAGEDOWN},
-	{"CHANNELUP"      , "03", KEY_PAGEUP},
+	{ "CHANNELDOWN", "02", KEY_CHANNELDOWN },
+	{ "CHANNELUP",   "03", KEY_CHANNELUP },
 
-	{"VOLUMEDOWN"     , "01", KEY_VOLUMEDOWN},
-	{"VOLUMEUP"       , "06", KEY_VOLUMEUP},
+	{ "VOLUMEDOWN",  "01", KEY_VOLUMEDOWN },
+	{ "VOLUMEUP",    "06", KEY_VOLUMEUP },
 
-	{"STANDBY"        , "0C", KEY_POWER}, // This is the fake power call
-	{""               , ""  , KEY_NULL},
+	{ "STANDBY",     "0C", KEY_POWER }, // This is the fake power call
+	{ "",            "",   KEY_NULL },
 };
 
 static int gNextKey = 0;
@@ -198,7 +198,7 @@ static int pRead(Context_t *context)
 
 static int pNotification(Context_t *context, const int cOn)
 {
-	//Notification is handled by the frontpanel
+	// Notification is handled by the frontpanel
 	return 0;
 }
 

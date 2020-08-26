@@ -50,60 +50,60 @@ static tLongKeyPressSupport cLongKeyPressSupport =
 	10, 120, 1
 };
 
-static tButton cButtonUFS912[] =
+static tButton cButtonUFS912[] =  // order is same as on RC671
 {
-	{"MEDIA"          , "D5", KEY_MEDIA},
-	{"ARCHIVE"        , "46", KEY_ARCHIVE},
-	{"MENU"           , "54", KEY_MENU},
-	{"RED"            , "6D", KEY_RED},
-	{"GREEN"          , "6E", KEY_GREEN},
-	{"YELLOW"         , "6F", KEY_YELLOW},
-	{"BLUE"           , "70", KEY_BLUE},
-	{"EXIT"           , "55", KEY_HOME},
-	{"TEXT"           , "3C", KEY_TEXT},
-	{"EPG"            , "CC", KEY_EPG},
-	{"REWIND"         , "21", KEY_REWIND},
-	{"FASTFORWARD"    , "20", KEY_FASTFORWARD},
-	{"PLAY"           , "38", KEY_PLAY},
-	{"PAUSE"          , "39", KEY_PAUSE},
-	{"RECORD"         , "37", KEY_RECORD},
-	{"STOP"           , "31", KEY_STOP},
-	{"STANDBY"        , "0C", KEY_POWER},
-	{"MUTE"           , "0D", KEY_MUTE},
-	{"CHANNELUP"      , "1E", KEY_PAGEUP},
-	{"CHANNELDOWN"    , "1F", KEY_PAGEDOWN},
-	{"VOLUMEUP"       , "10", KEY_VOLUMEUP},
-	{"VOLUMEDOWN"     , "11", KEY_VOLUMEDOWN},
-	{"HELP"           , "81", KEY_HELP},
-	{"INFO"           , "0F", KEY_INFO},
-	{"OK"             , "5C", KEY_OK},
-	{"UP"             , "58", KEY_UP},
-	{"RIGHT"          , "5B", KEY_RIGHT},
-	{"DOWN"           , "59", KEY_DOWN},
-	{"LEFT"           , "5A", KEY_LEFT},
-	{"0BUTTON"        , "00", KEY_0},
-	{"1BUTTON"        , "01", KEY_1},
-	{"2BUTTON"        , "02", KEY_2},
-	{"3BUTTON"        , "03", KEY_3},
-	{"4BUTTON"        , "04", KEY_4},
-	{"5BUTTON"        , "05", KEY_5},
-	{"6BUTTON"        , "06", KEY_6},
-	{"7BUTTON"        , "07", KEY_7},
-	{"8BUTTON"        , "08", KEY_8},
-	{"9BUTTON"        , "09", KEY_9},
-	{""               , ""  , KEY_NULL}
+	{ "HELP",            "81", KEY_HELP },
+	{ "POWER",           "0C", KEY_POWER },
+	{ "1",               "01", KEY_1 },
+	{ "2",               "02", KEY_2 },
+	{ "3",               "03", KEY_3 },
+	{ "4",               "04", KEY_4 },
+	{ "5",               "05", KEY_5 },
+	{ "6",               "06", KEY_6 },
+	{ "7",               "07", KEY_7 },
+	{ "8",               "08", KEY_8 },
+	{ "9",               "09", KEY_9 },
+	{ "MENU",            "54", KEY_MENU },
+	{ "0",               "00", KEY_0 },
+	{ "TEXT",            "3C", KEY_TEXT },
+	{ "VOLUMEDOWN",      "11", KEY_VOLUMEDOWN },
+	{ "CHANNELUP",       "1E", KEY_CHANNELUP },
+	{ "VOLUMEUP",        "10", KEY_VOLUMEUP },
+	{ "MUTE",            "0D", KEY_MUTE },
+	{ "CHANNELDOWN",     "1F", KEY_CHANNELDOWN },
+	{ "INFO",            "0F", KEY_INFO },
+	{ "RED",             "6D", KEY_RED },
+	{ "GREEN",           "6E", KEY_GREEN },
+	{ "YELLOW",          "6F", KEY_YELLOW },
+	{ "BLUE",            "70", KEY_BLUE },
+	{ "EPG",             "CC", KEY_EPG },
+	{ "UP",              "58", KEY_UP },
+	{ "ARCHIV",          "46", KEY_FILE },
+	{ "LEFT",            "5A", KEY_LEFT },
+	{ "OK",              "5C", KEY_OK },
+	{ "RIGHT",           "5B", KEY_RIGHT },
+	{ "EXIT",            "55", KEY_EXIT },
+	{ "DOWN",            "59", KEY_DOWN },
+	{ "MEDIA",           "D5", KEY_MEDIA },
+	{ "REWIND",          "21", KEY_REWIND },
+	{ "PLAY",            "38", KEY_PLAY },
+	{ "FASTFORWARD",     "20", KEY_FASTFORWARD },
+	{ "PAUSE",           "39", KEY_PAUSE },
+	{ "RECORD",          "37", KEY_RECORD },
+	{ "STOP",            "31", KEY_STOP },
+	{ "",                "",   KEY_NULL }
 };
 
 /* ***************** our fp button assignment **************** */
 
 static tButton cButtonUFS912Frontpanel[] =
 {
-	{"FP_MEDIA"		, "80", KEY_MEDIA},
-	{"FP_ON_OFF"		, "01", KEY_POWER},
-	{"FP_MINUS"		, "04", KEY_DOWN},
-	{"FP_PLUS"		, "02", KEY_UP},
-	{"FP_TV_R"		, "08", KEY_OK},
-	{""			, ""  , KEY_NULL}
+	{ "FP_MEDIA",        "80", KEY_MEDIA },
+	{ "FP_ON_OFF",       "01", KEY_POWER },
+	{ "FP_MINUS",        "04", KEY_DOWN },
+	{ "FP_PLUS",         "02", KEY_UP },
+	{ "FP_TV_R",         "08", KEY_TV2 },
+	{ "",                "",   KEY_NULL }
 };
 
 
@@ -152,7 +152,7 @@ static int pInit(Context_t *context, int argc, char *argv[])
 		fd = fopen("/etc/.rccode", "r");
 		if (fd != NULL)
 		{
-			if (fgets (buf , sizeof(buf), fd) != NULL)
+			if (fgets (buf, sizeof(buf), fd) != NULL)
 			{
 				val = atoi(buf);
 				if (val > 0 && val < 5)
@@ -206,7 +206,7 @@ static int pRead(Context_t *context)
 			 * will be read and rc_code = 2 is used ( press then back + 2 simultanessly on remote to fit it there)
 			 * default is rc_code = 1 ( like back + 1 on remote )	*/
 			rc = ((vData[4] & 0x30) >> 4) + 1;
-			printf("RC code: %d\n", rc);
+			printf("[evremote2 ufs912] RC code: %d\n", rc);
 			if (rc == ((RemoteControl_t *)context->r)->LongKeyPressSupport->rc_code)
 			{
 				vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[1]);

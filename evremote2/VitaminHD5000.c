@@ -51,75 +51,74 @@ static tLongKeyPressSupport cLongKeyPressSupport =
 
 static tButton cButtonVitaminHD5000[] =
 {
-	{"POWER"            , "5F", KEY_POWER},
-	{"OK"               , "45", KEY_OK},
-	{"LEFT"             , "41", KEY_LEFT},
-	{"RIGHT"            , "49", KEY_RIGHT},
-	{"UP"               , "18", KEY_UP},
-	{"DOWN"             , "46", KEY_DOWN},
-	{"MENU"             , "1C", KEY_MENU},
-	{"EXIT"             , "4A", KEY_EXIT},		// KEY_BACK ?
-	{"INFO"             , "1D", KEY_INFO},  	// INFO
-	{"FEED"             , "16", KEY_F11},		// FEED
-	{"RECALL"           , "14", KEY_F12},		// RECALL
-	{"FAV"              , "4C", KEY_FAVORITES},
-	{"EPG"              , "1A", KEY_EPG},
-	{"VOLUP"            , "40", KEY_VOLUMEUP},
-	{"VOLDOWN"          , "44", KEY_VOLUMEDOWN},
-	{"CHUP"             , "03", KEY_PAGEUP},
-	{"CHDOWN"           , "07", KEY_PAGEDOWN},
-	{"TVRADIO"          , "19", KEY_TV}, 		// TV/RADIO
-	{"SATLIST"          , "17", KEY_F10},		// SAT LIST
-	{"MOSAIC"           , "15", KEY_WWW},		// MOSAIC
-	{"PLAYLIST"         , "42", KEY_MEDIA},
-	{"RED"              , "09", KEY_RED},
-	{"GREEN"            , "0D", KEY_GREEN},
-	{"YELLOW"           , "00", KEY_YELLOW},
-	{"BLUE"             , "0C", KEY_BLUE},
-	{"0"                , "1B", KEY_0},
-	{"1"                , "56", KEY_1},
-	{"2"                , "5A", KEY_2},
-	{"3"                , "5E", KEY_3},
-	{"4"                , "55", KEY_4},
-	{"5"                , "59", KEY_5},
-	{"6"                , "5D", KEY_6},
-	{"7"                , "54", KEY_7},
-	{"8"                , "58", KEY_8},
-	{"9"                , "5C", KEY_9},
-	{"F1"               , "11", KEY_F1},
-	{"F2"               , "12", KEY_F2},
-	{"TV_STB"           , "5B", KEY_TV2}, 		// TV/STB
-	{"MUTE"             , "57", KEY_MUTE},
-	{"TEXT"             , "48", KEY_F8},		// TEXT
-	{"SUBTITLE"         , "01", KEY_F9},		// SUBTITLE
-	{"SIGNAL"           , "1F", KEY_F3},		// SIGNAL
-	{"CAPTURE"          , "53", KEY_F4},		// CAPTURE
-	{"BOOK_M"           , "1E", KEY_F5},		// BOOK_M
-	{"BOOK_J"           , "02", KEY_F6},		// BOOK_J
-	{"PREV"             , "05", KEY_PREVIOUS},
-	{"REW"              , "06", KEY_REWIND},
-	{"FWD"              , "0A", KEY_FASTFORWARD},
-	{"NEXT"             , "0E", KEY_NEXT},
-	{"REPEAT"           , "08", KEY_F7},		// REPEAT
-	{"PLAY"             , "50", KEY_PLAY},
-	{"STOP"             , "52", KEY_STOP},
-	{"RECORD"           , "0F", KEY_RECORD},
-	{""                 , ""  , KEY_NULL},
+	{ "TV/STB",      "5B", KEY_AUX },
+	{ "POWER",       "5F", KEY_POWER },
+	{ "MUTE",        "57", KEY_MUTE },
+	{ "TEXT",        "48", KEY_TEXT },
+	{ "SUBTITLE",    "01", KEY_SUBTITLE },
+	{ "SIGNAL",      "1F", KEY_F3 },
+	{ "CAPTURE",     "53", KEY_PROGRAM },
+	{ "BOOK/M",      "1E", KEY_F5 },
+	{ "BOOK/J",      "02", KEY_SCREEN },
+	{ "PREVIOUS",    "05", KEY_PREVIOUS },
+	{ "REWIND",      "06", KEY_REWIND },
+	{ "FASTFORWARD", "0A", KEY_FASTFORWARD },
+	{ "NEXT",        "0E", KEY_NEXT },
+	{ "REPEAT",      "08", KEY_AGAIN },
+	{ "PLAY/PAUSE",  "50", KEY_PLAY },
+	{ "STOP",        "52", KEY_STOP },
+	{ "RECORD",      "0F", KEY_RECORD },
+	{ "MENU",        "1C", KEY_MENU },
+	{ "EXIT",        "4A", KEY_EXIT },
+	{ "UP",          "18", KEY_UP },
+	{ "CHUP",        "03", KEY_CHANNELUP },
+	{ "VOLUP",       "40", KEY_VOLUMEUP },
+	{ "LEFT",        "41", KEY_LEFT },
+	{ "OK",          "45", KEY_OK },
+	{ "RIGHT",       "49", KEY_RIGHT },
+	{ "CHDOWN",      "07", KEY_CHANNELDOWN},
+	{ "VOLDOWN",     "44", KEY_VOLUMEDOWN },
+	{ "DOWN",        "46", KEY_DOWN },
+	{ "INFO",        "1D", KEY_INFO },
+	{ "EPG",         "1A", KEY_EPG },
+	{ "RECALL",      "14", KEY_BACK },
+	{ "FAV",         "4C", KEY_FAVORITES },
+	{ "SAT",         "17", KEY_SAT },
+	{ "MOSAIC",      "15", KEY_WWW },
+	{ "FEED",        "16", KEY_F11 },
+	{ "TV/RADIO",    "19", KEY_TV2 },
+	{ "PLAYLIST",    "42", KEY_FILE },
+	{ "RED",         "09", KEY_RED },
+	{ "GREEN",       "0D", KEY_GREEN },
+	{ "YELLOW",      "00", KEY_YELLOW },
+	{ "BLUE",        "0C", KEY_BLUE },
+	{ "1",           "56", KEY_1 },
+	{ "2",           "5A", KEY_2 },
+	{ "3",           "5E", KEY_3 },
+	{ "4",           "55", KEY_4 },
+	{ "5",           "59", KEY_5 },
+	{ "6",           "5D", KEY_6 },
+	{ "7",           "54", KEY_7 },
+	{ "8",           "58", KEY_8 },
+	{ "9",           "5C", KEY_9 },
+	{ "F1",          "11", KEY_F1 },
+	{ "0",           "1B", KEY_0 },
+	{ "F2",          "12", KEY_F2 },
+	{ "",            "",   KEY_NULL },
 };
 
 /* ***************** our fp button assignment **************** */
 
 static tButton cButtonVitaminHD5000Frontpanel[] =
 {
-	{"FRONT_LEFT"       , "05", KEY_LEFT},
-	{"FRONT_OK"         , "06", KEY_OK},
-	{"FRONT_RIGHT"      , "02", KEY_RIGHT},
-	{"FRONT_UP"         , "04", KEY_UP},
-	{"FRONT_MENU"       , "01", KEY_MENU},
-	{"FRONT_DOWN"       , "03", KEY_DOWN},
-	{"FRONT_POWER"      , "00", KEY_POWER},
-	{""	            , ""  , KEY_NULL}
-	/* Powerkey is used as HOME EXIT Button? */
+	{ "FRONT_LEFT",  "05", KEY_LEFT },
+	{ "FRONT_OK",    "06", KEY_OK },
+	{ "FRONT_RIGHT", "02", KEY_RIGHT },
+	{ "FRONT_UP",    "04", KEY_UP },
+	{ "FRONT_MENU",  "01", KEY_MENU },
+	{ "FRONT_DOWN",  "03", KEY_DOWN },
+	{ "FRONT_POWER", "00", KEY_POWER },
+	{ "",            "",   KEY_NULL}
 };
 
 

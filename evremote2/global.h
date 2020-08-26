@@ -12,6 +12,9 @@
 #define INPUT_PRESS 1
 #define INPUT_RELEASE 0
 
+// Additional key definitions
+//#define KEY_VMODE 678
+
 typedef enum
 {
 	Unknown,        //  0

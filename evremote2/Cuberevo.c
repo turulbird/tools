@@ -55,60 +55,60 @@ static tLongKeyPressSupport cLongKeyPressSupport =
 
 static tButton cButtonCuberevo[] =
 {
-	{"KEY_F1"         , "00", KEY_F1},
-	{"KEY_F2"         , "01", KEY_F2},
-	{"KEY_F3"         , "02", KEY_F3},
-	{"INFO"           , "03", KEY_INFO},
-	{"RADIO"          , "04", KEY_RADIO},
-	{"PREVIOUS"       , "05", KEY_PREVIOUS},
-	{"EPG"            , "06", KEY_EPG},
-	{"RECORD"         , "07", KEY_RECORD},
-	{"FAVORITES"      , "08", KEY_FAVORITES},
-	{"MEDIA"          , "09", KEY_MEDIA},   //fixme
-	{"STANDBY"        , "0A", KEY_POWER},
-	{"KEY_F5"         , "0B", KEY_F5},
-	{"MUTE"           , "0C", KEY_MUTE},
-	{"ARCHIVE"        , "0D", KEY_ARCHIVE}, //fixme
-	{"0BUTTON"        , "10", KEY_0},
-	{"1BUTTON"        , "11", KEY_1},
-	{"2BUTTON"        , "12", KEY_2},
-	{"3BUTTON"        , "13", KEY_3},
-	{"4BUTTON"        , "14", KEY_4},
-	{"5BUTTON"        , "15", KEY_5},
-	{"6BUTTON"        , "16", KEY_6},
-	{"7BUTTON"        , "17", KEY_7},
-	{"8BUTTON"        , "18", KEY_8},
-	{"9BUTTON"        , "19", KEY_9},
-	{"UP"             , "1A", KEY_UP},
-	{"DOWN"           , "1B", KEY_DOWN},
-	{"RIGHT"          , "1C", KEY_RIGHT},
-	{"LEFT"           , "1D", KEY_LEFT},
-	{"REWIND"         , "1E", KEY_REWIND},
-	{"OK"             , "1F", KEY_OK},
-	{"PLAY"           , "20", KEY_PLAY},
-	{"FASTFORWARD"    , "21", KEY_FASTFORWARD},
-	{"STOP"           , "22", KEY_STOP},
-	{"SLOW"           , "23", KEY_SLOW},
-	{"AGAIN"          , "24", KEY_AGAIN},
-	{"PAUSE"          , "25", KEY_PAUSE},
-	{"MENU"           , "26", KEY_MENU},
-	{"EXIT"           , "27", KEY_HOME},
-	{"KEY_F7"         , "28", KEY_F7},
-	{"KEY_BOOMARKS"   , "29", KEY_BOOKMARKS},
-	{"RED"            , "2A", KEY_RED},
-	{"BLUE"           , "2B", KEY_BLUE},
-	{"KEY_F8"         , "2C", KEY_F8},
-	{"GREEN"          , "2D", KEY_GREEN},
-	{"YELLOW"         , "2E", KEY_YELLOW},
-	{"AUDIO"          , "2F", KEY_AUDIO},
-	{"SUBTITLE"       , "30", KEY_SUBTITLE},
-	{"TEXT"           , "31", KEY_TEXT},
-	{"CHANNELUP"      , "32", KEY_CHANNELUP},
-	{"CHANNELDOWN"    , "33", KEY_CHANNELDOWN},
-	{"VOLUMEUP"       , "34", KEY_VOLUMEUP},
-	{"VOLUMEDOWN"     , "35", KEY_VOLUMEDOWN},
-	{"WWW"            , "36", KEY_WWW},
-	{""               , ""  , KEY_NULL},
+	{ "POWER",       "0A", KEY_POWER },
+	{ "MUTE",        "0C", KEY_MUTE },
+	{ "TV/RADIO",    "04", KEY_TV2 },
+	{ "WWW",         "36", KEY_WWW },
+	{ "PIP",         "28", KEY_SCREEN },
+	{ "MOSAIC",      "00", KEY_F1 },  // MOSAIC
+	{ "PIC_SWAP",    "01", KEY_OPTION },
+	{ "SUBCH",       "02", KEY_F3 },  // Sub_ch
+	{ "CHANNELUP",   "32", KEY_CHANNELUP },
+	{ "RECALL",      "05", KEY_BACK },
+	{ "VOLUMEUP",    "34", KEY_VOLUMEUP },
+	{ "CHANNELDOWN", "33", KEY_CHANNELDOWN },
+	{ "INFO",        "03", KEY_INFO },
+	{ "VOLUMEDOWN",  "35", KEY_VOLUMEDOWN },
+	{ "FAV",         "08", KEY_FAVORITES },
+	{ "MARK",        "29", KEY_HELP },
+	{ "MAIL",        "09", KEY_MEDIA },
+	{ "EPG",         "06", KEY_EPG },
+	{ "UP",          "1A", KEY_UP },
+	{ "MENU",        "26", KEY_MENU },
+	{ "LEFT",        "1D", KEY_LEFT },
+	{ "OK",          "1F", KEY_OK },
+	{ "RIGHT",       "1C", KEY_RIGHT },
+	{ "EXIT",        "27", KEY_EXIT },
+	{ "DOWN",        "1B", KEY_DOWN },
+	{ "RED",         "2A", KEY_RED },
+	{ "GREEN",       "2D", KEY_GREEN },
+	{ "YELLOW",      "2E", KEY_YELLOW },
+	{ "BLUE",        "2B", KEY_BLUE },
+	{ "1",           "11", KEY_1 },
+	{ "2",           "12", KEY_2 },
+	{ "3",           "13", KEY_3 },
+	{ "4",           "14", KEY_4 },
+	{ "5",           "15", KEY_5 },
+	{ "6",           "16", KEY_6 },
+	{ "7",           "17", KEY_7 },
+	{ "8",           "18", KEY_8 },
+	{ "9",           "19", KEY_9 },
+	{ "MUSIC",       "0B", KEY_F5 },
+	{ "0",           "10", KEY_0 },
+	{ "PHOTO",       "0D", KEY_FILE },
+	{ "RECORD",      "07", KEY_RECORD },
+	{ "REWIND",      "1E", KEY_REWIND },
+	{ "PLAY",        "20", KEY_PLAY },
+	{ "FASTFORWARD", "21", KEY_FASTFORWARD },
+	{ "AGAIN",       "24", KEY_AGAIN },
+	{ "SLOW",        "23", KEY_SLOW },
+	{ "STOP",        "22", KEY_STOP },
+	{ "PAUSE",       "25", KEY_PAUSE },
+	{ "KEY_F8",      "2C", KEY_F8 },
+	{ "SUBTITLE",    "30", KEY_SUBTITLE },
+	{ "TEXT",        "31", KEY_TEXT },
+	{ "AUDIO",       "2F", KEY_AUDIO },
+	{ "",            "",   KEY_NULL },
 };
 
 /* ***************** our fp button assignment **************** */
@@ -122,45 +122,45 @@ typedef struct
 
 key_table_t front_keymap_13grid[] =
 {
-	{ "STANDBY", 0x1000,   KEY_POWER },  /* front power */
-	{ "LEFT"   , 0x0002,   KEY_LEFT  },  /* front left */
-	{ "RIGHT"  , 0x0004,   KEY_RIGHT },  /* front right */
-	{ "UP"     , 0x4000,   KEY_UP    },  /* front up */
-	{ "FILE"   , 0x2000,   KEY_MEDIA },  /* front file */
-	{ "DOWN"   , 0x0040,   KEY_DOWN  },  /* front down */
-	{ "OK"     , 0x0020,   KEY_OK    },  /* front ok */
-	{ "HOME"   , 0x0010,   KEY_HOME  },  /* front back */
-	{ "MENU"   , 0x0001,   KEY_MENU  },  /* front menu */
-	{ "RELEASE", 0xFFFF,   KEY_NULL  },  /* release */
-	{ ""       , 0x0000,   KEY_NULL  },
+	{ "POWER",   0x1000, KEY_POWER },  /* front power */
+	{ "LEFT",    0x0002, KEY_LEFT  },  /* front left */
+	{ "RIGHT",   0x0004, KEY_RIGHT },  /* front right */
+	{ "UP",      0x4000, KEY_UP    },  /* front up */
+	{ "FILE",    0x2000, KEY_FILE  },  /* front file */
+	{ "DOWN",    0x0040, KEY_DOWN  },  /* front down */
+	{ "OK",      0x0020, KEY_OK    },  /* front ok */
+	{ "HOME",    0x0010, KEY_EXIT  },  /* front back */
+	{ "MENU",    0x0001, KEY_MENU  },  /* front menu */
+	{ "RELEASE", 0xFFFF, KEY_NULL  },  /* release */
+	{ "",        0x0000, KEY_NULL  },
 };
 
 key_table_t front_keymap_7seg[] =
 {
-	{ "STANDBY", 0x0001,   KEY_POWER },  /* front power */
-	{ "MENU"   , 0x0002,   KEY_MENU  },  /* front menu  */
-	{ "EXIT"   , 0x0004,   KEY_HOME  },  /* front exit  */
-	{ "OK"     , 0x0010,   KEY_OK    },  /* front ok    */
-	{ "LEFT"   , 0x0020,   KEY_LEFT  },  /* front left  */
-	{ "RIGHT"  , 0x0040,   KEY_RIGHT },  /* front right */
-	{ "UP"     , 0x0080,   KEY_UP    },  /* front up    */
-	{ "DOWN"   , 0x0100,   KEY_DOWN  },  /* front down  */
-	{ ""       , 0x0000,   KEY_NULL  },
+	{ "POWER",  0x0001, KEY_POWER },  /* front power */
+	{ "MENU",   0x0002, KEY_MENU  },  /* front menu  */
+	{ "EXIT",   0x0004, KEY_EXIT  },  /* front exit  */
+	{ "OK",     0x0010, KEY_OK    },  /* front ok    */
+	{ "LEFT",   0x0020, KEY_LEFT  },  /* front left  */
+	{ "RIGHT",  0x0040, KEY_RIGHT },  /* front right */
+	{ "UP",     0x0080, KEY_UP    },  /* front up    */
+	{ "DOWN",   0x0100, KEY_DOWN  },  /* front down  */
+	{ "",       0x0000, KEY_NULL  },
 };
 
 key_table_t front_keymap_12dotmatrix[] =
 {
-	{ "STANDBY", (1 << 0), KEY_POWER }, /* front power */
-	{ "MENU"   , (1 << 1), KEY_MENU  }, /* front menu */
-	{ "HOME"   , (1 << 2), KEY_HOME  }, /* front back */
-	{ "FILE"   , (1 << 3), KEY_MEDIA }, /* front file */
-	{ "OK"     , (1 << 4), KEY_OK    }, /* front ok */
-	{ "LEFT"   , (1 << 5), KEY_LEFT  }, /* front left */
-	{ "RIGHT"  , (1 << 6), KEY_RIGHT }, /* front right */
-	{ "UP"     , (1 << 7), KEY_UP    }, /* front up */
-	{ "DOWN"   , (1 << 8), KEY_DOWN  }, /* front down */
+	{ "POWER",   (1 << 0), KEY_POWER },  /* front power */
+	{ "MENU",    (1 << 1), KEY_MENU  },  /* front menu */
+	{ "HOME",    (1 << 2), KEY_EXIT  },  /* front back */
+	{ "FILE",    (1 << 3), KEY_FILE  },  /* front file */
+	{ "OK",      (1 << 4), KEY_OK    },  /* front ok */
+	{ "LEFT",    (1 << 5), KEY_LEFT  },  /* front left */
+	{ "RIGHT",   (1 << 6), KEY_RIGHT },  /* front right */
+	{ "UP",      (1 << 7), KEY_UP    },  /* front up */
+	{ "DOWN",    (1 << 8), KEY_DOWN  },  /* front down */
 	{ "RELEASE", 0xFFFF,   KEY_NULL  },  /* front release */
-	{ ""       , 0x0000,   KEY_NULL  },
+	{ "",        0x0000,   KEY_NULL  },
 };
 
 

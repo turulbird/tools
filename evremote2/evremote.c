@@ -443,6 +443,11 @@ int getModel()
 				}
 			}
 		}
+		else if ((!strncasecmp(vName, "ufs912", 5))
+		     ||  (!strncasecmp(vName, "ufs913", 5)))
+		{
+			vBoxType = Ufs912;
+		}
 		else if (!strncasecmp(vName, "ufs922", 6))
 		{
 			vBoxType = Ufs922;
@@ -459,11 +464,8 @@ int getModel()
 		{
 			vBoxType = Hl101;
 		}
-		else if (!strncasecmp(vName, "vip1-v2", 7))
-		{
-			vBoxType = Vip2;
-		}
-		else if (!strncasecmp(vName, "vip2-v1", 7))
+		else if ((!strncasecmp(vName, "vip1-v2", 7))
+		     ||  (!strncasecmp(vName, "vip2-v1", 7)))
 		{
 			vBoxType = Vip2;
 		}
@@ -496,10 +498,6 @@ int getModel()
 		{
 			vBoxType = CNBox;
 		}
-		else if (!strncasecmp(vName, "hs5101", 6))
-		{
-			vBoxType = Hs5101;
-		}
 		else if ((!strncasecmp(vName, "adb_box", 7))
 		     ||  (!strncasecmp(vName, "adb_2850", 8))
 		     ||  (!strncasecmp(vName, "sagemcom88", 10))
@@ -514,14 +512,6 @@ int getModel()
 		     ||  (!strncasecmp(vName, "ipbox55", 7)))
 		{
 			vBoxType = Ipbox;
-		}
-		else if (!strncasecmp(vName, "ufs912", 5))
-		{
-			vBoxType = Ufs912;
-		}
-		else if (!strncasecmp(vName, "ufs913", 5))
-		{
-			vBoxType = Ufs912;
 		}
 		else if ((!strncasecmp(vName, "spark", 5))
 		     ||  (!strncasecmp(vName, "spark7162", 9)))
@@ -573,7 +563,7 @@ int main(int argc, char *argv[])
 	int vButtonExtensionCounter;
 
 	/* Dagobert: if tuxtxt closes the socket while
-	 * we are writing a sigpipe occures which kills
+	 * we are writing a sigpipe occurs which kills
 	 * evremote. so lets ignore it ...
 	 */
 	ignoreSIGPIPE();
