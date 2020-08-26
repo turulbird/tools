@@ -58,6 +58,8 @@ file    /lib/libcrypt-2.14.1.so   ../../tufsbox/cdkroot/lib/libcrypt-2.14.1.so  
 slink   /lib/libcrypt.so.1        /lib/libcrypt-2.14.1.so                         0755 0 0
 file    /lib/libdl-2.14.1.so      ../../tufsbox/cdkroot/lib/libdl-2.14.1.so       0755 0 0
 slink   /lib/libdl.so.2           /lib/libdl-2.14.1.so                            0755 0 0
+file    /lib/librt-2.14.1.so      ../../tufsbox/cdkroot/lib/librt-2.14.1.so       0755 0 0
+slink   /lib/librt.so.1           /lib/librt-2.14.1.so                            0755 0 0
 
 dir     /mnt                                                                      0755 0 0
 
