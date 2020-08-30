@@ -45,7 +45,7 @@
 #define	EDISION_RC2_PREDATA "11EE"  // equals Spark rc05
 
 //#define STB_ID_HL101       "03:05:08"
-//#define STB_ID_VIP1        "03:05:08"
+#define STB_ID_VIP1_V1     "03:00:08"
 #define STB_ID_VIP2        "03:05:08"
 
 char VendorStbID[] = "00:00:00\0";

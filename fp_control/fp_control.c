@@ -35,7 +35,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Software version of fp_control, please increase on every change */
-static const char *sw_version = "1.11Audioniek 20200817.1";
+static const char *sw_version = "1.11Audioniek 20200829.1";
 static eWakeupReason reason = 0;
 
 typedef struct
@@ -765,15 +765,13 @@ int getModel()
 		{
 			vBoxType = Tf7700;
 		}
-		else if (!strncasecmp(vName, "hl101", 5))
+		else if ((!strncasecmp(vName, "hl101", 5))
+		     ||  (!strncasecmp(vName, "vip1-v1", 7)))
 		{
 			vBoxType = Hl101;
 		}
-		else if (!strncasecmp(vName, "vip1-v2", 7))
-		{
-			vBoxType = Vip2;
-		}
-		else if (!strncasecmp(vName, "vip2-v1", 7))
+		else if ((!strncasecmp(vName, "vip1-v2", 7))
+		     ||  (!strncasecmp(vName, "vip2", 4)))
 		{
 			vBoxType = Vip2;
 		}

@@ -579,17 +579,6 @@ static int Vip2_setBrightness(Context_t *context, int brightness)
 static int Vip2_setLight(Context_t *context, int on)
 {
 	// -L command
-#if 0
-	if (on)
-	{
-		setBrightness(context, 7);
-	}
-	else
-	{
-		setBrightness(context, 0);
-	}
-	return 0;
-#else
 	struct aotom_ioctl_data vData;
 
 	if (on < 0 || on > 1)
@@ -604,7 +593,6 @@ static int Vip2_setLight(Context_t *context, int on)
 		return -1;
 	}
 	return 0;
-#endif
 }
 
 static int Vip2_setDisplayTime(Context_t *context, int on)
@@ -678,6 +666,7 @@ static int Vip2_Clear(Context_t *context)
 static int Vip2_Clear(Context_t *context)
 {
 	// -c command
+	int res;
 	struct aotom_ioctl_data vData;
 
 	if (ioctl(context->fd, VFDDISPLAYCLR, &vData) < 0)
@@ -695,7 +684,6 @@ static int Vip2_Clear(Context_t *context)
 			return -1;
 		}
 	}
-#if 0  // VIP2 does not have any LEDs
 	vData.u.led.led_nr = 0;
 	vData.u.led.on = 0;
 	res = (ioctl(context->fd, VFDSETLED, &vData));
@@ -704,6 +692,7 @@ static int Vip2_Clear(Context_t *context)
 		perror("Setled (red)");
 		return -1;
 	}
+#if 0
 	if (fp_type != 1)
 	{
 		vData.u.led.led_nr = 1;

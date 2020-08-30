@@ -464,8 +464,9 @@ int getModel()
 		{
 			vBoxType = Hl101;
 		}
-		else if ((!strncasecmp(vName, "vip1-v2", 7))
-		     ||  (!strncasecmp(vName, "vip2-v1", 7)))
+		else if ((!strncasecmp(vName, "vip1-v1", 7))
+		     ||  (!strncasecmp(vName, "vip1-v2", 7))
+		     ||  (!strncasecmp(vName, "vip2", 4)))
 		{
 			vBoxType = Vip2;
 		}
