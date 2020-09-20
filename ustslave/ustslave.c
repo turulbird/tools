@@ -445,7 +445,7 @@ int main(int argc, char *argv[])
 	int verbose = 0;
 	unsigned int entry_p, stack_p;
 
-	if (argc == 3)
+	if (argc == 4)
 	{
 		if ((strcmp(argv[3], "-v") == 0)
 		||  (strcmp(argv[3], "--verbose") == 0))
