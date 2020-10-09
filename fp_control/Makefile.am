@@ -14,7 +14,7 @@ fp_control_SOURCES = \
 	Spark.c \
 	Cuberevo.c \
 	Adb_Box.c \
-	Cnbox.c \
+	AM5xx.c \
 	Vitamin_HD5000.c
 
 AM_CFLAGS = -Wall

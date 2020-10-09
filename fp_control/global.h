@@ -65,7 +65,7 @@ typedef enum
 	Spark,
 	Cuberevo,
 	Adb_Box,
-	CNBox,
+	AM5xx,
 	Vitamin_HD5000
 } eBoxType;
 
@@ -123,7 +123,7 @@ extern	Model_t VIP2_model;
 extern	Model_t Spark_model;
 extern	Model_t Adb_Box_model;
 extern	Model_t Cuberevo_model;
-extern	Model_t CNBOX_model;
+extern	Model_t AM5XX_model;
 extern	Model_t Vitamin_model;
 
 double modJulianDate(struct tm *theTime);

@@ -1,5 +1,5 @@
-#ifndef __CNBOX_H
-#define __CNBOX_H
+#ifndef __AM5XX_H
+#define __AM5XX_H
 
 struct set_standby_s
 {

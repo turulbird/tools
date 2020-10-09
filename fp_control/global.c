@@ -56,7 +56,7 @@ static Model_t *AvailableModels[] =
 	&Spark_model,
 	&Adb_Box_model,
 	&Cuberevo_model,
-	&CNBOX_model,
+	&AM5XX_model,
 	&Vitamin_model,
 	NULL
 };

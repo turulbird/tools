@@ -799,7 +799,7 @@ int getModel()
 		else if ((!strncasecmp(vName, "atemio520", 9))
 		     ||  (!strncasecmp(vName, "atemio530", 9)))
 		{
-			vBoxType = CNBox;
+			vBoxType = AM5xx;
 		}
 		else if ((!strncasecmp(vName, "spark", 5))
 		     ||  (!strncasecmp(vName, "spark7162", 9)))

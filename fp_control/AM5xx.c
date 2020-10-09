@@ -1,5 +1,5 @@
 /*
- * CNBOX.c
+ * AM5xx.c
  *
  * (c) 2009 dagobert@teamducktales
  *
@@ -33,7 +33,7 @@
 #include <linux/input.h>
 
 #include "global.h"
-#include "Cnbox.h"
+#include "AM5xx.h"
 
 static int setText(Context_t *context, char *theText);
 static int Clear(Context_t *context);
@@ -43,7 +43,7 @@ static int Clear(Context_t *context);
 #define cVFD_DEVICE "/dev/vfd"
 #define cEVENT_DEVICE "/dev/input/event0"
 
-#define cMAXCharsCnbox 12
+#define cMAXCharsAM5xx 12
 
 typedef struct
 {
@@ -53,20 +53,19 @@ typedef struct
 
 	time_t wakeupTime;
 	int wakeupDecrement;
-} tCnboxPrivate;
+} tAM5xxPrivate;
 
 /* ******************* helper/misc functions ****************** */
 
-unsigned long getCnboxTime(char *nuvotonTimeString)
+unsigned long getAM5xxTime(char *TimeString)
 {
-	unsigned int    mjd     = ((nuvotonTimeString[0] & 0xFF) * 256) + (nuvotonTimeString[1] & 0xFF);
+	unsigned int    mjd     = ((TimeString[0] & 0xFF) * 256) + (TimeString[1] & 0xFF);
 	unsigned long   epoch   = ((mjd - 40587) * 86400);
-	unsigned int    hour    = nuvotonTimeString[2] & 0xFF;
-	unsigned int    min     = nuvotonTimeString[3] & 0xFF;
-	unsigned int    sec     = nuvotonTimeString[4] & 0xFF;
+	unsigned int    hour    = TimeString[2] & 0xFF;
+	unsigned int    min     = TimeString[3] & 0xFF;
+	unsigned int    sec     = TimeString[4] & 0xFF;
 	epoch += (hour * 3600 + min * 60 + sec);
-	printf("MJD = %d epoch = %ld, time = %02d:%02d:%02d\n", mjd,
-		   epoch, hour, min, sec);
+	printf("MJD = %d epoch = %ld, time = %02d:%02d:%02d\n", mjd, epoch, hour, min, sec);
 	return epoch;
 }
 
@@ -75,7 +74,7 @@ unsigned long getCnboxTime(char *nuvotonTimeString)
  * julian date). mjd is relativ to gmt so theTime
  * must be in GMT/UTC.
  */
-void setCnboxTime(time_t theTime, char *destString)
+void setAM5xxTime(time_t theTime, char *destString)
 {
 	struct tm *now_tm;
 	now_tm = gmtime(&theTime);
@@ -94,7 +93,7 @@ void setCnboxTime(time_t theTime, char *destString)
 
 static int init(Context_t *context)
 {
-	tCnboxPrivate *private = malloc(sizeof(tCnboxPrivate));
+	tAM5xxPrivate *private = malloc(sizeof(tAM5xxPrivate));
 	int vFd;
 	vFd = open(cVFD_DEVICE, O_RDWR);
 	if (vFd < 0)
@@ -103,7 +102,7 @@ static int init(Context_t *context)
 		perror("");
 	}
 	((Model_t *)context->m)->private = private;
-	memset(private, 0, sizeof(tCnboxPrivate));
+	memset(private, 0, sizeof(tAM5xxPrivate));
 	checkConfig(&private->display, &private->display_custom, &private->timeFormat, &private->wakeupDecrement);
 	return vFd;
 }
@@ -141,7 +140,7 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 	{
 		fprintf(stderr, "Success reading time from fp\n");
 		/* current front controller time */
-		*theGMTTime = (time_t)getCnboxTime(fp_time);
+		*theGMTTime = (time_t)getAM5xxTime(fp_time);
 	}
 	else
 	{
@@ -208,7 +207,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		{
 			fprintf(stderr, "Success reading time from fp\n");
 			/* current front controller time */
-			curTimeFP = (time_t) getCnboxTime(fp_time);
+			curTimeFP = (time_t) getAM5xxTime(fp_time);
 			/* set FP-Time if curTime > or < 12h (gost)*/
 			if (((curTimeFP - curTime) > 43200) || ((curTime - curTimeFP) > 43200))
 			{
@@ -225,7 +224,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 			/* noop current time already set */
 		}
 		wakeupTime = curTimeFP + diff;
-//		setCnboxTime(wakeupTime, vData.u.standby.time);
+//		setAM5xxTime(wakeupTime, vData.u.standby.time);
 		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
 		{
 			perror("standBy: ");
@@ -292,9 +291,9 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 	struct timeval tv;
 	int retval, i, rd;
 	struct tm *ts;
-	char output[cMAXCharsCnbox + 1];
+	char output[cMAXCharsAM5xx + 1];
 	struct input_event ev[64];
-	tCnboxPrivate *private = (tCnboxPrivate *)((Model_t *)context->m)->private;
+	tAM5xxPrivate *private = (tAM5xxPrivate *)((Model_t *)context->m)->private;
 	vFd = open(cEVENT_DEVICE, O_RDWR);
 	if (vFd < 0)
 	{
@@ -344,7 +343,7 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 		}
 		if (private->display)
 		{
-			strftime(output, cMAXCharsCnbox + 1, private->timeFormat, ts);
+			strftime(output, cMAXCharsAM5xx + 1, private->timeFormat, ts);
 			setText(context, output);
 		}
 	}
@@ -353,9 +352,9 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 
 static int setText(Context_t *context, char *theText)
 {
-	char vHelp[cMAXCharsCnbox + 1];
-	strncpy(vHelp, theText, cMAXCharsCnbox);
-	vHelp[cMAXCharsCnbox] = '\0';
+	char vHelp[cMAXCharsAM5xx + 1];
+	strncpy(vHelp, theText, cMAXCharsAM5xx);
+	vHelp[cMAXCharsAM5xx] = '\0';
 	/* printf("%s, %d\n", vHelp, strlen(vHelp));*/
 	write(context->fd, vHelp, strlen(vHelp));
 	return 0;
@@ -368,7 +367,7 @@ static int setLed(Context_t *context, int which, int on)
 
 static int Exit(Context_t *context)
 {
-	tCnboxPrivate *private = (tCnboxPrivate *)((Model_t *)context->m)->private;
+	tAM5xxPrivate *private = (tAM5xxPrivate *)((Model_t *)context->m)->private;
 	if (context->fd > 0)
 	{
 		close(context->fd);
@@ -379,15 +378,14 @@ static int Exit(Context_t *context)
 
 static int Clear(Context_t *context)
 {
-//	int i;
 	setText(context, "        ");
 	return 0;
 }
 
-Model_t CNBOX_model =
+Model_t AM5XX_model =
 {
-	.Name             = "CreNova Micom frontpanel control utility",
-	.Type             = CNBox,
+	.Name             = "Atemio AM5xx Micom frontpanel control utility",
+	.Type             = AM5xx,
 	.Init             = init,
 	.Clear            = Clear,
 	.Usage            = usage,
