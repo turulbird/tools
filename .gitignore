@@ -48,6 +48,7 @@ fp_control/fp_control
 gitVCInfo/gitVCInfo
 hd-idle/hd-idle
 hotplug/hotplug
+msgbox/msgbox
 libeplayer3/eplayer3
 libeplayer3/container
 libeplayer3/container/.dirstamp
