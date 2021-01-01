@@ -1,5 +1,5 @@
 /*
- * Cnbox.c (for Atemio 520HD & 530HD)
+ * Cnbox.c (for Atemio 520HD & 530HD, Opticum HD 9600 series)
  *
  * (c) 2009 teamducktales
  *
@@ -54,55 +54,14 @@ static tLongKeyPressSupport cLongKeyPressSupport =
 	10, 140
 };
 
-static tButton cButtonCnbox[] =
+static tButton cButtonCnbox[] =  // order is same as on HD 9600 RC
 {
-	{ "MEDIA",       "07", KEY_MEDIA },
-	{ "ARCHIVE",     "17", KEY_ARCHIVE },
-	{ "MENU",        "4A", KEY_MENU },
-	{ "RED",         "5B", KEY_RED },
-	{ "GREEN",       "1F", KEY_GREEN },
-	{ "YELLOW",      "08", KEY_YELLOW },
-	{ "BLUE",        "03", KEY_BLUE },
-	{ "EXIT",        "1D", KEY_EXIT },
-	{ "BACK",        "15", KEY_HOME },
-	{ "TEXT",        "03", KEY_TEXT },
-	{ "EPG",         "09", KEY_EPG },
-	{ "REWIND",      "1E", KEY_REWIND },
-	{ "FASTFORWARD", "01", KEY_FASTFORWARD },
-	{ "PLAY",        "12", KEY_PLAY },
-//	{ "PAUSE",       "",   KEY_PAUSE },
-	{ "RECORD",      "1C", KEY_RECORD },
-	{ "STOP",        "10", KEY_STOP },
 	{ "POWER",       "5F", KEY_POWER },
 	{ "MUTE",        "57", KEY_MUTE },
-	{ "CHANNELUP",   "20", KEY_CHANNELUP },
-	{ "CHANNELDOWN", "21", KEY_CHANNELDOWN },
-	{ "VOLUMEUP",    "22", KEY_VOLUMEUP },
-	{ "VOLUMEDOWN",  "23", KEY_VOLUMEDOWN },
-	{ "INFO",        "11", KEY_INFO },
-	{ "OK",          "45", KEY_OK },
-	{ "UP",          "18", KEY_UP },
-	{ "RIGHT",       "49", KEY_RIGHT },
-	{ "DOWN",        "46", KEY_DOWN },
-	{ "LEFT",        "41", KEY_LEFT },
-	{ "RECALL",      "15", KEY_BACK },
-	{ "INFO",        "06", KEY_INFO },
-	{ "ZOOM",        "1a", KEY_ZOOM },
-	{ "FIND",        "16", KEY_PC },
-	{ "RESOLUTION",  "07", KEY_SCREEN },
-	{ "TVRADIO",     "14", KEY_MODE },
-	{ "SLOW",        "0D", KEY_SLOW },
-	{ "FILE",        "17", KEY_FILE },
-	{ "FAV",         "00", KEY_FAVORITES },
-	{ "CHECK",       "42", KEY_SELECT },
-	{ "UPUP",        "43", KEY_PAGEUP },
-	{ "DOWNDOWN",    "44", KEY_PAGEDOWN },
-	{ "NEXT",        "02", KEY_NEXT },
-	{ "PREVIOUS",    "42", KEY_PREVIOUS },
-	{ "OPTION",      "19", KEY_OPTION },
-	{ "STATUS",      "0C", KEY_TV2 },
-	{ "SLEEP",       "24", KEY_PROGRAM },
-	{ "0",           "1B", KEY_0 },
+	{ "HELP",        "11", KEY_HELP },
+	{ "TV_FORMAT",   "07", KEY_ZOOM },
+	{ "TVRADIO",     "14", KEY_TV2 },
+	{ "MODE",        "1a", KEY_SWITCHVIDEOMODE },
 	{ "1",           "56", KEY_1 },
 	{ "2",           "5A", KEY_2 },
 	{ "3",           "5E", KEY_3 },
@@ -112,22 +71,75 @@ static tButton cButtonCnbox[] =
 	{ "7",           "54", KEY_7 },
 	{ "8",           "58", KEY_8 },
 	{ "9",           "5C", KEY_9 },
+	{ "MENU",        "4A", KEY_MENU },
+	{ "0",           "1B", KEY_0 },
+	{ "RECALL",      "15", KEY_BACK },
+	{ "REWIND",      "1E", KEY_REWIND },
+	{ "STOP",        "10", KEY_STOP },
+	{ "PLAYPAUSE",   "12", KEY_PLAYPAUSE },
+	{ "FASTFORWARD", "01", KEY_FASTFORWARD },
+	{ "RECORD",      "1C", KEY_RECORD },
+	{ "UP",          "18", KEY_UP },
+	{ "EXIT",        "1D", KEY_EXIT },
+	{ "LEFT",        "41", KEY_LEFT },
+	{ "OK",          "45", KEY_OK },
+	{ "RIGHT",       "49", KEY_RIGHT },
+	{ "INFO",        "06", KEY_INFO },
+	{ "DOWN",        "46", KEY_DOWN },
+	{ "EPG",         "09", KEY_EPG },
+	{ "ARCHIVE",     "17", KEY_FILE },
+	{ "SLOW",        "0D", KEY_SLOW },
+	{ "PREVIOUS",    "02", KEY_PREVIOUS },
+	{ "NEXT",        "42", KEY_NEXT },
+	{ "RED",         "5B", KEY_RED },
+	{ "GREEN",       "1F", KEY_GREEN },
+	{ "YELLOW",      "08", KEY_YELLOW },
+	{ "BLUE",        "03", KEY_BLUE },
+	{ "FAV",         "00", KEY_FAVORITES },
+	{ "STATUS",      "0C", KEY_AUX },
+	{ "OPTION",      "19", KEY_OPTION },
+	{ "FIND",        "16", KEY_PROGRAM },
+
+#if 0
+	/* The following assignments were there in the original code
+	 * but make no sense. Some seem to have Fortis origins.
+	 */
+	{ "BACK",        "15", KEY_HOME },         // double for RECALL
+	{ "TEXT",        "03", KEY_TEXT },         // double for BLUE
+	{ "PAUSE",       "",   KEY_PAUSE },        // does not exist
+	{ "CHANNELUP",   "20", KEY_CHANNELUP },    // does not exist (AM530?)
+	{ "CHANNELDOWN", "21", KEY_CHANNELDOWN },  // does not exist (AM530?)
+	{ "VOLUMEUP",    "22", KEY_VOLUMEUP },     // does not exist (AM530?)
+	{ "VOLUMEDOWN",  "23", KEY_VOLUMEDOWN },   // does not exist (AM530?)
+	{ "RESOLUTION",  "07", KEY_SCREEN },       // double for TVFORMAT
+	{ "CHECK",       "42", KEY_SELECT },       // double for NEXT
+	{ "UPUP",        "43", KEY_PAGEUP },       // does not exist (AM530?)
+	{ "DOWNDOWN",    "44", KEY_PAGEDOWN },     // does not exist (AM530?)
+	{ "SLEEP",       "24", KEY_PROGRAM },      // does not exist (AM530?)
+#endif
 	{ "",            "",   KEY_NULL }
 };
 
 /* ***************** our fp button assignment **************** */
 
+/* NOTE on front panel keys: These are al handled by the front
+ * processor and yield exactly the same codes as the
+ * corresponding remote control key. The front panel keys can
+ * therefore not be distinguished from the remote control ones.
+ */
+#if 0
 static tButton cButtonCnboxFrontpanel[] =
 {
-	{ "POWER",       "00", KEY_POWER },
-	{ "OK",          "06", KEY_OK },
-	{ "MENU",        "05", KEY_MENU },
-	{ "VOLUMEUP",    "03", KEY_VOLUMEUP },
-	{ "VOLUMEDOWN",  "04", KEY_VOLUMEDOWN },
-	{ "CHANNELUP",   "01", KEY_CHANNELUP },
-	{ "CHANNELDOWN", "02", KEY_CHANNELDOWN },
+	{ "POWER",       "5F", KEY_POWER },
+	{ "OK",          "45", KEY_OK },
+	{ "MENU",        "4A", KEY_MENU },
+	{ "LEFT",        "41", KEY_LEFT },
+	{ "RIGHT",       "49", KEY_RIGHT },
+	{ "UP",          "18", KEY_UP },
+	{ "DOWN",        "46", KEY_DOWN },
 	{ "",            "",   KEY_NULL }
 };
+#endif
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
@@ -208,7 +220,7 @@ static int pRead(Context_t *context)
 
 static int pNotification(Context_t *context, const int cOn)
 {
-	/* noop: is handled from fp itself */
+	/* noop: there no controllable LEDs or icons on this model */
 	return 0;
 }
 
@@ -226,7 +238,7 @@ RemoteControl_t CNBOX_RC =
 	"Crenova Remote2 RemoteControl",
 	CNBox,
 	cButtonCnbox,
-	cButtonCnboxFrontpanel,
+	NULL, //	cButtonCnboxFrontpanel,
 	NULL,
 	1,
 	&cLongKeyPressSupport
