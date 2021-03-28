@@ -561,12 +561,12 @@ static int Spark_setText(Context_t *context, char *theText)
 
 	switch (fp_type)
 	{
-		case 3: //DVFD
+		case 3: // DVFD
 		{
 			disp_size = (time_mode ? 10 : 16);
 			break;
 		}
-		case 4: //LED
+		case 4: // LED
 		{
 			if (strlen(theText) > 2 //handle period, comma and colon
 			&& (theText[2] == 0x2e || theText[2] == 0x2c || theText[2] == 0x3a))
@@ -579,7 +579,7 @@ static int Spark_setText(Context_t *context, char *theText)
 			}
 			break;
 		}
-		default: //VFD and others
+		default: // VFD and others
 		{
 			disp_size = 8;
 			break;
@@ -811,7 +811,7 @@ static int Spark_getVersion(Context_t *context, int *version)
 {
 	//-v command
 	unsigned char strVersion[20];
-	const char *CPU_type[3] = { "Unknown", "ATTING48", "ATTING88" };
+	const char *CPU_type[3] = { "Unknown", "ATtiny48", "ATtiny88" };
 	const char *Display_type[9] = { "Unknown", "VFD", "LCD", "DVFD", "LED", "?", "?", "?", "LBD" };
 
 	if (ioctl(context->fd, VFDGETVERSION, &strVersion) < 0) // get version info (1x u32 4x u8)
