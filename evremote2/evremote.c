@@ -443,10 +443,13 @@ int getModel()
 				}
 			}
 		}
-		else if ((!strncasecmp(vName, "ufs912", 5))
-		     ||  (!strncasecmp(vName, "ufs913", 5)))
+		else if ((!strncasecmp(vName, "ufs912", 6)))
 		{
 			vBoxType = Ufs912;
+		}
+		else if ((!strncasecmp(vName, "ufs913", 6)))
+		{
+			vBoxType = Ufs913;
 		}
 		else if (!strncasecmp(vName, "ufs922", 6))
 		{

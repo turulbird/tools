@@ -29,13 +29,14 @@ typedef enum
 	Fortis_4G,      //  9
 	Hs5101,         // 10
 	Ufs912,         // 11
-	Spark,          // 12
-	Cuberevo,       // 13
-	Adb_Box,        // 14
-	Ipbox,          // 15
-	CNBox,          // 16
-	VitaminHD5000,  // 17
-	LircdName       // 18
+	Ufs913,         // 12
+	Spark,          // 13
+	Cuberevo,       // 14
+	Adb_Box,        // 15
+	Ipbox,          // 16
+	CNBox,          // 17
+	VitaminHD5000,  // 18
+	LircdName       // 19
 } eBoxType;
 
 typedef enum

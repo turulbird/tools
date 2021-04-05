@@ -12,6 +12,7 @@ evremote2_SOURCES = \
 	Hl101.c \
 	Vip2.c \
 	Ufs912.c \
+	Ufs913.c \
 	Spark.c \
 	Ufs922.c \
 	Ufc960.c \
