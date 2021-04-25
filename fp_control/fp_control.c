@@ -777,7 +777,7 @@ int getModel()
 		}
 		else if ((!strncasecmp(vName, "hdbox", 5))
 		     ||  (!strncasecmp(vName, "octagon1008", 11))
-		     ||  (!strncasecmp(vName, "atevio7500", 10))
+		     ||  (!strncasecmp(vName, "hs8200", 10))
 		     ||  (!strncasecmp(vName, "hs7110", 6))
 		     ||  (!strncasecmp(vName, "hs7420", 6))
 		     ||  (!strncasecmp(vName, "hs7810a", 7))
