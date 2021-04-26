@@ -243,12 +243,12 @@ AC_ARG_WITH(boxtype,
 
 AC_ARG_WITH(boxmodel,
 	AS_HELP_STRING([--with-boxmodel], [valid for generic: raspi])
-AS_HELP_STRING([], [valid for duckbox: adb_box, adb_2850, ufs910, ufs912, ufs913, ufs922, ufc960, fortis_hdbox, octagon1008, hs7110, hs7119, hs7420, hs7429, hs7810a, hs7819, hs8200, cuberevo, cuberevo_mini, cuberevo_mini2, cuberevo_mini_fta, cuberevo_250hd, cuberevo_2000hd, cuberevo_3000hd, cuberevo_9500hd, atemio520, atemio530, ipbox9900, ipbox99, ipbox55, vip1_v1, vip1_v2, vip2, hl101, sagemcom88, arivalink200, pace7241, tf7700, vitamin_hd5000, opt9600])
+AS_HELP_STRING([], [valid for duckbox: adb_box, adb_2850, ufs910, ufs912, ufs913, ufs922, ufc960, fortis_hdbox, hs9510, hs7110, hs7119, hs7420, hs7429, hs7810a, hs7819, hs8200, cuberevo, cuberevo_mini, cuberevo_mini2, cuberevo_mini_fta, cuberevo_250hd, cuberevo_2000hd, cuberevo_3000hd, cuberevo_9500hd, atemio520, atemio530, ipbox9900, ipbox99, ipbox55, vip1_v1, vip1_v2, vip2, hl101, sagemcom88, arivalink200, pace7241, tf7700, vitamin_hd5000, opt9600])
 AS_HELP_STRING([], [valid for spark: spark, spark7162])
 AS_HELP_STRING([], [valid for armbox: bre2ze4k, hd51, hd60, hd61, vusolo4k, vuduo4k, vuultimo4k, vuzero4k, vuuno4kse, vuuno4k, h7, osmio4k, osmio4kplus])
 AS_HELP_STRING([], [valid for mipsbox: vuduo]),
 	[case "${withval}" in
-		adb_box|adb_2850|ufs910|ufs912|ufs913|ufs922|ufc960|fortis_hdbox|octagon1008|hs7110|hs7119|hs7420|hs7429|hs7810a|hs7819|hs8200|cuberevo|cuberevo_mini|cuberevo_mini2|cuberevo_mini_fta|cuberevo_250hd|cuberevo_2000hd|cuberevo_3000hd|cuberevo_9500hd|atemio520|atemio530|ipbox9900|ipbox99|ipbox55|vip1_v1|vip1_v2|vip2|hl101|sagemcom88|arivalink200|pace7241|tf7700|vitamin_hd5000|opt9600)
+		adb_box|adb_2850|ufs910|ufs912|ufs913|ufs922|ufc960|fortis_hdbox|hs9510|hs7110|hs7119|hs7420|hs7429|hs7810a|hs7819|hs8200|cuberevo|cuberevo_mini|cuberevo_mini2|cuberevo_mini_fta|cuberevo_250hd|cuberevo_2000hd|cuberevo_3000hd|cuberevo_9500hd|atemio520|atemio530|ipbox9900|ipbox99|ipbox55|vip1_v1|vip1_v2|vip2|hl101|sagemcom88|arivalink200|pace7241|tf7700|vitamin_hd5000|opt9600)
 			if test "$BOXTYPE" = "duckbox"; then
 				BOXMODEL="$withval"
 			else
@@ -308,7 +308,7 @@ AM_CONDITIONAL(BOXMODEL_SPARK, test "$BOXMODEL" = "spark")
 AM_CONDITIONAL(BOXMODEL_SPARK7162, test "$BOXMODEL" = "spark7162")
 AM_CONDITIONAL(BOXMODEL_HS8200, test "$BOXMODEL" = "hs8200")
 AM_CONDITIONAL(BOXMODEL_FORTIS_HDBOX, test "$BOXMODEL" = "fortis_hdbox")
-AM_CONDITIONAL(BOXMODEL_OCTAGON1008, test "$BOXMODEL" = "octagon1008")
+AM_CONDITIONAL(BOXMODEL_HS9510, test "$BOXMODEL" = "hs9510")
 AM_CONDITIONAL(BOXMODEL_HS7110, test "$BOXMODEL" = "hs7110")
 AM_CONDITIONAL(BOXMODEL_HS7119, test "$BOXMODEL" = "hs7119")
 AM_CONDITIONAL(BOXMODEL_HS7420, test "$BOXMODEL" = "hs7420")
@@ -399,8 +399,8 @@ elif test "$BOXMODEL" = "hs8200"; then
 	AC_DEFINE(BOXMODEL_HS8200, 1, [hs8200])
 elif test "$BOXMODEL" = "fortis_hdbox"; then
 	AC_DEFINE(BOXMODEL_FORTIS_HDBOX, 1, [fortis_hdbox])
-elif test "$BOXMODEL" = "octagon1008"; then
-	AC_DEFINE(BOXMODEL_OCTAGON1008, 1, [octagon1008])
+elif test "$BOXMODEL" = "hs9510"; then
+	AC_DEFINE(BOXMODEL_HS9510, 1, [hs9510])
 elif test "$BOXMODEL" = "hs7110"; then
 	AC_DEFINE(BOXMODEL_HS7110, 1, [hs7110])
 elif test "$BOXMODEL" = "hs7119"; then
