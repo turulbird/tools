@@ -775,7 +775,7 @@ int getModel()
 		{
 			vBoxType = Vip2;
 		}
-		else if ((!strncasecmp(vName, "hdbox", 5))
+		else if ((!strncasecmp(vName, "fs9000", 6))
 		     ||  (!strncasecmp(vName, "hs9510", 6))
 		     ||  (!strncasecmp(vName, "hs8200", 6))
 		     ||  (!strncasecmp(vName, "hs7110", 6))
