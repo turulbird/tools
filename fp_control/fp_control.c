@@ -35,7 +35,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Software version of fp_control, please increase on every change */
-static const char *sw_version = "1.11Audioniek 20200829.1";
+static const char *sw_version = "1.12 (Audioniek 20210403.1)";
 static eWakeupReason reason = 0;
 
 typedef struct
@@ -51,7 +51,7 @@ char vName[129] = "Unknown";
 int Vdisplay = 0; //
 int Vdisplay_custom = 0;
 char *VtimeFormat = "Unknown";
-int Vwakeup = 5 * 60; //default wakeup decrement in minutes
+int Vwakeup = 5 * 60;  // default wakeup decrement in minutes
 const char *wakeupreason[8] = { "Unknown", "Power on", "From deep standby", "Timer", "Power switch", "Unknown", "Unknown", "Unknown" };
 
 tArgs vArgs[] =
@@ -704,6 +704,7 @@ int getKathreinUfs910BoxType()
 {
 	char vType;
 	int vFdBox = open("/proc/boxtype", O_RDONLY);
+
 	read(vFdBox, &vType, 1);
 	close(vFdBox);
 	return vType == '0' ? 0 : vType == '1' || vType == '3' ? 1 : -1;
@@ -724,6 +725,10 @@ int getModel()
 	if (vLen > 0)
 	{
 		vName[vLen - 1] = '\0';
+		if (disp)
+		{
+			printf("Receiver model: %s\n", vName);
+		}
 		if (!strncasecmp(vName, "ufs910", 6))
 		{
 			switch (getKathreinUfs910BoxType())
