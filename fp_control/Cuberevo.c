@@ -56,6 +56,7 @@ static int setDisplayTime(Context_t *context, int on);
 
 #define cVFD_DEVICE "/dev/vfd"
 #define cRTC_OFFSET_FILE "/proc/stb/fp/rtc_offset"
+//#define cRTC_FAN_FILE "/proc/stb/fp/fan"
 #define cEVENT_DEVICE "/dev/input/event0"
 
 #define cMAXCharsCuberevo 14 /* 14seg ->rest is filtered by driver */
@@ -96,13 +97,13 @@ tArgs vCArgs[] =
 	{ "-l", "  --setLed             ", "Args: LED# int    LED#: int=on,off,blink (0,1,2,3)" },
 	{ "-i", "  --setIcon            ", "Args: icon# 1|0   Set an icon on or off" },
 	{ "-b", "  --setBrightness      ", "Arg : 0..7        Set display brightness" },
-	{ "-led", "--setBrightness      ", "Arg : 0..255      Set LED brightness" },
+//	{ "-led", "--setLedBrightness   ", "Arg : 0..255      Set LED brightness" },
 	{ "-w", "  --getWakeupReason    ", "Args: None        Get the wake up reason" },
 	{ "-L", "  --setLight           ", "Arg : 0|1         Set display on/off" },
 	{ "-c", "  --clear              ", "Args: None        Clear display, all icons and LEDs off" },
 	{ "-v", "  --version            ", "Args: None        Get version info from frontprocessor" },
 	{ "-sf", " --setFan             ", "Arg : 0/1         Set fan on/off" },
-	{ "-sr", " --setRF              ", "Arg : 0/1         Set rf modulator on/off" },
+//	{ "-sr", " --setRF              ", "Arg : 0/1         Set rf modulator on/off" },
 	{ "-dt", " --display_time       ", "Arg : 0/1         Set time display on/off" },
 	{ "-tm", " --time_mode          ", "Arg : 0/1         Set 12 or 24 hour time mode" },
 	{ "-V", "  --verbose            ", "Args: None        Verbose operation" },
@@ -688,6 +689,7 @@ static int setLed(Context_t *context, int which, int state)
 	return 0;
 }
 
+#if 0
 static int setRFModulator(Context_t *context, int on)
 {
 	// -sr command
@@ -709,6 +711,7 @@ static int setRFModulator(Context_t *context, int on)
 	}
 	return 0;
 }
+#endif
 
 static int setDisplayTime(Context_t *context, int on)
 {
@@ -728,11 +731,12 @@ static int setDisplayTime(Context_t *context, int on)
 static int setFan(Context_t *context, int on)
 {
 	// -sf command
+#if 1
 	struct micom_ioctl_data vData;
 	int version;
 
 	getVersion(context, &version);
-	if (version >= 2)
+	if (version < 700 && version > 799)
 	{
 		printf("This model cannot control the fan.\n");
 		return 0;
@@ -745,6 +749,27 @@ static int setFan(Context_t *context, int on)
 		return -1;
 	}
 	return 0;
+#else
+	int proc_fs;
+	FILE *proc_fs_file;
+
+	on = (on ? 1 : 0);
+	proc_fs_file = fopen(cRTC_FAN_FILE, "w");
+	if (proc_fs_file == NULL)
+	{
+		perror("Open fan");
+		return -1;
+	}
+	proc_fs = fprintf(proc_fs_file, "%d", on);
+	if (proc_fs < 0)
+	{
+		perror("Write fan");
+		return -1;
+	}
+	fclose(proc_fs_file);
+	printf("This model does not have an RF modulator.\n");
+	return 0;
+#endif
 }
 
 static int setIcon(Context_t *context, int which, int on)
@@ -770,7 +795,8 @@ static int setBrightness(Context_t *context, int brightness)
 	int version;
 
 	getVersion(context, &version);
-	if (version >= 2)
+//	printf("Version is %d\n", version);
+	if (version < 700)  // LED models have 
 	{
 		printf("This model cannot control display brightness.\n");
 		return 0;
@@ -781,7 +807,7 @@ static int setBrightness(Context_t *context, int brightness)
 	}
 	vData.u.brightness.level = brightness;
 	setMode(context->fd);
-	printf("%d\n", context->fd);
+//	printf("%d\n", context->fd);
 	if (ioctl(context->fd, VFDBRIGHTNESS, &vData) < 0)
 	{
 		perror("setBrightness");
@@ -857,7 +883,7 @@ static int getWakeupReason(Context_t *context, eWakeupReason *reason)
 static int getVersion(Context_t *context, int *version)
 {
 	//-v command
-	/* Version: 0 = 12 char VFD, 1 = 13 char VFD, 2 = 14 char VFD, 3 = 4 char LED */
+	/* Version: 6XX = LED, 7XX = 13 char VFD or 12 char VFD, 8XX = 14 char VFD,  */
 	struct micom_ioctl_data micom;
 
 	/* front controller version */
@@ -867,7 +893,6 @@ static int getVersion(Context_t *context, int *version)
 		return -1;
 	}
 	*version = micom.u.version.version;
-//	printf("micom version = %d\n", micom.u.version.version);
 	return 0;
 }
 
@@ -886,6 +911,7 @@ static int setTimeMode(Context_t *context, int twentyFour)
 	return 0;
 }
 
+#if 0
 static int setLedBrightness(Context_t *context, int brightness)
 {
 	// -led command, not tested
@@ -893,7 +919,7 @@ static int setLedBrightness(Context_t *context, int brightness)
 	int version;
 
 	getVersion(context, &version);
-	if (version >= 2)
+	if (version < 700)
 	{
 		printf("This model cannot control LED brightness.\n");
 		return 0;
@@ -913,6 +939,7 @@ static int setLedBrightness(Context_t *context, int brightness)
 	}
 	return 0;
 }
+#endif
 
 #if defined MODEL_SPECIFIC
 static int modelSpecific(Context_t *context, char len, unsigned char *data)
@@ -988,9 +1015,9 @@ Model_t Cuberevo_model =
 	.SetBrightness    = setBrightness,
 	.GetWakeupReason  = getWakeupReason,
 	.SetLight         = setLight,
-	.SetLedBrightness = setLedBrightness,
+	.SetLedBrightness = NULL, // setLedBrightness,
 	.GetVersion       = getVersion,
-	.SetRF            = setRFModulator,
+	.SetRF            = NULL, // setRFModulator,
 	.SetFan           = setFan,
 	.SetDisplayTime   = setDisplayTime,
 	.SetTimeMode      = setTimeMode,
