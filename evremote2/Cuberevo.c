@@ -120,22 +120,22 @@ typedef struct
 	int KeyCode;
 } key_table_t;
 
-key_table_t front_keymap_13grid[] =
+key_table_t front_keymap_14grid[] =  // mini, mini II, 2000HD, 3000HD
 {
 	{ "POWER",   0x1000, KEY_POWER },  /* front power */
 	{ "LEFT",    0x0002, KEY_LEFT  },  /* front left */
 	{ "RIGHT",   0x0004, KEY_RIGHT },  /* front right */
 	{ "UP",      0x4000, KEY_UP    },  /* front up */
-	{ "FILE",    0x2000, KEY_FILE  },  /* front file */
+	{ "FILE",    0x2000, KEY_MEDIA },  /* front file */
 	{ "DOWN",    0x0040, KEY_DOWN  },  /* front down */
 	{ "OK",      0x0020, KEY_OK    },  /* front ok */
-	{ "HOME",    0x0010, KEY_EXIT  },  /* front back */
+	{ "EXIT",    0x0010, KEY_EXIT  },  /* front back */
 	{ "MENU",    0x0001, KEY_MENU  },  /* front menu */
 	{ "RELEASE", 0xFFFF, KEY_NULL  },  /* release */
 	{ "",        0x0000, KEY_NULL  },
 };
 
-key_table_t front_keymap_7seg[] =
+key_table_t front_keymap_7seg[] =  // 250HD, mini FTA (200HD)
 {
 	{ "POWER",  0x0001, KEY_POWER },  /* front power */
 	{ "MENU",   0x0002, KEY_MENU  },  /* front menu  */
@@ -148,12 +148,12 @@ key_table_t front_keymap_7seg[] =
 	{ "",       0x0000, KEY_NULL  },
 };
 
-key_table_t front_keymap_12dotmatrix[] =
+key_table_t front_keymap_12dotmatrix[] =  // Used for late CubeRevo and 9500HD (12dotmatrix)
 {
 	{ "POWER",   (1 << 0), KEY_POWER },  /* front power */
 	{ "MENU",    (1 << 1), KEY_MENU  },  /* front menu */
-	{ "HOME",    (1 << 2), KEY_EXIT  },  /* front back */
-	{ "FILE",    (1 << 3), KEY_FILE  },  /* front file */
+	{ "EXIT",    (1 << 2), KEY_EXIT  },  /* front back */
+	{ "FILE",    (1 << 3), KEY_MEDIA },  /* front file */
 	{ "OK",      (1 << 4), KEY_OK    },  /* front ok */
 	{ "LEFT",    (1 << 5), KEY_LEFT  },  /* front left */
 	{ "RIGHT",   (1 << 6), KEY_RIGHT },  /* front right */
@@ -161,6 +161,21 @@ key_table_t front_keymap_12dotmatrix[] =
 	{ "DOWN",    (1 << 8), KEY_DOWN  },  /* front down */
 	{ "RELEASE", 0xFFFF,   KEY_NULL  },  /* front release */
 	{ "",        0x0000,   KEY_NULL  },
+};
+
+key_table_t front_keymap_13grid[] =  // Used for early CubeRevo (13seg)
+{
+	{ "MENU",    0x0001, KEY_MENU  },  /* front menu */
+	{ "LEFT",    0x0002, KEY_LEFT  },  /* front left */
+	{ "RIGHT",   0x0004, KEY_RIGHT },  /* front right */
+	{ "EXIT",    0x0010, KEY_EXIT  },  /* front back */
+	{ "OK",      0x0020, KEY_OK    },  /* front ok */
+	{ "DOWN",    0x0040, KEY_DOWN  },  /* front down */
+	{ "POWER",   0x1000, KEY_POWER },  /* front power */
+	{ "FILE",    0x2000, KEY_MEDIA },  /* front file */
+	{ "UP",      0x4000, KEY_UP    },  /* front up */
+	{ "RELEASE", 0xFFFF, KEY_NULL  },  /* front release */
+	{ "",        0x0000, KEY_NULL  },
 };
 
 
@@ -266,19 +281,25 @@ static int pRead(Context_t *context)
 			{
 				front_key |= vData[1];
 				printf("[evremote2 cuberevo] front_key = 0x%04x\n", front_key);
-
-				/* 12 dot, 12 and 14 segs */
-				if ((version == 0) || (version == 2))
-				{
-					vCurrentCode = getCuberevoCode(front_keymap_12dotmatrix, front_key);
-				}
-				else if (version == 3)
+				/* LED */
+				if (version <= 699)  // mini FTA, 250HD
 				{
 					vCurrentCode = getCuberevoCode(front_keymap_7seg, front_key);
 				}
-				else
+				/* 14dotmatrix */
+				else if (version > 804)  //mini, mini II, 2000HD, 3000HD (version >= 806)
+				{
+					vCurrentCode = getCuberevoCode(front_keymap_14grid, front_key);
+				}
+				/* 13grid */
+				else if (version >= 700 || version < 708)  // early CubeRevo (13seg) TODO: check upper limit of fp version number
 				{
 					vCurrentCode = getCuberevoCode(front_keymap_13grid, front_key);
+				}
+				/* 12dotmatrix */
+				else  // late CubeRevo, 9500HD (12dotmatrix)
+				{
+					vCurrentCode = getCuberevoCode(front_keymap_12dotmatrix, front_key);
 				}
 				if (vCurrentCode != 0)
 				{
