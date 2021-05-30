@@ -54,8 +54,6 @@
 // Uncomment the next line to enable write functions (CAUTION: NOT tested!)
 //#define write_works
 
-#define EEPROM_SIZE 512  // 24C04 device
-
 #define N_TVMODE	6
 char *tvmode_name[N_TVMODE] =
 {
@@ -122,7 +120,7 @@ static struct
 };
 
 #define CFG_EEPROM_ADD   0x50
-#define CFG_EEPROM_SIZE  512
+#define EEPROM_SIZE      512  // 24C04 device
 
 #define db_name_tbl_size (sizeof(db_name_tbl) / sizeof(db_name_tbl[0]))
 
