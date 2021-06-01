@@ -366,7 +366,7 @@ static int read_item(int fd, int offset, db_key *key, unsigned char *buf, int bu
 
 //	printf("[eeprom] %s >\n", __func__);
 
-	if (offset >= CFG_EEPROM_SIZE - DB_HEADER_SIZE)
+	if (offset >= EEPROM_SIZE - DB_HEADER_SIZE)
 	{
 		return -1;
 	}
