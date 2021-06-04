@@ -248,7 +248,7 @@ static int pRead(Context_t *context)
 		{
 			continue;
 		}
-		printf("[evremote2 cuberevo] data[0] 0x%2x, data[1] 0x%2x\n", vData[0], vData[1]);
+		printf("[evremote2 cuberevo] data[0] 0x%02x, data[1] 0x%02x\n", vData[0], vData[1]);
 		if (vKeyType == RemoteControl)
 		{
 			if (vData[1] != 0xff)
@@ -287,12 +287,12 @@ static int pRead(Context_t *context)
 					vCurrentCode = getCuberevoCode(front_keymap_7seg, front_key);
 				}
 				/* 14dotmatrix */
-				else if (version > 804)  //mini, mini II, 2000HD, 3000HD (version >= 806)
+				else if (version >= 804)  //mini, mini II, 2000HD, 3000HD (version >= 806)
 				{
 					vCurrentCode = getCuberevoCode(front_keymap_14grid, front_key);
 				}
 				/* 13grid */
-				else if (version >= 700 || version < 708)  // early CubeRevo (13seg) TODO: check upper limit of fp version number
+				else if (version >= 700 && version < 708)  // early CubeRevo (13seg) TODO: check upper limit of fp version number
 				{
 					vCurrentCode = getCuberevoCode(front_keymap_13grid, front_key);
 				}
