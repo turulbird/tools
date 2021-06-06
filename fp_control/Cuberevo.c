@@ -731,12 +731,11 @@ static int setDisplayTime(Context_t *context, int on)
 static int setFan(Context_t *context, int on)
 {
 	// -sf command
-#if 1
 	struct micom_ioctl_data vData;
 	int version;
 
 	getVersion(context, &version);
-	if (version < 700 && version > 799)
+	if ((version < 700 && version > 799) || version != 803)
 	{
 		printf("This model cannot control the fan.\n");
 		return 0;
@@ -749,27 +748,6 @@ static int setFan(Context_t *context, int on)
 		return -1;
 	}
 	return 0;
-#else
-	int proc_fs;
-	FILE *proc_fs_file;
-
-	on = (on ? 1 : 0);
-	proc_fs_file = fopen(cRTC_FAN_FILE, "w");
-	if (proc_fs_file == NULL)
-	{
-		perror("Open fan");
-		return -1;
-	}
-	proc_fs = fprintf(proc_fs_file, "%d", on);
-	if (proc_fs < 0)
-	{
-		perror("Write fan");
-		return -1;
-	}
-	fclose(proc_fs_file);
-	printf("This model does not have an RF modulator.\n");
-	return 0;
-#endif
 }
 
 static int setIcon(Context_t *context, int which, int on)
@@ -795,8 +773,8 @@ static int setBrightness(Context_t *context, int brightness)
 	int version;
 
 	getVersion(context, &version);
-//	printf("Version is %d\n", version);
-	if (version < 700)  // LED models have 
+
+	if (version < 700)  // LED models have no brightness control
 	{
 		printf("This model cannot control display brightness.\n");
 		return 0;
@@ -807,7 +785,6 @@ static int setBrightness(Context_t *context, int brightness)
 	}
 	vData.u.brightness.level = brightness;
 	setMode(context->fd);
-//	printf("%d\n", context->fd);
 	if (ioctl(context->fd, VFDBRIGHTNESS, &vData) < 0)
 	{
 		perror("setBrightness");
@@ -832,22 +809,14 @@ static int Clear(Context_t *context)
 
 static int setLight(Context_t *context, int on)
 {
-	// -L command, FIXME: add models that cannot control brightness in micom and use IOCTL
-	int version;
+	// -L command
+	struct vfd_ioctl_data data;
 
-	getVersion(context, &version);
-	if (version >= 2)
+	data.start = on;
+	if (ioctl(context->fd, VFDDISPLAYWRITEONOFF, &data) < 0)
 	{
-		printf("Command not yet supported on this model.\n");
-		return 0;
-	}
-	if (on)
-	{
-		setBrightness(context, 7);
-	}
-	else
-	{
-		setBrightness(context, 0);
+		perror("Clear");
+		return -1;
 	}
 	return 0;
 }
