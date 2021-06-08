@@ -122,6 +122,7 @@ typedef struct
 
 key_table_t front_keymap_14grid[] =  // mini, mini II, 2000HD, 3000HD
 {
+#if 0  // The values are wrong on my test receiver
 	{ "POWER",   0x1000, KEY_POWER },  /* front power */
 	{ "LEFT",    0x0002, KEY_LEFT  },  /* front left */
 	{ "RIGHT",   0x0004, KEY_RIGHT },  /* front right */
@@ -133,9 +134,21 @@ key_table_t front_keymap_14grid[] =  // mini, mini II, 2000HD, 3000HD
 	{ "MENU",    0x0001, KEY_MENU  },  /* front menu */
 	{ "RELEASE", 0xFFFF, KEY_NULL  },  /* release */
 	{ "",        0x0000, KEY_NULL  },
+#else //  ...and these are OK (same as 7seg)
+	{ "POWER",   0x0001, KEY_POWER },  /* front power */
+	{ "MENU",    0x0002, KEY_MENU  },  /* front menu */
+	{ "EXIT",    0x0004, KEY_EXIT  },  /* front exit */
+	{ "OK",      0x0010, KEY_OK    },  /* front ok */
+	{ "LEFT",    0x0020, KEY_LEFT  },  /* front left */
+	{ "RIGHT",   0x0040, KEY_RIGHT },  /* front right */
+	{ "UP",      0x0080, KEY_UP    },  /* front up */
+	{ "DOWN",    0x0100, KEY_DOWN  },  /* front down */
+	{ "RELEASE", 0xFFFF, KEY_NULL  },  /* release */
+	{ "",        0x0000, KEY_NULL  },
+#endif
 };
 
-key_table_t front_keymap_7seg[] =  // 250HD, mini FTA (200HD)
+key_table_t front_keymap_7seg[] =  // 250HD, mini FTA (200HD), LED
 {
 	{ "POWER",  0x0001, KEY_POWER },  /* front power */
 	{ "MENU",   0x0002, KEY_MENU  },  /* front menu  */
