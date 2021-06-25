@@ -41,6 +41,10 @@ stamp-h1
 libs/libstgles/libltdl/
 aio-grab/grab
 devinit/devinit
+eeprom_fortis/eeprom
+eeprom_ipbox/eeprom
+eeprom_ufs913/eeprom
+eeprom_ufs922/eeprom
 evremote2/evremote2
 evremote2/evtest
 fbshot/fbshot
