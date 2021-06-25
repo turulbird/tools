@@ -1,7 +1,8 @@
 #ifndef _ufs912_
 #define _ufs912_
 
-#define VFDSETLED        0xc0425afe
+#define VFDSETRCCODE 0xc0425af6
+#define VFDSETLED    0xc0425afe
 
 struct set_brightness_s
 {
@@ -40,4 +41,5 @@ struct micom_ioctl_data
 	} u;
 };
 
-#endif
+#endif  // _ufs912_
+// vim:ts=4

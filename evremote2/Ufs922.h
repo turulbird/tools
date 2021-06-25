@@ -1,7 +1,9 @@
 #ifndef _ufs922_
 #define _ufs922_
 
-#define VFDSETLED        0xc0425afe
+#define VFDSETRCCODE 0xc0425af6
+#define VFDSETLED    0xc0425afe
+#define VFDSETMODE   0xc0425aff
 
 struct set_brightness_s
 {

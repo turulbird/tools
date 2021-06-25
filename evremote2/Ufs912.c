@@ -109,7 +109,6 @@ static tButton cButtonUFS912Frontpanel[] =
 
 static int ufs912SetRemote(unsigned int code)
 {
-	#define VFDSETRCCODE 0xc0425af6
 	int vfd_fd = -1;
 	struct
 	{

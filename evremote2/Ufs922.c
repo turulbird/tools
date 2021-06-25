@@ -45,9 +45,11 @@
 
 typedef struct
 {
-	int          toggleFeedback;
-	int          disableFeedback;
+	int toggleFeedback;
+	int disableFeedback;
 } tUFS922Private;
+
+int wheelmode = 0;  // default is list mode
 
 /* ***************** our key assignment **************** */
 
@@ -57,64 +59,102 @@ static tLongKeyPressSupport cLongKeyPressSupport =
 };
 
 static tButton cButtonUFS922[] =
-{
-	{ "MEDIA",       "D5", KEY_MEDIA },
-	{ "ARCHIVE",     "46", KEY_FILE },
-	{ "MENU",        "54", KEY_MENU },
-	{ "RED",         "6D", KEY_RED },
-	{ "GREEN",       "6E", KEY_GREEN },
-	{ "YELLOW",      "6F", KEY_YELLOW },
-	{ "BLUE",        "70", KEY_BLUE },
-	{ "EXIT",        "55", KEY_EXIT },
-	{ "TEXT",        "3C", KEY_TEXT },
-//	{ "EPG",         "4C", KEY_EPG },
-	{ "EPG",         "CC", KEY_EPG },
-	{ "REWIND",      "21", KEY_REWIND },
-	{ "FASTFORWARD", "20", KEY_FASTFORWARD },
-	{ "PLAY",        "38", KEY_PLAY },
-	{ "PAUSE",       "39", KEY_PAUSE },
-	{ "RECORD",      "37", KEY_RECORD },
-	{ "STOP",        "31", KEY_STOP },
-	{ "POWER",       "0C", KEY_POWER },
-	{ "MUTE",        "0D", KEY_MUTE },
-	{ "CHANNELUP",   "1E", KEY_CHANNELUP },
-	{ "CHANNELDOWN", "1F", KEY_CHANNELDOWN },
-	{ "VOLUMEUP",    "10", KEY_VOLUMEUP },
-	{ "VOLUMEDOWN",  "11", KEY_VOLUMEDOWN },
-	{ "INFO",        "0F", KEY_INFO },
-	{ "OK",          "5C", KEY_OK },
-	{ "UP",          "58", KEY_UP },
-	{ "RIGHT",       "5B", KEY_RIGHT },
-	{ "DOWN",        "59", KEY_DOWN },
-	{ "LEFT",        "5A", KEY_LEFT },
-	{ "0",           "00", KEY_0 },
-	{ "1",           "01", KEY_1 },
-	{ "2",           "02", KEY_2 },
-	{ "3",           "03", KEY_3 },
-	{ "4",           "04", KEY_4 },
-	{ "5",           "05", KEY_5 },
-	{ "6",           "06", KEY_6 },
-	{ "7",           "07", KEY_7 },
-	{ "8",           "08", KEY_8 },
-	{ "9",           "09", KEY_9 },
-	{ "",            "",   KEY_NULL }
+{  // Table is for RC670
+	{ "HELP",            "81", KEY_HELP },
+	{ "POWER",           "0C", KEY_POWER },
+	{ "1",               "01", KEY_1 },
+	{ "2",               "02", KEY_2 },
+	{ "3",               "03", KEY_3 },
+	{ "4",               "04", KEY_4 },
+	{ "5",               "05", KEY_5 },
+	{ "6",               "06", KEY_6 },
+	{ "7",               "07", KEY_7 },
+	{ "8",               "08", KEY_8 },
+	{ "9",               "09", KEY_9 },
+	{ "MENU",            "54", KEY_MENU },
+	{ "0",               "00", KEY_0 },
+	{ "TEXT",            "3C", KEY_TEXT },
+	{ "VOLUMEDOWN",      "11", KEY_VOLUMEDOWN },
+	{ "CHANNELUP",       "1E", KEY_CHANNELUP },
+	{ "VOLUMEUP",        "10", KEY_VOLUMEUP },
+	{ "MUTE",            "0D", KEY_MUTE },
+	{ "CHANNELDOWN",     "1F", KEY_CHANNELDOWN },
+	{ "INFO",            "0F", KEY_INFO },
+	{ "RED",             "6D", KEY_RED },
+	{ "GREEN",           "6E", KEY_GREEN },
+	{ "YELLOW",          "6F", KEY_YELLOW },
+	{ "BLUE",            "70", KEY_BLUE },
+	{ "EPG",             "CC", KEY_EPG },
+	{ "UP",              "58", KEY_UP },
+	{ "ARCHIV",          "46", KEY_FILE },
+	{ "LEFT",            "5A", KEY_LEFT },
+	{ "OK",              "5C", KEY_OK },
+	{ "RIGHT",           "5B", KEY_RIGHT },
+	{ "EXIT",            "55", KEY_EXIT },
+	{ "DOWN",            "59", KEY_DOWN },
+	{ "MEDIA",           "D5", KEY_MEDIA },
+	{ "REWIND",          "21", KEY_REWIND },
+	{ "PLAY",            "38", KEY_PLAY },
+	{ "FASTFORWARD",     "20", KEY_FASTFORWARD },
+	{ "PAUSE",           "39", KEY_PAUSE },
+	{ "RECORD",          "37", KEY_RECORD },
+	{ "STOP",            "31", KEY_STOP },
+	{ "",                "",   KEY_NULL }
 };
 
 /* ***************** our fp button assignment **************** */
 
-static tButton cButtonUFS922Frontpanel[] =
+static tButton cButtonUFS922ListFrontpanel[] =
 {
-	{ "FP_MENU",         "80", KEY_MENU },
-	{ "FP_EXIT",         "0D", KEY_EXIT },
+	{ "FP_REC",          "80", KEY_RECORD },
+	{ "FP_STOP",         "0D", KEY_STOP },
 	{ "FP_AUX",          "20", KEY_AUX },
 	{ "FP_TV_R",         "08", KEY_TV2 },
 
-	{ "FP_OK",           "04", KEY_OK },
+	{ "FP_WHEEL_PRESS",  "04", KEY_OK },
 	{ "FP_WHEEL_LEFT",   "0F", KEY_UP },
 	{ "FP_WHEEL_RIGHT",  "0E", KEY_DOWN },
 	{ "",                "",   KEY_NULL }
-	/* is there no power key on frontpanel? */
 };
+
+static tButton cButtonUFS922VolumeFrontpanel[] =
+{
+	{ "FP_REC",          "80", KEY_RECORD },
+	{ "FP_STOP",         "0D", KEY_STOP },
+	{ "FP_AUX",          "20", KEY_AUX },
+	{ "FP_TV_R",         "08", KEY_TV2 },
+
+	{ "FP_WHEEL_PRESS",  "04", KEY_OK },
+	{ "FP_WHEEL_LEFT",   "0F", KEY_VOLUMEDOWN },
+	{ "FP_WHEEL_RIGHT",  "0E", KEY_VOLUMEUP },
+	{ "",                "",   KEY_NULL }
+};
+
+
+#if 0
+static int ufs922SetRemote(unsigned int code)
+{
+	int vfd_fd = -1;
+	struct
+	{
+		unsigned char start;
+		unsigned char data[64];
+		unsigned char length;
+	} data;
+
+	data.start = 0x00;
+	data.data[0] = code & 0x07;
+	data.length = 1;
+
+	vfd_fd = open("/dev/vfd", O_RDWR);
+	if (vfd_fd)
+	{
+		ioctl(vfd_fd, VFDSETRCCODE, &data);
+		close(vfd_fd);
+	}
+	return 0;
+}
+#endif
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
@@ -130,7 +170,7 @@ static int pInit(Context_t *context, int argc, char *argv[])
 	}
 	else
 	{
-		private->toggleFeedback = 0;
+		private->toggleFeedback = 1;
 	}
 	if (argc >= 3)
 	{
@@ -138,7 +178,7 @@ static int pInit(Context_t *context, int argc, char *argv[])
 	}
 	else
 	{
-		private->disableFeedback = 0;
+		private->disableFeedback = 1;
 	}
 	printf("[evremote2 ufs922] Toggle = %d, disable feedback = %d\n", private->toggleFeedback, private->disableFeedback);
 	if (argc >= 4)
@@ -149,14 +189,50 @@ static int pInit(Context_t *context, int argc, char *argv[])
 	{
 		cLongKeyPressSupport.delay = atoi(argv[4]);
 	}
-	printf("[evremote2 ufs922] Period = %d, delay = %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
-	if (private->toggleFeedback)
+#if 0
+	if (! access("/etc/.rccode", F_OK))
+	{
+		char buf[10];
+		int val;
+		FILE* fd;
+		fd = fopen("/etc/.rccode", "r");
+		if (fd != NULL)
+		{
+			if (fgets (buf, sizeof(buf), fd) != NULL)
+			{
+				val = atoi(buf);
+				if (val > 0 && val < 5)
+				{
+					cLongKeyPressSupport.rc_code = val;
+					printf("[evremote2 ufs922] Selected RC Code: %d\n", cLongKeyPressSupport.rc_code);
+					ufs922SetRemote(cLongKeyPressSupport.rc_code);
+				}
+			}
+			fclose(fd);
+		}
+	}
+	else
+	{
+		ufs922SetRemote(1);  // default to 1
+	}
+#endif
+	printf("[evremote2 ufs922] Period = %d, delay = %d, rc_code = %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay, cLongKeyPressSupport.rc_code);
+	printf("[evremote2 ufs922] private->disableFeedback = %d\n", private->disableFeedback);
+
+	if (private->disableFeedback == 0)
 	{
 		struct micom_ioctl_data vfd_data;
-		int ioctl_fd = open("/dev/vfd", O_RDONLY);
+		int ioctl_fd;
 
-		vfd_data.u.led.led_nr = 6;
+		ioctl_fd = open("/dev/vfd", O_RDONLY);
+		vfd_data.u.led.led_nr = 6;  // wheel symbols
 		vfd_data.u.led.on = 1;
+		ioctl(ioctl_fd, VFDSETLED, &vfd_data);
+		vfd_data.u.led.led_nr = (wheelmode ? 5 : 2);  // wheel text: VOLUME on in wheelmode = 1
+		vfd_data.u.led.on = 1;
+		ioctl(ioctl_fd, VFDSETLED, &vfd_data);
+		vfd_data.u.led.led_nr = (wheelmode ? 2 : 5);  // wheel text: LIST on in wheelmode = 0
+		vfd_data.u.led.on = 0;
 		ioctl(ioctl_fd, VFDSETLED, &vfd_data);
 		close(ioctl_fd);
 	}
@@ -168,7 +244,7 @@ static int pShutdown(Context_t *context)
 	tUFS922Private *private = (tUFS922Private *)context->r->private;
 
 	close(context->fd);
-	if (private->toggleFeedback)
+	if (private->disableFeedback == 0)
 	{
 		struct micom_ioctl_data vfd_data;
 		int ioctl_fd = open("/dev/vfd", O_RDONLY);
@@ -187,6 +263,9 @@ static int pRead(Context_t *context)
 	unsigned char vData[cUFS922CommandLen];
 	eKeyType vKeyType = RemoteControl;
 	int vCurrentCode = -1;
+//	int rc = 1;
+	int ioctl_fd = -1;
+	struct micom_ioctl_data vfd_data;
 
 //	printf("%s >\n", __func__);
 	while (1)
@@ -207,11 +286,59 @@ static int pRead(Context_t *context)
 		}
 		if (vKeyType == RemoteControl)
 		{
+#if 0
+			/* mask out for rc codes
+			 * possible 0 to 3 for remote controls 1 to 4
+			 * given in /etc for example via console: echo 2 > /etc/.rccode
+			 * will be read and rc_code = 2 is used ( press then back + 2 simultanessly on remote to fit it there)
+			 * default is rc_code = 1 ( like back + 1 on remote )	*/
+			rc = ((vData[4] & 0x30) >> 4) + 1;
+			printf("[evremote2 ufs922] RC code: %d\n", rc);
+			if (rc == ((RemoteControl_t *)context->r)->LongKeyPressSupport->rc_code)
+			{
+				vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[1]);
+			}
+			else
+			{
+				break;
+			}
+#else
 			vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[1]);
+#endif
 		}
 		else
 		{
 			vCurrentCode = getInternalCodeHex(context->r->Frontpanel, vData[1]);
+#if 0
+			printf("[evremote_ufs922] Frontpanel key, vCurrentCode = 0x%03x\n", vCurrentCode);
+			if (vCurrentCode == KEY_OK)
+			{
+				printf("[evremote_ufs922] Toggle wheel mode\n");
+				wheelmode = (wheelmode ? 0 : 1);
+				vfd_data.u.led.led_nr = (wheelmode ? 5 : 2);
+				vfd_data.u.led.on = 0;
+				ioctl_fd = open("/dev/vfd", O_RDONLY);
+				ioctl(ioctl_fd, VFDSETMODE, &vfd_data);
+				ioctl(ioctl_fd, VFDSETLED, &vfd_data);
+				usleep(10000);
+				vfd_data.u.led.led_nr = (wheelmode ? 2 : 5);
+				vfd_data.u.led.on = 1;
+				ioctl_fd = open("/dev/vfd", O_RDONLY);
+				ioctl(ioctl_fd, VFDSETMODE, &vfd_data);
+				ioctl(ioctl_fd, VFDSETLED, &vfd_data);
+				close(ioctl_fd);
+				if (wheelmode)
+				{
+					printf("[[evremote_ufs922] Wheel in Volume mode\n");
+					context->r->Frontpanel = cButtonUFS922VolumeFrontpanel;
+				}
+				else
+				{
+					printf("[evremote_ufs922] Wheel in List mode\n");
+					context->r->Frontpanel = cButtonUFS922ListFrontpanel;
+				}
+			}
+#endif
 		}
 		if (vCurrentCode != 0)
 		{
@@ -230,21 +357,25 @@ static int pNotification(Context_t *context, const int cOn)
 	struct micom_ioctl_data vfd_data;
 	tUFS922Private *private = (tUFS922Private *)((RemoteControl_t *)context->r)->private;
 
-	if (private->disableFeedback)
-	{
-		return 0;
-	}
-	vfd_data.u.led.led_nr = 6;
+//	if (private->disableFeedback == 0)
+//	{
+//		printf("[evremote_ufs922] Notification is %s (%d)\n", (private->disableFeedback != 0 ? "off": "on"), private->disableFeedback);
+//		return 0;
+//	}
+	vfd_data.u.led.led_nr = 6;  // wheel
 	if (cOn)
 	{
-		vfd_data.u.led.on = !private->toggleFeedback;
+		vfd_data.u.led.on = (private->toggleFeedback ? 0 : 1);
 	}
 	else
 	{
 		usleep(100000);
-		vfd_data.u.led.on = private->toggleFeedback;
+		vfd_data.u.led.on = (private->toggleFeedback ? 1 : 0);
 	}
 	ioctl_fd = open("/dev/vfd", O_RDONLY);
+//	vfd_data.u.mode.compat = 1;
+//	ioctl(ioctl_fd, VFDSETMODE, &vfd_data);
+	printf("[evremote_ufs922] Set LED %d to %s\n", vfd_data.u.led.led_nr, (vfd_data.u.led.on == 0 ? "off" : "on"));
 	ioctl(ioctl_fd, VFDSETLED, &vfd_data);
 	close(ioctl_fd);
 	return 0;
@@ -255,7 +386,7 @@ RemoteControl_t UFS922_RC =
 	"Kathrein UFS922 RemoteControl",
 	Ufs922,
 	cButtonUFS922,
-	cButtonUFS922Frontpanel,
+	cButtonUFS922ListFrontpanel,
 	NULL,
 	1,
 	&cLongKeyPressSupport
@@ -269,4 +400,3 @@ BoxRoutines_t UFS922_BR =
 	&pNotification
 };
 // vim:ts=4
-
