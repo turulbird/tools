@@ -58,6 +58,7 @@ libeplayer3/output/.dirstamp
 libeplayer3/output/writer/.dirstamp
 libeplayer3/playback/.dirstamp
 libeplayer3/tools/.dirstamp
+read-edid/read-edid
 satfind/satfind
 showiframe/showiframe
 stfbcontrol/stfbcontrol
