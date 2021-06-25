@@ -66,25 +66,25 @@ int open_i2c_dev(int i2cbus)
 			i2cfile=-5;
 		}
 	}
-
 	return i2cfile;
 }
 
-int i2cmain( int bus, int qit, uint8_t *buffer )
+int i2cmain(int bus, int qit, uint8_t *buffer)
 {
-	int i, j, ret, len, numbusses=0, tryonly=-1, i2cfile, i2cbus=0;
+	int i, j, ret, len, numbusses = 0, tryonly = -1, i2cfile, i2cbus = 0;
 	int goodbus[128];
 	uint8_t block[256];
 
 	quiet = qit;
-	if (bus==-1)
+	if (bus == -1)
 	{
 		for (i2cfile = open_i2c_dev(i2cbus); i2cfile >= 0 || i2cfile < -3;)
 		{
 			//read a byte. This is the official way to scan
 			if (i2cfile < -3) //problem with a bus, not general enough. Skip and close.
+			{
 				goto endloop;
-
+			}
 			ret = i2c_smbus_read_byte_data(i2cfile, 0);
 			if (ret < 0)
 			{
@@ -114,62 +114,83 @@ endloop:
 
 		display("%i potential busses found:", numbusses);
 		for (i=0; i<numbusses; i++)
+		{
 			display(" %i", goodbus[i]);
+		}
 		display("\n");
 		if (numbusses > 1)
 		{
 			if (bus == -1)
+			{
 				display("Will scan through until the first EDID is found.\nPass a bus number as an option to this program to go only for that one.\n");
+			}
 		}
 	}
 	else
 	{
 		tryonly = bus;
-		numbusses=1;
+		numbusses = 1;
 		display("Only trying %i as per your request.\n", tryonly);
 	}
-	ret=1;
-	for (i=0; i<numbusses; i++)
+	ret = 1;
+	for (i = 0; i < numbusses; i++)
 	{
 		i2cbus = goodbus[i];
 		if (tryonly >= 0)
 		{
 			i2cbus = tryonly;
 		}
-
 		i2cfile = open_i2c_dev(i2cbus);
-		if (i2cfile >=0)  //no matter how many times, >=0 still looks really angry.
+		if (i2cfile >= 0)  //no matter how many times, >=0 still looks really angry.
 		{
-			for (j=0; j<256; j++)
+			for (j = 0; j < 256; j++)
+			{
 				block[j] = i2c_smbus_read_byte_data(i2cfile, j);
+			}
 		}
 		close(i2cfile);
-		if (block[0]==0x00&&block[7]==0x00&&block[1]==0xff&&block[2]==0xff&&block[3]==0xff&&block[4]==0xff&&block[5]==0xff&&block[6]==0xff)
+		if (block[0] == 0x00
+		&&  block[7] == 0x00
+		&&  block[1] == 0xff
+		&&  block[2] == 0xff
+		&&  block[3] == 0xff
+		&&  block[4] == 0xff
+		&&  block[5] == 0xff
+		&&  block[6]==0xff)
 		{
 			ret = 0;
 			break;
 		}
 		else
+		{
 			display("Bus %i doesn't really have an EDID...\n", i2cbus);
+		}
 	}
 	if (ret==0)
 	{
 		if (block[128] == 0xff)
+		{
 			len = 128;
+		}
 		else
+		{
 			len = 256;
+		}
 		display("%i-byte EDID successfully retrieved from i2c bus %i\n", len, i2cbus);
-		if (i2cbus < (numbusses-1))
-			display("If this isn't the EDID you were looking for, consider the other potential busses.\n");
-		for (i=0; i<len; i++)
+		if (i2cbus < (numbusses - 1))
+		{
+			display("If this is not the EDID you were looking for, consider the other potential busses.\n");
+		}
+		for (i = 0; i < len; i++)
 		{
 			buffer[i] = block[i];
 		}
 	}
 	else
 	{
-		display("Couldn't find an accessible EDID on this %s.\n", (tryonly==-1)?"computer":"bus");
+		display("Could not find an accessible EDID on this %s.\n", (tryonly==-1)?"computer":"bus");
 		return 3;
 	}
 	return 0;
 }
+// vim:ts=4

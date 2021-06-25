@@ -1,4 +1,3 @@
-/* vim: set et fde fdm=syntax ft=c.doxygen ts=4 sts=4 sw=4 : */
 /*
  * Copyright © 2010-2011 Saleem Abdulrasool <compnerd@compnerd.org>.
  * All rights reserved.
@@ -34,16 +33,17 @@
 #include "cea861.h"
 
 /*! \todo figure out a better way to determine the offsets */
-#define HDMI_VSDB_EXTENSION_FLAGS_OFFSET        (0x06)
-#define HDMI_VSDB_MAX_TMDS_OFFSET               (0x07)
-#define HDMI_VSDB_LATENCY_FIELDS_OFFSET         (0x08)
+#define HDMI_VSDB_EXTENSION_FLAGS_OFFSET (0x06)
+#define HDMI_VSDB_MAX_TMDS_OFFSET        (0x07)
+#define HDMI_VSDB_LATENCY_FIELDS_OFFSET  (0x08)
 
-static const uint8_t HDMI_OUI[]                 = { 0x00, 0x0C, 0x03 };
+static const uint8_t HDMI_OUI[] = { 0x00, 0x0C, 0x03 };
 
-struct __attribute__ (( packed )) hdmi_vendor_specific_data_block {
+struct __attribute__ (( packed )) hdmi_vendor_specific_data_block
+{
     struct cea861_data_block_header header;
 
-    uint8_t  ieee_registration_id[3];           /* LSB */
+    uint8_t  ieee_registration_id[3];  /* LSB */
 
     unsigned port_configuration_b      : 4;
     unsigned port_configuration_a      : 4;
@@ -59,19 +59,18 @@ struct __attribute__ (( packed )) hdmi_vendor_specific_data_block {
     unsigned colour_depth_48_bit       : 1;
     unsigned audio_info_frame          : 1;
 
-    uint8_t  max_tmds_clock;                    /* = value * 5 */
+    uint8_t  max_tmds_clock;  /* = value * 5 */
 
     unsigned                           : 6;
     unsigned interlaced_latency_fields : 1;
     unsigned latency_fields            : 1;
 
-    uint8_t  video_latency;                     /* = (value - 1) * 2 */
-    uint8_t  audio_latency;                     /* = (value - 1) * 2 */
+    uint8_t  video_latency;  /* = (value - 1) * 2 */
+    uint8_t  audio_latency;  /* = (value - 1) * 2 */
     uint8_t  interlaced_video_latency;
     uint8_t  interlaced_audio_latency;
 
     uint8_t  reserved[];
 };
-
 #endif
-
+// vim:ts=4
