@@ -1,6 +1,7 @@
 #ifndef __ufs922__
 #define __ufs922__
 
+#define VFDSETFAN     0xc0425af6
 #define VFDGETVERSION 0xc0425af7
 
 /* this setups the mode temporarily (for one ioctl)
@@ -50,6 +51,10 @@ struct set_time_s
 	char time[5];
 };
 
+struct set_fan_s
+{
+	int speed;
+};
 
 struct micom_ioctl_data
 {
@@ -62,6 +67,7 @@ struct micom_ioctl_data
 		struct set_mode_s mode;
 		struct set_standby_s standby;
 		struct set_time_s time;
+		struct set_fan_s fan;
 	} u;
 };
 

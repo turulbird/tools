@@ -100,6 +100,7 @@ tArgs vK922Args[] =
 	{ "-L", "  --setLight           ", "Arg : 0|1         Set display on/off" },
 	{ "-c", "  --clear              ", "Args: None        Clear display, all icons and LEDs off" },
 	{ "-v", "  --version            ", "Args: None        Get version info from frontprocessor" },
+	{ "-sf", " --setFan             ", "Arg : 0..255      Set fan speed" },
 //	{ "-tm", " --time_mode          ", "Args: 0/1         Set time mode" },
 #if defined MODEL_SPECIFIC
 //	{ "-ms", " --model_specific     ", "Args: int1 [int2] [int3] ... [int16]   (note: input in hex)" },
@@ -254,6 +255,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	struct tm *ts;
 	struct tm *tsFp;
 	struct tm *tsWakeupTime;
+
 	printf("%s ->\n", __func__);
 	// Get current Frontpanel time
 	getTime(context, &curTimeFp);
@@ -437,6 +439,7 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 static int setText(Context_t *context, char *theText)
 {  // -t command: OK
 	char vHelp[128];
+
 	strncpy(vHelp, theText, cMAXCharsUFS922);
 	vHelp[cMAXCharsUFS922] = '\0';
 	/* printf("%s, %d\n", vHelp, strlen(vHelp));*/
@@ -510,6 +513,7 @@ static int setLight(Context_t *context, int on)
 static int getWakeupReason(Context_t *context, int *reason)
 {  // -w command: to be tested
 	unsigned char mode[8];
+
 	fprintf(stderr, "Waiting for wakeupmode from fp...\n");
 	/* front controller time */
 	if (ioctl(context->fd, VFDGETWAKEUPMODE, &mode) < 0)
@@ -557,6 +561,7 @@ static int getWakeupReason(Context_t *context, int *reason)
 static int getVersion(Context_t *context, int *version)
 {  // -v command:
 	char    strVersion[8];
+
 //	fprintf(stderr, "Waiting on version from fp...\n");
 	/* front controller version info */
 	if (ioctl(context->fd, VFDGETVERSION, &strVersion) < 0)
@@ -587,7 +592,6 @@ static int Exit(Context_t *context)
 	{
 		close(context->fd);
 	}
-
 	free(private);
 	exit(1);
 }
@@ -595,6 +599,7 @@ static int Exit(Context_t *context)
 static int Clear(Context_t *context)
 {  // -c command: OK
 	int i;
+
 	setText(context, "                ");
 //	setBrightness(context, 7);
 	for (i = 1; i <= 6 ; i++)
@@ -611,6 +616,7 @@ static int Clear(Context_t *context)
 static int setLedBrightness(Context_t *context, int brightness)
 {  // -led command: OK
 	struct micom_ioctl_data vData;
+
 	if (brightness < 0 || brightness > 7)
 	{
 		return -1;
@@ -621,6 +627,25 @@ static int setLedBrightness(Context_t *context, int brightness)
 	if (ioctl(context->fd, VFDLEDBRIGHTNESS, &vData) < 0)
 	{
 		perror("setledbrightness: ");
+		return -1;
+	}
+	return 0;
+}
+
+static int setFan(Context_t *context, int speed)
+{  // -sf command: OK
+	struct micom_ioctl_data vData;
+
+	if (speed < 0 || speed > 255)
+	{
+		return -1;
+	}
+	vData.u.fan.speed = speed;
+	setMode(context->fd);
+//	printf("%d\n", context->fd);
+	if (ioctl(context->fd, VFDSETFAN, &vData) < 0)
+	{
+		perror("setfan: ");
 		return -1;
 	}
 	return 0;
@@ -651,7 +676,7 @@ Model_t UFS922_model =
 	.SetLedBrightness = setLedBrightness,
 	.GetVersion       = getVersion,
 	.SetRF            = NULL,
-	.SetFan           = NULL,
+	.SetFan           = setFan,
 	.SetDisplayTime   = NULL,
 	.SetTimeMode      = NULL,
 #if defined MODEL_SPECIFIC
@@ -659,3 +684,4 @@ Model_t UFS922_model =
 #endif
 	.Exit             = Exit
 };
+// vim:ts=4
