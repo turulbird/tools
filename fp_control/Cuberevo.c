@@ -137,6 +137,28 @@ static void setMode(int fd)
 	}
 }
 
+char *getModelname(void)
+{
+	const int cSize = 32;
+	int vFd = -1;
+	int vLen = -1;
+	char *vName;
+
+	vFd = open("/proc/stb/info/model", O_RDONLY);
+	vLen = read(vFd, vName, cSize);
+	close(vFd);
+
+	if (vLen > 0)
+	{
+		vName[vLen - 1] = '\0';
+	}
+	else
+	{
+		printf("Problem: cannot determine receiver model.\n");
+	}
+	return vName;
+}		
+
 /* Remark on times:
  *
  * System time is in UTC
@@ -732,20 +754,21 @@ static int setFan(Context_t *context, int on)
 {
 	// -sf command
 	struct micom_ioctl_data vData;
-	int version;
 
-	getVersion(context, &version);
-	if ((version < 700 && version > 799) || version != 803)
+	if ((!strncasecmp(boxName, "cuberevo", 8))
+	||  (!strncasecmp(boxName, "cuberevo-9500hd", 15)))
+	{
+		vData.u.fan.on = on;
+		setMode(context->fd);
+		if (ioctl(context->fd, VFDSETFAN, &vData) < 0)
+		{
+			perror("setFan");
+			return -1;
+		}
+	}
+	else
 	{
 		printf("This model cannot control the fan.\n");
-		return 0;
-	}
-	vData.u.fan.on = on;
-	setMode(context->fd);
-	if (ioctl(context->fd, VFDSETFAN, &vData) < 0)
-	{
-		perror("setFan");
-		return -1;
 	}
 	return 0;
 }
@@ -770,25 +793,25 @@ static int setBrightness(Context_t *context, int brightness)
 {
 	// -b command
 	struct micom_ioctl_data vData;
-	int version;
 
-	getVersion(context, &version);
-
-	if (version < 700)  // LED models have no brightness control
+	if ((!strncasecmp(boxName, "cuberevo-mini-fta", 17))
+	||  (!strncasecmp(boxName, "cuberevo-250hd", 14)))
 	{
 		printf("This model cannot control display brightness.\n");
-		return 0;
 	}
-	if (brightness < 0 || brightness > 7)
+	else
 	{
-		return -1;
-	}
-	vData.u.brightness.level = brightness;
-	setMode(context->fd);
-	if (ioctl(context->fd, VFDBRIGHTNESS, &vData) < 0)
-	{
-		perror("setBrightness");
-		return -1;
+		if (brightness < 0 || brightness > 7)
+		{
+			return -1;
+		}
+		vData.u.brightness.level = brightness;
+		setMode(context->fd);
+		if (ioctl(context->fd, VFDBRIGHTNESS, &vData) < 0)
+		{
+			perror("setBrightness");
+			return -1;
+		}
 	}
 	return 0;
 }

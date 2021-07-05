@@ -133,5 +133,7 @@ struct micom_ioctl_data
 #endif
 	} u;
 };
-#endif
+
+extern char boxName[];  // name of receiver
+#endif  // __cuberevo__
 // vim:ts=4
