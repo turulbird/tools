@@ -37,7 +37,7 @@
 static int setText(Context_t *context, char *theText);
 
 /******************** constants ************************ */
-#define cTTY_DEVICE "/dev/ttyAS1"
+#define cTTY_DEVICE "/dev/ttyAS1"  // fp asc
 #define cVFD_DEVICE "/dev/vfd"
 
 #define cMAXCharsUFS910 16
@@ -47,7 +47,7 @@ static int setText(Context_t *context, char *theText);
 
 typedef struct
 {
-	int vfd;
+	int vfd;  // file descriptor of /dev/vfd
 
 	int display;
 	int display_custom;
@@ -82,7 +82,7 @@ static int setTemFlagsKathrein(int fd)
 	if ((tcgetattr(fd, &old_io)) == 0)
 	{
 		new_io = old_io;
-		printf("Setting new flags\n");
+//		printf("Setting new flags\n");
 		/* c_iflags ->input flags */
 		new_io.c_iflag &= ~(IMAXBEL | BRKINT | ICRNL);
 		/* c_lflags ->local flags*/
@@ -108,13 +108,15 @@ static int init(Context_t *context)
 	tUFS910Private *private = malloc(sizeof(tUFS910Private));
 	((Model_t *)context->m)->private = private;
 	memset(private, 0, sizeof(tUFS910Private));
+
 	vFd = open(cTTY_DEVICE, O_RDWR);
 	if (vFd < 0)
 	{
-		fprintf(stderr, "cannot open %s\n", cTTY_DEVICE);
+		fprintf(stderr, "Cannot open %s\n", cTTY_DEVICE);
 		perror("");
 	}
 	setTemFlagsKathrein(vFd);
+
 	private->vfd = open(cVFD_DEVICE, O_RDWR);
 	if (private->vfd < 0)
 	{
@@ -190,7 +192,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	printf("Goodbye\n");
 	sleep(1);
 	/* SWITCH ON RED LED */
-	write(context->fd, "2" ,1);
+	write(context->fd, "2", 1);
 	usleep(1000);
 	write(context->fd, &cTime[0], 1);
 	usleep(1000);
@@ -223,8 +225,8 @@ static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 		time(&curTime);
 		if (curTime >= *shutdownTimeGMT)
 		{
-			/* set most recent e2 timer and bye bye */
- 			return (setTimer(context, NULL));
+			/* set most recent e2 timer and shutdown */
+			return (setTimer(context, NULL));
 		}
 		usleep(100000);
 	}
@@ -286,19 +288,30 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 }
 
 static int setText(Context_t *context, char *theText)
-{
+{  // -t command
+#if 0
 	struct vfd_ioctl_data data;
-	tUFS910Private *private = (tUFS910Private *)
-							  ((Model_t *)context->m)->private;
+	tUFS910Private *private = (tUFS910Private *)((Model_t *)context->m)->private;
 	memset(data.data, ' ', 63);
 	memcpy(data.data, theText, strlen(theText));
 	data.start = 0;
 	data.length = strlen(theText);
+
 	if (ioctl(private->vfd, VFDDISPLAYCHARS, &data) < 0)
 	{
 		perror("setText: ");
 		return -1;
 	}
+#else
+	tUFS910Private *private = (tUFS910Private *)((Model_t *)context->m)->private;
+	char vHelp[65];
+
+	memset(vHelp, ' ', sizeof(vHelp));
+	strncpy(vHelp, theText, 64);
+	vHelp[64] = '\0';
+//	write(context->fd, vHelp, strlen(vHelp));
+	write(private->vfd, vHelp, strlen(vHelp));
+#endif
 	return 0;
 }
 
@@ -319,14 +332,15 @@ static int setLed(Context_t *context, int which, int on)
 	return 0;
 }
 	
-static int setIcon (Context_t *context, int which, int on)
-{
+static int setIcon(Context_t *context, int which, int on)
+{  // -i command
 	struct vfd_ioctl_data data;
 	tUFS910Private *private = (tUFS910Private *)((Model_t *)context->m)->private;
-	memset(data.data, ' ', 63);
+
+	memset(data.data, 0, sizeof(data));
 	data.start = 0;
 	data.length = 5;
-	data.data[0] = which & 0x0f;
+	data.data[0] = which & 0xff;
 	data.data[4] = on;
 	if (ioctl(private->vfd, VFDICONDISPLAYONOFF, &data) < 0)
 	{
@@ -379,8 +393,7 @@ static int setLight(Context_t *context, int on)
 
 static int Exit(Context_t *context)
 {
-	tUFS910Private *private = (tUFS910Private *)
-							  ((Model_t *)context->m)->private;
+	tUFS910Private *private = (tUFS910Private *)((Model_t *)context->m)->private;
 	if (private->vfd > 0)
 	{
 		close(private->vfd);
