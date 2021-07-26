@@ -37,6 +37,14 @@
 #include "global.h"
 #include "map.h"
 #include "remotes.h"
+#include "Ufs910_1W.h"
+
+#define OLD  // uncomment for support of old vfd driver
+#if defined OLD
+#define RCdevice "/dev/ttyAS1"
+#else
+#define RCdevice "/dev/rc"
+#endif
 
 #define UFS910_1W_LONGKEY
 
@@ -47,35 +55,10 @@ static tLongKeyPressSupport cLongKeyPressSupport =
 };
 #endif
 
-static tButton cButtonsKathrein[] =
+static tButton cButtonUFS910[] =  // order is the same as on RC660
 {
-	{ "MENU",          "54", KEY_MENU },
-	{ "RED",           "6D", KEY_RED },
-	{ "GREEN",         "6E", KEY_GREEN },
-	{ "YELLOW",        "6F", KEY_YELLOW },
-	{ "BLUE",          "70", KEY_BLUE },
-	{ "EXIT",          "55", KEY_EXIT },
-	{ "TEXT",          "3C", KEY_TEXT },
-	{ "EPG",           "4C", KEY_EPG },
-	{ "REWIND",        "21", KEY_REWIND },
-	{ "FASTFORWARD",   "20", KEY_FASTFORWARD },
-	{ "PLAY",          "38", KEY_PLAY },
-	{ "PAUSE",         "39", KEY_PAUSE },
-	{ "RECORD",        "37", KEY_RECORD },
-	{ "STOP",          "31", KEY_STOP },
-	{ "POWER",         "0C", KEY_POWER },
 	{ "MUTE",          "0D", KEY_MUTE },
-	{ "CHANNELUP",     "1E", KEY_CHANNELUP },
-	{ "CHANNELDOWN",   "1F", KEY_CHANNELDOWN },
-	{ "VOLUMEUP",      "10", KEY_VOLUMEUP },
-	{ "VOLUMEDOWN",    "11", KEY_VOLUMEDOWN },
-	{ "INFO",          "0F", KEY_INFO },
-	{ "OK",            "5C", KEY_OK },
-	{ "UP",            "58", KEY_UP },
-	{ "RIGHT",         "5B", KEY_RIGHT },
-	{ "DOWN",          "59", KEY_DOWN },
-	{ "LEFT",          "5A", KEY_LEFT },
-	{ "0",             "00", KEY_0 },
+	{ "POWER",         "0C", KEY_POWER },
 	{ "1",             "01", KEY_1 },
 	{ "2",             "02", KEY_2 },
 	{ "3",             "03", KEY_3 },
@@ -85,51 +68,77 @@ static tButton cButtonsKathrein[] =
 	{ "7",             "07", KEY_7 },
 	{ "8",             "08", KEY_8 },
 	{ "9",             "09", KEY_9 },
+	{ "MENU",          "54", KEY_MENU },
+	{ "0",             "00", KEY_0 },
+	{ "TEXT",          "3C", KEY_TEXT },
+	{ "RED",           "6D", KEY_RED },
+	{ "GREEN",         "6E", KEY_GREEN },
+	{ "YELLOW",        "6F", KEY_YELLOW },
+	{ "BLUE",          "70", KEY_BLUE },
+	{ "VOLUMEUP",      "10", KEY_VOLUMEUP },
+	{ "INFO",          "0F", KEY_INFO },
+	{ "CHANNELUP",     "1E", KEY_CHANNELUP },
+	{ "VOLUMEDOWN",    "11", KEY_VOLUMEDOWN },
+	{ "UP",            "58", KEY_UP },
+	{ "CHANNELDOWN",   "1F", KEY_CHANNELDOWN },
+	{ "LEFT",          "5A", KEY_LEFT },
+	{ "OK",            "5C", KEY_OK },
+	{ "RIGHT",         "5B", KEY_RIGHT },
+	{ "EXIT",          "55", KEY_EXIT },
+	{ "DOWN",          "59", KEY_DOWN },
+	{ "EPG",           "4C", KEY_EPG },
+	{ "REWIND",        "21", KEY_REWIND },
+	{ "PLAY",          "38", KEY_PLAY },
+	{ "FASTFORWARD",   "20", KEY_FASTFORWARD },
+	{ "PAUSE",         "39", KEY_PAUSE },
+	{ "RECORD",        "37", KEY_RECORD },
+	{ "STOP",          "31", KEY_STOP },
 /* Front panel keys */
 	{ "VFORMAT_FRONT", "4A", KEY_SWITCHVIDEOMODE },
 	{ "MENU_FRONT",    "49", KEY_MENU },
 	{ "EXIT_FRONT",    "4B", KEY_HOME },
-	{ "STANDBY_FRONT", "48", KEY_POWER },
+	{ "STANDBY_FRONT", "48", KEY_POWER },  // currently 1W models only
 	{ "OPTIONS_FRONT", "47", KEY_HELP },
 
-// Long table, compare to the above, these have bit 7 set 
-	{ "LMENU",           "D4", KEY_MENU },
-	{ "LRED",            "ED", KEY_RED },
-	{ "LGREEN",          "EE", KEY_GREEN },
-	{ "LYELLOW",         "EF", KEY_YELLOW },
-	{ "LBLUE",           "F0", KEY_BLUE },
-	{ "LEXIT",           "D5", KEY_EXIT },
-	{ "LTEXT",           "BC", KEY_TEXT },
-	{ "LEPG",            "CC", KEY_EPG },
-	{ "LREWIND",         "A1", KEY_REWIND },
-	{ "LFASTFORWARD",    "A0", KEY_FASTFORWARD },
-	{ "LPLAY",           "B8", KEY_PLAY },
-	{ "LPAUSE",          "B9", KEY_PAUSE },
-	{ "LRECORD",         "B7", KEY_RECORD },
-	{ "LSTOP",           "B1", KEY_STOP },
-	{ "LSTANDBY",        "8C", KEY_POWER },
-	{ "LMUTE",           "8D", KEY_MUTE },
-	{ "LCHANNELUP",      "9E", KEY_CHANNELUP },
-	{ "LCHANNELDOWN",    "9F", KEY_CHANNELDOWN },
-	{ "LVOLUMEUP",       "90", KEY_VOLUMEUP },
-	{ "LVOLUMEDOWN",     "91", KEY_VOLUMEDOWN },
-	{ "LINFO",           "8F", KEY_EXIT },
-	{ "LOK",             "DC", KEY_OK },
-	{ "LUP",             "D8", KEY_UP },
-	{ "LRIGHT",          "DB", KEY_RIGHT },
-	{ "LDOWN",           "D9", KEY_DOWN },
-	{ "LLEFT",           "DA", KEY_LEFT },
-	{ "L0",              "80", KEY_0 },
-	{ "L1",              "81", KEY_1 },
-	{ "L2",              "82", KEY_2 },
-	{ "L3",              "83", KEY_3 },
-	{ "L4",              "84", KEY_4 },
-	{ "L5",              "85", KEY_5 },
-	{ "L6",              "86", KEY_6 },
-	{ "L7",              "87", KEY_7 },
-	{ "L8",              "88", KEY_8 },
-	{ "L9",              "89", KEY_9 },
-	{ "",                "",   KEY_NULL },
+// Long table, compared to the above, these have bit 7 set 
+	{ "LMUTE",         "8D", KEY_MUTE },
+	{ "LSTANDBY",      "8C", KEY_POWER },
+	{ "L1",            "81", KEY_1 },
+	{ "L2",            "82", KEY_2 },
+	{ "L3",            "83", KEY_3 },
+	{ "L4",            "84", KEY_4 },
+	{ "L5",            "85", KEY_5 },
+	{ "L6",            "86", KEY_6 },
+	{ "L7",            "87", KEY_7 },
+	{ "L8",            "88", KEY_8 },
+	{ "L9",            "89", KEY_9 },
+	{ "LMENU",         "D4", KEY_MENU },
+	{ "L0",            "80", KEY_0 },
+	{ "LTEXT",         "BC", KEY_TEXT },
+	{ "LRED",          "ED", KEY_RED },
+	{ "LGREEN",        "EE", KEY_GREEN },
+	{ "LYELLOW",       "EF", KEY_YELLOW },
+	{ "LBLUE",         "F0", KEY_BLUE },
+	{ "LVOLUMEUP",     "90", KEY_VOLUMEUP },
+	{ "LINFO",         "8F", KEY_EXIT },
+	{ "LCHANNELUP",    "9E", KEY_CHANNELUP },
+	{ "LVOLUMEDOWN",   "91", KEY_VOLUMEDOWN },
+	{ "LUP",           "D8", KEY_UP },
+	{ "LCHANNELDOWN",  "9F", KEY_CHANNELDOWN },
+	{ "LLEFT",         "DA", KEY_LEFT },
+	{ "LOK",           "DC", KEY_OK },
+	{ "LRIGHT",        "DB", KEY_RIGHT },
+	{ "LEXIT",         "D5", KEY_EXIT },
+	{ "LDOWN",         "59", KEY_DOWN },
+	{ "LEPG",          "CC", KEY_EPG },
+	{ "LREWIND",       "A1", KEY_REWIND },
+	{ "LPLAY",         "B8", KEY_PLAY },
+	{ "LFASTFORWARD",  "A0", KEY_FASTFORWARD },
+	{ "LPAUSE",        "B9", KEY_PAUSE },
+	{ "LRECORD",       "B7", KEY_RECORD },
+	{ "LSTOP",         "B1", KEY_STOP },
+	{ "",              "",   KEY_NULL }  // end of table
+	// Front panel keys do not have long equivalents
 };
 
 static int vFd;
@@ -139,6 +148,7 @@ static int gNextKey = 0;
 #endif
 
 
+#if defined OLD
 static int setTemFlagsKathrein(int fd)
 {
 	struct termios old_io;
@@ -165,11 +175,14 @@ static int setTemFlagsKathrein(int fd)
 	}
 	return 0;
 }
+#endif
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
-	vFd = open("/dev/ttyAS1", O_RDWR);
+	vFd = open(RCdevice, O_RDWR);
+#if defined OLD
 	setTemFlagsKathrein(vFd);
+#endif
 	return vFd;
 }
 
@@ -217,6 +230,7 @@ static int pRead(Context_t *context)
 
 static int pNotification(Context_t *context, const int cOn)
 {
+#if defined OLD
 	if (cOn)
 	{
 		write(vFd, "1\n1\n1\n1\n", 8);
@@ -226,6 +240,21 @@ static int pNotification(Context_t *context, const int cOn)
 		usleep(50000);
 		write(vFd, "A\nA\nA\nA\n", 8);
 	}
+#else
+	struct ufs910_fp_ioctl_data vfd_data;
+	int ioctl_fd = -1;
+
+	vfd_data.u.led.on = cOn ? 1 : 0;
+	vfd_data.u.led.led_nr = LED_GREEN;
+
+	if (!cOn)
+	{
+		usleep(100000);
+	}
+	ioctl_fd = open("/dev/vfd", O_RDONLY);
+	ioctl(ioctl_fd, VFDSETLED, &vfd_data);
+	close(ioctl_fd);
+#endif
 	return 0;
 }
 
@@ -233,7 +262,7 @@ RemoteControl_t Ufs910_1W_RC =
 {
 	"Kathrein UFS910 (1W) RemoteControl",
 	Ufs910_1W,
-	cButtonsKathrein,
+	cButtonUFS910,
 	NULL,
 	NULL,
 #ifndef UFS910_1W_LONGKEY
