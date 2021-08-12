@@ -143,11 +143,12 @@ static int pInit(Context_t *context, int argc, char *argv[])
 	{
 		cLongKeyPressSupport.delay = atoi(argv[2]);
 	}
-	if (!access("/etc/.rccode", F_OK))
+	if (! access("/etc/.rccode", F_OK))
 	{
 		char buf[10];
 		int val;
 		FILE* fd;
+
 		fd = fopen("/etc/.rccode", "r");
 		if (fd != NULL)
 		{
@@ -160,9 +161,17 @@ static int pInit(Context_t *context, int argc, char *argv[])
 					printf("[evremote2 ufs913] Selected RC Code: %d\n", cLongKeyPressSupport.rc_code);
 					ufs913SetRemote(cLongKeyPressSupport.rc_code);
 				}
+				else
+				{
+					cLongKeyPressSupport.rc_code = 1;  // set default RC code
+				}
 			}
 			fclose(fd);
 		}
+	}
+	else
+	{
+		cLongKeyPressSupport.rc_code = 1;  // set default RC code
 	}
 	printf("[evremote2 ufs913] Period = %d, delay = %d, rc_code = %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay, cLongKeyPressSupport.rc_code);
 	return vFd;
@@ -180,11 +189,14 @@ static int pRead(Context_t *context)
 	eKeyType vKeyType = RemoteControl;
 	int vCurrentCode = -1;
 	int rc = 1;
+	struct vfd_ioctl_data data;
+	int ioctl_fd;
 
 //	printf("%s >\n", __func__);
 	while (1)
 	{
 		read(context->fd, vData, cUFS913CommandLen);
+
 		if (vData[0] == 0xD2)
 		{
 			vKeyType = RemoteControl;
@@ -199,14 +211,54 @@ static int pRead(Context_t *context)
 		}
 		if (vKeyType == RemoteControl)
 		{
+			if (vData[1] == 0x74 || vData[1] == 0x75 || vData[1] == 0x76 || vData[1] == 0x77)  // set RC code received (BACK + 9 + 1..4)
+			{
+				rc = vData[1] - 0x73;
+				printf("[evremote2 ufs913] Change RC code command received (code = %d)\n", rc);
+
+				if (! access("/etc/.rccode", F_OK))
+				{
+					char buf[2];
+					int fd;
+
+					memset(buf, 0, sizeof(buf));
+					buf[0] = (rc | 0x30);
+
+					fd = open("/etc/.rccode", O_WRONLY);
+					if (fd >= 0)
+					{
+						if (write(fd, buf, 1) == 1)
+						{
+							context->r->LongKeyPressSupport->rc_code = rc;
+						}
+						else
+						{
+							context->r->LongKeyPressSupport->rc_code = rc = 1;  // set default RC code
+						}
+						printf("[evremote2 ufs913] RC Code set to: %d\n", rc);
+
+						data.length = sprintf((char *)data.data, "RC code: %d\n", rc);
+						data.length--;
+						data.data[data.length] = 0;
+						ioctl_fd = open("/dev/vfd", O_RDONLY);
+						ioctl(ioctl_fd, VFDDISPLAYCHARS, &data);
+						close(ioctl_fd);
+					}
+					else
+					{
+						context->r->LongKeyPressSupport->rc_code = 1;  // set default RC code
+					}
+					close(fd);
+				}
+			}
 			/* mask out for rc codes
 			 * possible 0 to 3 for remote controls 1 to 4
 			 * given in /etc for example via console: echo 2 > /etc/.rccode
-			 * will be read and rc_code = 2 is used ( press then back + 2 simultanessly on remote to fit it there)
+			 * will be read and rc_code = 2 is used ( press then back + 2 simultaniously on remote to fit it there)
 			 * default is rc_code = 1 ( like back + 1 on remote )	*/
 			rc = ((vData[4] & 0x30) >> 4) + 1;
-			printf("[evremote2 ufs913] RC code: %d\n", rc);
-			if (rc == ((RemoteControl_t *)context->r)->LongKeyPressSupport->rc_code)
+//			printf("[evremote2 ufs913] RC code of received key: %d\n", rc);
+			if (rc == context->r->LongKeyPressSupport->rc_code)
 			{
 				vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[1]);
 			}
@@ -255,4 +307,3 @@ BoxRoutines_t UFS913_BR =
 	&pNotification
 };
 // vim:ts=4
-

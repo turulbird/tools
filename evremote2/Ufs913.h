@@ -1,8 +1,9 @@
 #ifndef _ufs913_
 #define _ufs913_
 
-#define VFDSETRCCODE 0xc0425af6
-#define VFDSETLED    0xc0425afe
+#define VFDDISPLAYCHARS 0xc0425a00
+#define VFDSETRCCODE    0xc0425af6
+#define VFDSETLED       0xc0425afe
 
 struct set_brightness_s
 {
@@ -39,6 +40,13 @@ struct micom_ioctl_data
 		struct set_brightness_s brightness;
 		struct set_mode_s mode;
 	} u;
+};
+
+struct vfd_ioctl_data
+{
+	unsigned char start_address;
+	unsigned char data[64];
+	unsigned char length;
 };
 
 #endif  // _ufs913_

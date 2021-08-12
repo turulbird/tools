@@ -162,6 +162,7 @@ static int pInit(Context_t *context, int argc, char *argv[])
 		char buf[10];
 		int val;
 		FILE* fd;
+
 		fd = fopen("/etc/.rccode", "r");
 		if (fd != NULL)
 		{
