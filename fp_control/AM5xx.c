@@ -70,16 +70,16 @@ unsigned long getAM5xxTime(char *TimeString)
 }
 
 /* Calculate the time value which we can pass to
- * the nuvoton fp. its a mjd time (mjd=modified
- * julian date). mjd is relativ to gmt so theTime
+ * the crenova fp. It is an MJD time (MJD=Modified
+ * Julian Date). MJD is relative to GMT so theTime
  * must be in GMT/UTC.
  */
 void setAM5xxTime(time_t theTime, char *destString)
 {
 	struct tm *now_tm;
 	now_tm = gmtime(&theTime);
-	printf("Set Time (UTC): %02d:%02d:%02d %02d-%02d-%04d\n",
-		   now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec, now_tm->tm_mday, now_tm->tm_mon + 1, now_tm->tm_year + 1900);
+//	printf("Set Time (UTC): %02d:%02d:%02d %02d-%02d-%04d\n",
+//		   now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec, now_tm->tm_mday, now_tm->tm_mon + 1, now_tm->tm_year + 1900);
 	double mjd = modJulianDate(now_tm);
 	int mjd_int = mjd;
 	destString[0] = (mjd_int >> 8);
@@ -128,7 +128,8 @@ static int setTime(Context_t *context, time_t *theGMTTime)
 static int getTime(Context_t *context, time_t *theGMTTime)
 {
 	char fp_time[8];
-	fprintf(stderr, "Waiting for current time from fp...\n");
+
+	fprintf(stderr, "Waiting for current time from FP...\n");
 	/* front controller time */
 	if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
 	{
@@ -138,13 +139,13 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 	/* if we get the fp time */
 	if (fp_time[0] != '\0')
 	{
-		fprintf(stderr, "Success reading time from fp\n");
+		fprintf(stderr, "Successfully read time from FP\n");
 		/* current front controller time */
 		*theGMTTime = (time_t)getAM5xxTime(fp_time);
 	}
 	else
 	{
-		fprintf(stderr, "Error reading time from fp\n");
+		fprintf(stderr, "Error reading time from FP\n");
 		*theGMTTime = 0;
 	}
 	return 0;
@@ -158,10 +159,14 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	time_t wakeupTime;
 	struct tm *ts;
 	struct tm *tsw;
+
 	time(&curTime);
 	ts = localtime(&curTime);
-	fprintf(stderr, "Current Time: %02d:%02d:%02d %02d-%02d-%04d\n",
+	if (disp)
+	{
+		fprintf(stderr, "Current Time: %02d:%02d:%02d %02d-%02d-%04d\n",
 			ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
+	}
 	if (theGMTTime == NULL)
 	{
 		wakeupTime = read_timers_utc(curTime);
@@ -171,17 +176,17 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		wakeupTime = *theGMTTime;
 	}
 	tsw = localtime(&wakeupTime);
-	printf("wakeup Time: %02d:%02d:%02d %02d-%02d-%04d\n",
+	printf("Wake up time: %02d:%02d:%02d %02d-%02d-%04d\n",
 		   tsw->tm_hour, tsw->tm_min, tsw->tm_sec, tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
 	tsw = localtime(&curTime);
-	printf("current Time: %02d:%02d:%02d %02d-%02d-%04d\n",
+	printf("Current system time: %02d:%02d:%02d %02d-%02d-%04d\n",
 		   tsw->tm_hour, tsw->tm_min, tsw->tm_sec, tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
 	//check --> WakupTime is set and larger curTime and no larger than a year in the future (gost)
 	if ((wakeupTime <= 0) || (curTime > wakeupTime) || (curTime < (wakeupTime-25920000)))
 	//if ((wakeupTime <= 0) || (wakeupTime == LONG_MAX))
 	{
-		/* nothing to do for e2 */
-		fprintf(stderr, "no e2 timer found clearing fp wakeup time ... good bye ...\n");
+		/* nothing to do for E2 */
+		fprintf(stderr, "No E2 timer found; clearing FP wakeup time\n");
 		vData.u.standby.localTime = 0;
 		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
 		{
@@ -193,6 +198,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	{
 		unsigned long diff;
 		char    fp_time[8];
+
 		fprintf(stderr, "Waiting for current time from fp...\n");
 		/* front controller time */
 		if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
@@ -205,7 +211,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		/* if we get the fp time */
 		if (fp_time[0] != '\0')
 		{
-			fprintf(stderr, "Success reading time from fp\n");
+			fprintf(stderr, "Successfully read time from FP\n");
 			/* current front controller time */
 			curTimeFP = (time_t) getAM5xxTime(fp_time);
 			/* set FP-Time if curTime > or < 12h (gost)*/
@@ -254,7 +260,7 @@ static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 		time(&curTime);
 		if (curTime >= *shutdownTimeGMT)
 		{
-			/* set most recent e2 timer and bye bye */
+			/* set most recent E2 timer and bye bye */
 			return (setTimer(context, NULL));
 		}
 		usleep(100000);
@@ -353,6 +359,7 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 static int setText(Context_t *context, char *theText)
 {
 	char vHelp[cMAXCharsAM5xx + 1];
+
 	strncpy(vHelp, theText, cMAXCharsAM5xx);
 	vHelp[cMAXCharsAM5xx] = '\0';
 	/* printf("%s, %d\n", vHelp, strlen(vHelp));*/

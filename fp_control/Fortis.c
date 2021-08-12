@@ -155,7 +155,11 @@ void calcSetNuvotonTime(time_t theTime, char *destString)
 	int mjd;
 
 	now_tm = gmtime(&theTime);
+	printf("Time to set: %02d:%02d:%02d %02d-%02d-%04d (local)\n", now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec,
+		now_tm->tm_mday, now_tm->tm_mon + 1, now_tm->tm_year + 1900);
+	
 	mjd = (int)modJulianDate(now_tm);
+	printf("Converted to: MJD = %d %02d-%02d-%04d (local)\n", mjd,now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
 	destString[0] = (mjd >> 8);
 	destString[1] = (mjd & 0xff);
 	destString[2] = now_tm->tm_hour;
@@ -186,8 +190,8 @@ static int usage(Context_t *context, char *prg_name, char *cmd_name)
 {
 	int i;
 
-	fprintf(stderr, "Usage:\n\n");
-	fprintf(stderr, "%s argument [optarg1] [optarg2]\n", prg_name);
+	printf("Usage:\n\n");
+	printf("%s argument [optarg1] [optarg2]\n", prg_name);
 	for (i = 0; ; i++)
 	{
 		if (vFArgs[i].arg == NULL)
@@ -199,7 +203,7 @@ static int usage(Context_t *context, char *prg_name, char *cmd_name)
 			fprintf(stderr, "%s   %s   %s\n", vFArgs[i].arg, vFArgs[i].arg_long, vFArgs[i].arg_description);
 		}
 	}
-	fprintf(stderr, "Options marked * should be the only calling argument.\n");
+	printf("Options marked * should be the only calling argument.\n");
 	return 0;
 }
 

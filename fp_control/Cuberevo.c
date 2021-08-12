@@ -142,7 +142,7 @@ char *getModelname(void)
 	const int cSize = 32;
 	int vFd = -1;
 	int vLen = -1;
-	char *vName;
+	char *vName = NULL;
 
 	vFd = open("/proc/stb/info/model", O_RDONLY);
 	vLen = read(vFd, vName, cSize);
@@ -250,7 +250,7 @@ static int init(Context_t *context)
 	if (vFd < 0)
 	{
 		fprintf(stderr, "Cannot open %s\n", cVFD_DEVICE);
-		perror("");
+		perror("Init");
 	}
 	((Model_t *)context->m)->private = private;
 	memset(private, 0, sizeof(tCubeRevoPrivate));
@@ -468,8 +468,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 }
 
 static int getWakeupTime(Context_t *context, time_t *theGMTTime)
-{
-	// -gw command
+{  // -gw command
 	struct micom_ioctl_data vData;
 
 	if (ioctl(context->fd, VFDGETWAKEUPTIME_CUB, &vData) < 0)
@@ -482,8 +481,7 @@ static int getWakeupTime(Context_t *context, time_t *theGMTTime)
 }
 
 static int setWakeupTime(Context_t *context, time_t *theGMTTime)
-{
-	// -st command
+{  // -st command
 	struct micom_ioctl_data vData;
 
 	setMicomTime(*theGMTTime - 3506716800u, vData.u.wakeup_time.time, 0); // without seconds
@@ -497,8 +495,7 @@ static int setWakeupTime(Context_t *context, time_t *theGMTTime)
 }
 
 static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
-{
-	// -d command
+{  // -d command
 	time_t curTime;
 	struct tm *ts_gmt;
 	int gmt_offset;
@@ -531,8 +528,7 @@ static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 }
 
 static int reboot(Context_t *context, time_t *rebootTimeGMT)
-{
-	//-r command
+{  //-r command
 	time_t curTime;
 	struct tm *ts_gmt;
 	int gmt_offset;

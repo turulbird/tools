@@ -1,9 +1,14 @@
 #ifndef __ufs912__
 #define __ufs912__
 
-#define VFDGETVERSION 0xc0425af7
+#define VFDGETVERSION    0xc0425af7
+#if defined VFDGETWAKEUPTIME
+#undef VFDGETWAKEUPTIME
+#endif
+#define VFDGETWAKEUPTIME 0xc0425b00
+#define VFDSETWAKEUPTIME 0xc0425b04
 
-/* this setups the mode temporarily (for one ioctl)
+/* this sets up the mode temporarily (for one ioctl)
  * to the desired mode. currently the "normal" mode
  * is the compatible vfd mode
  */
@@ -64,6 +69,5 @@ struct micom_ioctl_data
 		struct set_time_s time;
 	} u;
 };
-
-
-#endif
+#endif  // __ufs912__
+// vim:ts=4

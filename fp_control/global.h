@@ -38,6 +38,8 @@
 #define VFDSETTIMEFORMAT        0xc0425b04 /* Fortis specific */
 #define VFDGETTIMEFORMAT        0xc0425b05 /* Fortis specific */
 
+#define cRTC_OFFSET_FILE "/proc/stb/fp/rtc_offset"
+
 //Comment next line if you do not want the -ms option
 //#define MODEL_SPECIFIC 1
 
@@ -128,6 +130,8 @@ extern	Model_t Vitamin_model;
 
 double modJulianDate(struct tm *theTime);
 int    get_GMT_offset(struct tm theTime);
+int    getUTCoffset(void);
+int    setUTCoffset(int UTC_offset);
 time_t read_timers_utc(time_t curTime);
 time_t read_fake_timer_utc(time_t curTime);
 int    searchModel(Context_t *context, eBoxType type);
@@ -143,3 +147,4 @@ char   *VtimeFormat;
 int    Vwakeup;
 
 #endif
+// vim:ts=4
