@@ -530,7 +530,7 @@ int getModel()
 		     ||  (!strncasecmp(vName, "cuberevo-250hd", 14))
 		     ||  (!strncasecmp(vName, "cuberevo-2000hd", 15))
 		     ||  (!strncasecmp(vName, "cuberevo-9500hd", 15))
-		     ||  (!strncasecmp(vName, "cuberevo-3000hd", 14)))
+		     ||  (!strncasecmp(vName, "cuberevo-3000hd", 15)))
 		{
 			vBoxType = Cuberevo;
 		}
@@ -583,7 +583,7 @@ int main(int argc, char *argv[])
 		printf("               Can work with multiple RCs simultaneously.\n");
 		printf("<period> - time of pressing a key.\n");
 		printf("<delay> - delay between pressing keys. Increase if RC is too sensitive\n");
-		printf("<IconNumber> - Number of blinking Icon\n");
+		printf("<IconNumber> - Number of feedback Icon\n");
 		printf("No parameters - autoselection of RC driver with standard features.\n\n");
 		return 0;
 	}
