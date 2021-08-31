@@ -123,6 +123,29 @@ static tButton cButtonUFS922ListFrontpanel[] =
 };
 
 
+static int ufs922SetRemote(unsigned int code)
+{
+	int vfd_fd = -1;
+	struct
+	{
+		unsigned char start;
+		unsigned char data[64];
+		unsigned char length;
+	} data;
+
+	data.start = 0x00;
+	data.data[0] = code & 0x07;
+	data.length = 1;
+
+	vfd_fd = open("/dev/vfd", O_RDWR);
+	if (vfd_fd)
+	{
+		ioctl(vfd_fd, VFDSETRCCODE, &data);
+		close(vfd_fd);
+	}
+	return 0;
+}
+
 static int pInit(Context_t *context, int argc, char *argv[])
 {
 	int vFd;
@@ -172,6 +195,8 @@ static int pInit(Context_t *context, int argc, char *argv[])
 				if (val > 0 && val < 5)
 				{
 					cLongKeyPressSupport.rc_code = val;
+					printf("[evremote2 ufs922] Selected RC Code: %d\n", cLongKeyPressSupport.rc_code);
+					ufs922SetRemote(cLongKeyPressSupport.rc_code);
 				}
 				else
 				{
@@ -235,6 +260,7 @@ static int pRead(Context_t *context)
 	int rc;
 	int ioctl_fd = -1;
 	struct micom_ioctl_data vfd_data;
+	struct vfd_ioctl_data data;
 
 //	printf("%s >\n", __func__);
 	while (1)
@@ -258,7 +284,7 @@ static int pRead(Context_t *context)
 			if (vData[1] == 0x74 || vData[1] == 0x75 || vData[1] == 0x76 || vData[1] == 0x77)  // set RC code received (BACK + 9 + 1..4)
 			{
 				rc = vData[1] - 0x73;
-//				printf("[evremote2 ufs922] Change RC code command received (code = %d)\n", rc);
+				printf("[evremote2 ufs922] Change RC code command received (code = %d)\n", rc);
 
 				if (! access("/etc/.rccode", F_OK))
 				{
@@ -280,6 +306,12 @@ static int pRead(Context_t *context)
 							context->r->LongKeyPressSupport->rc_code = rc = 1;  // set default RC code
 						}
 						printf("[evremote2 ufs922] RC Code set to: %d\n", rc);
+						data.length = sprintf((char *)data.data, "RC code: %d\n", rc);
+						data.length--;
+						data.data[data.length] = 0;
+						ioctl_fd = open("/dev/vfd", O_RDONLY);
+						ioctl(ioctl_fd, VFDDISPLAYCHARS, &data);
+						close(ioctl_fd);
 					}
 					else
 					{
