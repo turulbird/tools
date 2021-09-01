@@ -79,7 +79,7 @@ int getInternalCode(tButton *cButtons, const char cCode[3])
 		if ((cButtons[vLoop].KeyWord[0] == cCode[0] || cButtons[vLoop].KeyWord[0] == (cCode[0] - 32))
 		&&  (cButtons[vLoop].KeyWord[1] == cCode[1] || cButtons[vLoop].KeyWord[1] == (cCode[1] - 32)))
 		{
-			printf("[evremote2] KEY by code: %02X (%s)\n", cButtons[vLoop].KeyCode, cButtons[vLoop].KeyName);
+			printf("[evremote2] KEY by code: %d (0x%02x, %s)\n", cButtons[vLoop].KeyCode, cButtons[vLoop].KeyCode, cButtons[vLoop].KeyName);
 			return cButtons[vLoop].KeyCode;
 		}
 	}
@@ -96,7 +96,7 @@ int getInternalCodeLircKeyName(tButton *cButtons, const char cCode[30])
 		//printf("%20s - %2s - %3d\n", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode);
 		if (strcmp(cCode, cButtons[vLoop].KeyName) == 0)
 		{
-			printf("[evremote2] KEY by name: %02X (%s)\n", cButtons[vLoop].KeyCode, cButtons[vLoop].KeyName);
+			printf("[evremote2] KEY by name: %d (0x%02x, %s)\n", cButtons[vLoop].KeyCode, cButtons[vLoop].KeyCode, cButtons[vLoop].KeyName);
 			return cButtons[vLoop].KeyCode;
 		}
 	}

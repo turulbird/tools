@@ -41,12 +41,12 @@
 #include "remotes.h"
 #include "Vip2.h"
 
-#define	EDISION_RC1_PREDATA "9966"  // equals Spark rc09
-#define	EDISION_RC2_PREDATA "11EE"  // equals Spark rc05
+#define	EDISION_RC1_PREDATA 0x9966  // equals Spark rc09
+#define	EDISION_RC2_PREDATA 0x11EE  // equals Spark rc05
 
 //#define STB_ID_HL101       "03:05:08"
-#define STB_ID_VIP1_V1     "03:00:08"
-#define STB_ID_VIP2        "03:05:08"
+#define STB_ID_VIP1_V1      "03:00:08"
+#define STB_ID_VIP2         "03:05:08"
 
 char VendorStbID[] = "00:00:00\0";
 
@@ -131,7 +131,6 @@ void Get_StbID()
 	char *pch;
 	int fn = open("/proc/cmdline", O_RDONLY);
 
-//	printf("[evremote2 vip2] %s >\n", __func__);
 	if (fn > -1)
 	{
 		char procCmdLine[1024];
@@ -152,127 +151,25 @@ void Get_StbID()
 		}
 		close(fn);
 	}
-//	printf("[evremote2 vip2] %s <\n", __func__);
 }
 
-#if 0
-static tButton *pVip2GetButton(char *pData)
+int String2bin(const char *string)
 {
-	tButton	*pButtons = cButtonsEdisionVip2;
+	int predata;
+	int i;
 
-	if (!strncasecmp(pData, EDISION_RC1_PREDATA, sizeof(EDISION_RC1_PREDATA)))
+	predata = 0;
+	for (i = 0; i < strlen(string); i++)
 	{
-		pButtons = cButtonsEdisionVip2;
-	}
-	else if (!strncasecmp(pData, EDISION_RC2_PREDATA, sizeof(EDISION_RC2_PREDATA)))
-	{
-		pButtons = cButtonsEdisionVip2;
-	}
-	else if (!strncasecmp(pData, SPARK_RC09_PREDATA, sizeof(SPARK_RC09_PREDATA)))
-	{
-		static tButton *cButtons = NULL;
-
-		if (!cButtons)
+		predata = predata << 4;
+		predata += string[i] & 0x0f;
+		if (string[i] > '9')
 		{
-			if (strstr(STB_ID_EDISION_PINGULUX, VendorStbID))
-			{
-				cButtons = cButtonsEdisionSpark;
-			}
-			else if (strstr(STB_ID_GALAXYINNOVATIONS_S8120, VendorStbID))
-			{
-				cButtons = cButtonsGalaxy;
-			}
-			else
-			{
-				cButtons = cButtonsSparkRc09; /* Amiko Alien 8900 */
-			}
+			predata += 9;
 		}
-		return cButtons;
-#if 0
-		if (!cButtons)
-		{
-			int fn = open("/proc/cmdline", O_RDONLY);
-
-			if (fn > -1)
-			{
-				char procCmdLine[1024];
-				int len = read(fn, procCmdLine, sizeof(procCmdLine) - 1);
-
-				if (len > 0)
-				{
-					procCmdLine[len] = 0;
-
-					if (strstr(procCmdLine, "STB_ID=" STB_ID_EDISION_PINGULUX))
-					{
-						cButtons = cButtonsEdisionSpark;
-					}
-					if (strstr(procCmdLine, "STB_ID=" STB_ID_GALAXYINNOVATIONS_S8120))
-					{
-						cButtons = cButtonsGalaxy;
-					}
-				}
-				close(fn);
-			}
-			if (!cButtons)
-			{
-				cButtons = cButtonsSparkRc09; /* Amiko Alien 8900 */
-			}
-		}
-		return cButtons;
-#endif
 	}
-	else if (!strncasecmp(pData, SPARK_DEFAULT_PREDATA, sizeof(SPARK_DEFAULT_PREDATA)))
-	{
-		static tButton *cButtons = NULL;
-
-		if (!cButtons)
-		{
-			if (strstr(STB_ID_SOGNO_TRIPLE_HD, VendorStbID))
-			{
-				cButtons = cButtonsSognoTriplex;
-			}
-//			else if (strstr(STB_ID_SAB_UNIX_TRIPLE_HD, VendorStbID))
-//			{
-//				cButtons = cButtonsSparkDefault;
-//			}
-			else
-			{
-				cButtons = cButtonsSparkDefault;
-			}
-		}
-		return cButtons;
-	}
-	else if (!strncasecmp(pData, UFS910_RC660_PREDATA, sizeof(UFS910_RC660_PREDATA)))
-	{
-		pButtons = cButtonsUfs910Rc660;
-	}
-	else if (!strncasecmp(pData, UFS913_RC230_PREDATA, sizeof(UFS913_RC230_PREDATA)))
-	{
-		pButtons = cButtonsUfs913Rc230;
-	}
-	else if (!strncasecmp(pData, SAMSUNG_AA59_PREDATA, sizeof(SAMSUNG_AA59_PREDATA)))
-	{
-		pButtons = cButtonsSamsungAA59;
-	}
-	else if (!strncasecmp(pData, SPARK_RC12_PREDATA, sizeof(SPARK_RC12_PREDATA)))
-	{
-		pButtons = cButtonsSparkRc12;
-	}
-	else if (!strncasecmp(pData, SPARK_RC04_PREDATA, sizeof(SPARK_RC04_PREDATA)))
-	{
-		pButtons = cButtonsSparkRc04;
-	}
-	else if (!strncasecmp(pData, SPARK_EDV_RC1, sizeof(SPARK_EDV_RC1)))
-	{
-		pButtons = cButtonsSparkEdv;
-	}
-	else if (!strncasecmp(pData, SPARK_EDV_RC2, sizeof(SPARK_EDV_RC2)))
-	{
-		pButtons = cButtonsSparkEdv;
-	}
-	return pButtons;
+	return predata;
 }
-#endif
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
@@ -301,7 +198,36 @@ static int pInit(Context_t *context, int argc, char *argv[])
 	{
 		cLongKeyPressSupport.delay = atoi(argv[2]);
 	}
-	printf("[evremote2 vip2] Period = %d, delay = %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay);
+	if (! access("/etc/.rccode", F_OK))
+	{
+		char buf[10];
+		int val;
+		FILE* fd;
+
+		fd = fopen("/etc/.rccode", "r");
+		if (fd != NULL)
+		{
+			if (fgets(buf, sizeof(buf), fd) != NULL)
+			{
+				val = atoi(buf);
+				if (val > 0 && val < 3)
+				{
+					cLongKeyPressSupport.rc_code = val;
+					printf("[evremote2 vip2] Selected RC Code: %d\n", cLongKeyPressSupport.rc_code);
+				}
+				else
+				{
+					cLongKeyPressSupport.rc_code = 1;  // set default RC code
+				}
+			}
+			fclose(fd);
+		}
+	}
+	else
+	{
+		cLongKeyPressSupport.rc_code = 1;  // set default RC code
+	}
+	printf("[evremote2 vip2] Period = %d, delay = %d, rc code = %d\n", cLongKeyPressSupport.period, cLongKeyPressSupport.delay, cLongKeyPressSupport.rc_code);
 	return vHandle;
 }
 
@@ -317,7 +243,10 @@ static int pRead(Context_t *context)
 	char vData[10];
 	const int cSize = 128;
 	int vCurrentCode = -1;
+	struct vfd_ioctl_data data;
 	int rc;
+	int predata;
+	int ioctl_fd = -1;
 	tButton *cButtons = cButtonsEdisionVip2;
 
 	memset(vBuffer, 0, 128);
@@ -333,24 +262,87 @@ static int pRead(Context_t *context)
 	vData[2] = vBuffer[10];
 	vData[3] = vBuffer[11];
 	vData[4] = '\0';
-	printf("[evremote2 vip2] Predata = %s\n", vData);
+	predata = String2bin(vData);
 
-	// parse and send key event
 	vData[0] = vBuffer[14];
 	vData[1] = vBuffer[15];
 	vData[2] = '\0';
-	printf("[evremote2 vip2] Key: %s -> %s\n", vData, &vBuffer[0]);
+//	printf("[evremote2 vip2] Key: %s -> %s\n", vData, &vBuffer[0]);
+	printf("[evremote2 vip2] Key: %s\n", vData);
 	vCurrentCode = getInternalCode(cButtons, vData);
 
-	if (vCurrentCode != 0)
+	if (((vData[0] == 'A') || (vData[0] == 'a')) && vData[1] == '5')
 	{
-		static int nextflag = 0;
-
-		if (('0' == vBuffer[17]) && ('0' == vBuffer[18]))
+		if (vBuffer[17] == '0' && vBuffer[18] == '0')  // RC12 key pressed
 		{
-			nextflag++;
+			if (! access("/etc/.rccode", F_OK))
+			{
+				char buf[2];
+				int fd;
+
+				memset(buf, 0, sizeof(buf));
+
+				fd = open("/etc/.rccode", O_RDWR);
+				if (fd >= 0)
+				{
+					if (read(fd, buf, 1) == 1)
+					{
+						rc = 0x31;
+						if (predata == EDISION_RC2_PREDATA)
+						{
+							rc++;
+						}
+						buf[0] = rc;
+						lseek (fd, 0, SEEK_SET);
+						if (write(fd, buf, 1) == 1)
+						{
+							context->r->LongKeyPressSupport->rc_code = rc & 0x03;
+						}
+					}
+					else
+					{
+						context->r->LongKeyPressSupport->rc_code = rc = 1;  // set default RC code
+					}
+					printf("[evremote2 vip2] RC Code set to: %c\n", rc);
+	
+					data.length = sprintf((char *)data.data, "Code RC%c\n", rc);
+					data.length--;
+					data.data[data.length] = 0;
+					ioctl_fd = open("/dev/vfd", O_RDONLY);
+					ioctl(ioctl_fd, VFDDISPLAYCHARS, &data);
+					close(ioctl_fd);
+				}	
+				else
+				{
+					context->r->LongKeyPressSupport->rc_code = 1;  // set default RC code
+				}
+				close(fd);
+			}
 		}
-		vCurrentCode += (nextflag << 16);
+		vCurrentCode = 0;  // ignore RC12 key
+	}
+	else
+	{
+//		printf("[evremote2 vip2] predata = 0x%04x, rc code = %d\n", predata, context->r->LongKeyPressSupport->rc_code);
+		if ((context->r->LongKeyPressSupport->rc_code == 1 && predata == EDISION_RC1_PREDATA)
+		||  (context->r->LongKeyPressSupport->rc_code == 2 && predata == EDISION_RC2_PREDATA))
+		{
+			if (vCurrentCode != 0)
+			{
+				static int nextflag = 0;
+		
+				if (('0' == vBuffer[17]) && ('0' == vBuffer[18]))
+				{
+					nextflag++;
+				}
+				vCurrentCode += (nextflag << 16);
+			}
+		}
+		else
+		{
+//			printf("[evremote2 vip2] Mismatch: predata = 0x%04x, rc code = %d\n", predata, context->r->LongKeyPressSupport->rc_code);
+			vCurrentCode = 0;  // ignore key
+		}
 	}
 	return vCurrentCode;
 }

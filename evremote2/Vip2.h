@@ -1,6 +1,7 @@
 #ifndef __vip2_h__
 #define __vip2_h__
 
+#define VFDDISPLAYCHARS     0xc0425a00
 #define VFDICONDISPLAYONOFF 0xc0425a0a
 
 /* this sets up the mode temporarily (for one ioctl)
@@ -58,5 +59,12 @@ struct aotom_ioctl_data
 	} u;
 };
 
-#endif // __vip2_h__
+struct vfd_ioctl_data
+{
+	unsigned char start_address;
+	unsigned char data[64];
+	unsigned char length;
+};
+
+#endif  // __vip2_h__
 // vim:ts=4
