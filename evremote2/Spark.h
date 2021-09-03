@@ -1,6 +1,7 @@
 #ifndef __spark__
 #define __spark__
 
+#define VFDDISPLAYCHARS     0xc0425a00
 #define VFDICONDISPLAYONOFF 0xc0425a0a
 #define ICON_DOT2 35
 
@@ -59,4 +60,12 @@ struct aotom_ioctl_data
 	} u;
 };
 
-#endif
+struct vfd_ioctl_data
+{
+	unsigned char start_address;
+	unsigned char data[64];
+	unsigned char length;
+};
+
+#endif  // __spark__
+// vim:ts=4
