@@ -1,5 +1,5 @@
 /*
- * AM5xx.c
+ * Am520.c
  *
  * (c) 2009 dagobert@teamducktales
  *
@@ -33,7 +33,7 @@
 #include <linux/input.h>
 
 #include "global.h"
-#include "AM5xx.h"
+#include "Am520.h"
 
 static int setText(Context_t *context, char *theText);
 static int Clear(Context_t *context);
@@ -43,7 +43,7 @@ static int Clear(Context_t *context);
 #define cVFD_DEVICE "/dev/vfd"
 #define cEVENT_DEVICE "/dev/input/event0"
 
-#define cMAXCharsAM5xx 12
+#define cMAXCharsAm520 12
 
 typedef struct
 {
@@ -297,7 +297,7 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 	struct timeval tv;
 	int retval, i, rd;
 	struct tm *ts;
-	char output[cMAXCharsAM5xx + 1];
+	char output[cMAXCharsAm520 + 1];
 	struct input_event ev[64];
 	tAM5xxPrivate *private = (tAM5xxPrivate *)((Model_t *)context->m)->private;
 	vFd = open(cEVENT_DEVICE, O_RDWR);
@@ -349,7 +349,7 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 		}
 		if (private->display)
 		{
-			strftime(output, cMAXCharsAM5xx + 1, private->timeFormat, ts);
+			strftime(output, cMAXCharsAm520 + 1, private->timeFormat, ts);
 			setText(context, output);
 		}
 	}
@@ -358,10 +358,10 @@ static int Sleep(Context_t *context, time_t *wakeUpGMT)
 
 static int setText(Context_t *context, char *theText)
 {
-	char vHelp[cMAXCharsAM5xx + 1];
+	char vHelp[cMAXCharsAm520 + 1];
 
-	strncpy(vHelp, theText, cMAXCharsAM5xx);
-	vHelp[cMAXCharsAM5xx] = '\0';
+	strncpy(vHelp, theText, cMAXCharsAm520);
+	vHelp[cMAXCharsAm520] = '\0';
 	/* printf("%s, %d\n", vHelp, strlen(vHelp));*/
 	write(context->fd, vHelp, strlen(vHelp));
 	return 0;
@@ -391,7 +391,7 @@ static int Clear(Context_t *context)
 
 Model_t AM5XX_model =
 {
-	.Name             = "Atemio AM5xx Micom frontpanel control utility",
+	.Name             = "Atemio AM520HD frontpanel control utility",
 	.Type             = AM5xx,
 	.Init             = init,
 	.Clear            = Clear,
@@ -421,4 +421,4 @@ Model_t AM5XX_model =
 #endif
 	.Exit             = Exit
 };
-
+// vim:ts=4

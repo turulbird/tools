@@ -1,5 +1,5 @@
-#ifndef __AM5XX_H
-#define __AM5XX_H
+#ifndef __AM520_H
+#define __AM520_H
 
 struct set_standby_s
 {
@@ -20,4 +20,5 @@ struct cnbox_ioctl_data
 	} u;
 };
 
-#endif
+#endif  // __AM520_H
+// vim:ts=4
