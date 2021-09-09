@@ -243,12 +243,12 @@ AC_ARG_WITH(boxtype,
 
 AC_ARG_WITH(boxmodel,
 	AS_HELP_STRING([--with-boxmodel], [valid for generic: raspi])
-AS_HELP_STRING([], [valid for duckbox: adb_box, adb_2850, ufs910, ufs912, ufs913, ufs922, ufc960, hs8200, fs9000, octagon1008, hs7110, hs7119, hs7420, hs7429, hs7810a, hs7819, cuberevo, cuberevo_mini, cuberevo_mini2, cuberevo_mini_fta, cuberevo_250hd, cuberevo_2000hd, cuberevo_3000hd, cuberevo_9500hd, atemio520, atemio530, ipbox9900, ipbox99, ipbox55, vip1_v1, vip1_v2, vip2, hl101, sagemcom88, arivalink200, pace7241, tf7700, vitamin_hd5000, opt9600])
+AS_HELP_STRING([], [valid for duckbox: adb_box, adb_2850, ufs910, ufs912, ufs913, ufs922, ufc960, hs8200, fs9000, octagon1008, hs7110, hs7119, hs7420, hs7429, hs7810a, hs7819, cuberevo, cuberevo_mini, cuberevo_mini2, cuberevo_mini_fta, cuberevo_250hd, cuberevo_2000hd, cuberevo_3000hd, cuberevo_9500hd, atemio520, ipbox9900, ipbox99, ipbox55, vip1_v1, vip1_v2, vip2, hl101, sagemcom88, arivalink200, pace7241, tf7700, vitamin_hd5000, opt9600])
 AS_HELP_STRING([], [valid for spark: spark, spark7162])
 AS_HELP_STRING([], [valid for armbox: bre2ze4k, hd51, hd60, hd61, vusolo4k, vuduo4k, vuultimo4k, vuzero4k, vuuno4kse, vuuno4k, h7, osmio4k, osmio4kplus])
 AS_HELP_STRING([], [valid for mipsbox: vuduo]),
 	[case "${withval}" in
-		adb_box|adb_2850|ufs910|ufs912|ufs913|ufs922|ufc960|hs8200|fs9000|octagon1008|hs7110|hs7119|hs7420|hs7429|hs7810a|hs7819|cuberevo|cuberevo_mini|cuberevo_mini2|cuberevo_mini_fta|cuberevo_250hd|cuberevo_2000hd|cuberevo_3000hd|cuberevo_9500hd|atemio520|atemio530|ipbox9900|ipbox99|ipbox55|vip1_v1|vip1_v2|vip2|hl101|sagemcom88|arivalink200|pace7241|tf7700|vitamin_hd5000|opt9600)
+		adb_box|adb_2850|ufs910|ufs912|ufs913|ufs922|ufc960|hs8200|fs9000|octagon1008|hs7110|hs7119|hs7420|hs7429|hs7810a|hs7819|cuberevo|cuberevo_mini|cuberevo_mini2|cuberevo_mini_fta|cuberevo_250hd|cuberevo_2000hd|cuberevo_3000hd|cuberevo_9500hd|atemio520|ipbox9900|ipbox99|ipbox55|vip1_v1|vip1_v2|vip2|hl101|sagemcom88|arivalink200|pace7241|tf7700|vitamin_hd5000|opt9600)
 			if test "$BOXTYPE" = "duckbox"; then
 				BOXMODEL="$withval"
 			else
@@ -327,7 +327,6 @@ AM_CONDITIONAL(BOXMODEL_IPBOX99, test "$BOXMODEL" = "ipbox99")
 AM_CONDITIONAL(BOXMODEL_IPBOX55, test "$BOXMODEL" = "ipbox55")
 AM_CONDITIONAL(BOXMODEL_TF7700, test "$BOXMODEL" = "tf7700")
 AM_CONDITIONAL(BOXMODEL_ATEMIO520, test "$BOXMODEL" = "atemio520")
-AM_CONDITIONAL(BOXMODEL_ATEMIO530, test "$BOXMODEL" = "atemio530")
 
 AM_CONDITIONAL(BOXMODEL_VIP1_V1, test "$BOXMODEL" = "vip1_v1")
 AM_CONDITIONAL(BOXMODEL_VIP1_V2, test "$BOXMODEL" = "vip1_v2")
@@ -435,8 +434,6 @@ elif test "$BOXMODEL" = "tf7700"; then
 	AC_DEFINE(BOXMODEL_TF7700, 1, [tf7700])
 elif test "$BOXMODEL" = "atemio520"; then
 	AC_DEFINE(BOXMODEL_ATEMIO520, 1, [atemio520])
-elif test "$BOXMODEL" = "atemio530"; then
-	AC_DEFINE(BOXMODEL_ATEMIO530, 1, [atemio530])
 elif test "$BOXMODEL" = "hl101"; then
 	AC_DEFINE(BOXMODEL_HL101, 1, [hl101])
 elif test "$BOXMODEL" = "vip1_v1"; then

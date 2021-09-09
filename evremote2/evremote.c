@@ -498,7 +498,6 @@ int getModel()
 			vBoxType = Fortis_4G;
 		}
 		else if ((!strncasecmp(vName, "atemio520", 9))
-		     ||  (!strncasecmp(vName, "atemio530", 9))
 		     ||  (!strncasecmp(vName, "opt9600", 7)))
 		{
 			vBoxType = CNBox;

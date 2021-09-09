@@ -1,5 +1,5 @@
 /*
- * Cnbox.c (for Atemio 520HD & 530HD, Opticum HD 9600 series)
+ * Cnbox.c (for Atemio 520HD, Opticum HD 9600 series)
  *
  * (c) 2009 teamducktales
  *

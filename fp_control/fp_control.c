@@ -812,8 +812,7 @@ int getModel()
 		{
 			vBoxType = Fortis;
 		}
-		else if ((!strncasecmp(vName, "atemio520", 9))
-		     ||  (!strncasecmp(vName, "atemio530", 9)))
+		else if (!strncasecmp(vName, "atemio520", 9))
 		{
 			vBoxType = AM5xx;
 		}

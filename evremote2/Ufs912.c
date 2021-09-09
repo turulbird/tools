@@ -158,7 +158,7 @@ static int pInit(Context_t *context, int argc, char *argv[])
 				if (val > 0 && val < 5)
 				{
 					cLongKeyPressSupport.rc_code = val;
-					printf("[evremote2 ufs913] Selected RC Code: %d\n", cLongKeyPressSupport.rc_code);
+					printf("[evremote2 ufs912] Selected RC Code: %d\n", cLongKeyPressSupport.rc_code);
 					ufs912SetRemote(cLongKeyPressSupport.rc_code);
 				}
 				else

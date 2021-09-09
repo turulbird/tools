@@ -22,7 +22,7 @@ struct set_led_s
 	int on;
 };
 
-/* this sets up the mode temporarily (for one ioctl)
+/* this sets the mode temporarily (for one ioctl)
  * to the desired mode. currently the "normal" mode
  * is the compatible vfd mode
  */
