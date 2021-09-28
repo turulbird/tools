@@ -15,7 +15,8 @@ fp_control_SOURCES = \
 	Cuberevo.c \
 	Adb_Box.c \
 	Am520.c \
-	Vitamin_HD5000.c
+	Vitamin_HD5000.c \
+	Opt9600.c
 
 AM_CFLAGS = -Wall
 AM_LDFLAGS = -lrt
