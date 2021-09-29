@@ -54,13 +54,13 @@ typedef struct
 
 oArgs vOArgs[] =
 {
-//	{ "-e", "  --setTimer         * ", "Args: [time date]  Format: HH:MM:SS dd-mm-YYYY" },
-//	{ "", "                         ", "      No arg: Set the most recent timer from e2 or neutrino" },
-//	{ "", "                         ", "      to the frontcontroller and shutdown" },
-//	{ "", "                         ", "      Arg time date: Set frontcontroller wake up time to" },
-//	{ "", "                         ", "      time, shutdown, and wake up at given time" },
-//	{ "-d", "  --shutdown         * ", "Args: None or [time date]  Format: HH:MM:SS dd-mm-YYYY" },
-//	{ "", "                         ", "      No arg: Shut down immediately" },
+	{ "-e", "  --setTimer         * ", "Args: [time date]  Format: HH:MM:SS dd-mm-YYYY" },
+	{ "", "                         ", "      No arg: Set the most recent timer from e2 or neutrino" },
+	{ "", "                         ", "      to the frontcontroller and shutdown" },
+	{ "", "                         ", "      Arg time date: Set frontcontroller wake up time to" },
+	{ "", "                         ", "      time, shutdown, and wake up at given time" },
+	{ "-d", "  --shutdown         * ", "Args: None or [time date]  Format: HH:MM:SS dd-mm-YYYY" },
+	{ "", "                         ", "      No arg: Shut down immediately" },
 //	{ "", "                         ", "      Arg time date: Shut down at given time/date" },
 //	{ "-r", "  --reboot           * ", "Args: None" },
 //	{ "", "                         ", "      No arg: Reboot immediately" },
@@ -213,7 +213,7 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 	return 0;
 }
 
-#if 0
+#if 1
 static int setTimer(Context_t *context, time_t *theGMTTime)
 {
 	struct opt9600_fp_ioctl_data vData;
@@ -307,7 +307,7 @@ static int getWTime(Context_t *context, time_t *theGMTTime)
 }
 #endif
 
-#if 0
+#if 1
 static int shutdown(Context_t *context, time_t *shutdownTimeGMT)
 {
 	time_t curTime;
@@ -551,10 +551,10 @@ Model_t Opt9600_model =
 	.Usage            = usage,
 	.SetTime          = setTime,
 	.GetTime          = getTime,
-	.SetTimer         = NULL,  // setTimer,
+	.SetTimer         = setTimer,  // setTimer,
 	.GetWTime         = NULL,  // getWTime,
 	.SetWTime         = NULL,
-	.Shutdown         = NULL,  // shutdown,
+	.Shutdown         = shutdown,  // shutdown,
 	.Reboot           = NULL,  // reboot,
 	.Sleep            = Sleep,
 	.SetText          = setText,
