@@ -1,9 +1,15 @@
 #ifndef __Opt9600_H
 #define __Opt9600_H
 
+/* time must be given as follows:
+ * time[0] & time[1] = MJD
+ * time[2] = hour
+ * time[3] = min
+ * time[4] = sec
+ */
 struct set_standby_s
 {
-	time_t localTime;
+	char time[5];
 };
 
 struct set_time_s
