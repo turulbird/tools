@@ -323,7 +323,7 @@ int main()
 
 	buffer = calloc(256, 1);
 
-	if (i2cmain(-1,1,buffer) == 0)
+	if (i2cmain(-1, 1, buffer) == 0)
 	{
 		parse_edid(buffer);
 		rv = EXIT_SUCCESS;
@@ -339,11 +339,11 @@ int main()
 		{
 			if (buf[0] == 0x0a)
 			{
-				long pos = ftell(edid)-2;
-				fseek(edid,pos,SEEK_SET);
+				long pos = ftell(edid) - 2;
+				fseek(edid, pos, SEEK_SET);
 				continue;
 			}
-			buffer[length] = ahex2bin(buf[0],buf[1]);
+			buffer[length] = ahex2bin(buf[0], buf[1]);
 			length++;
 		}
 		parse_edid(buffer);
@@ -358,4 +358,4 @@ out:
 	free(buffer);
 	return rv;
 }
-// vim"ts=4
+// vim:ts=4
