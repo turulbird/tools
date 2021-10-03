@@ -56,6 +56,7 @@ typedef struct
 tSecIndex IndexTable[MAX_SECTIONS];
 int IndexCounter = 0;
 int IDCounter = -1;
+int verbose = 0;
 
 unsigned int getKernelVersion()
 {
@@ -75,7 +76,10 @@ unsigned int getKernelVersion()
 	{
 		version = 24;
 	}
-	printf("ustslave: Kernel Version: %1d.%1d\n", version / 10, version % 10);
+	if (verbose)
+	{
+		printf("[ustslave] Kernel Version: %1d.%1d\n", version / 10, version % 10);
+	}
 	return version;
 }
 
@@ -88,14 +92,14 @@ int writeToSlave(int cpuf, int fd, off_t DestinationAddress, unsigned int Source
 	err = lseek(fd, SourceAddress, SEEK_SET);
 	if (err < 0)
 	{
-		printf("error seeking SourceAddress\n");
+		printf("[ustslave] error seeking SourceAddress\n");
 		return 1;
 	}
 
 	err = read(fd, BUFFER, Size);
 	if (err != Size)
 	{
-		printf("error read fd\n");
+		printf("[ustslave] error read fd\n");
 		return 1;
 	}
 
@@ -103,13 +107,13 @@ int writeToSlave(int cpuf, int fd, off_t DestinationAddress, unsigned int Source
 	//printf("[ustslave] Seeking to 0x%08x\n", (int)DestinationAddress);
 	if (err < 0)
 	{
-		printf("error seeking copo addi (addi = %x)\n", (int)DestinationAddress);
+		printf("[ustslave] error seeking copo addi (addi = %x)\n", (int)DestinationAddress);
 		return 1;
 	}
 	err = write(cpuf, BUFFER, Size);
 	if (err != Size)
 	{
-		printf("error write cpuf\n");
+		printf("[ustslave] error write cpuf\n");
 		return 1;
 	}
 	free(BUFFER);
@@ -131,7 +135,7 @@ int sectionToSlave(int cpuf, int fd, unsigned int *EntryPoint)
 		err = ioctl(cpuf, STCOP_GET_PROPERTIES, &cop);
 		if (err < 0)
 		{
-			printf("Error: ioctl STCOP_GET_PROPERTIES failed\n");
+			printf("[ustslave] Error: ioctl STCOP_GET_PROPERTIES failed\n");
 			return 1;
 		}
 		printf("[ustslave] Base_address 0x%.8lx\n", cop.cp_ram_start);
@@ -371,8 +375,10 @@ int loadElf(int cpuf, int fd, unsigned int *entry_p, unsigned int *stack_p, int 
 		printf("[ustslave] %s: ReadBytes failed\n", __func__);
 		return 1;
 	}
-	printTable();
-
+	if (verbose)
+	{
+		printTable();
+	}
 	err = sectionToSlave(cpuf, fd, entry_p);
 	if (err != 0)
 	{
@@ -430,10 +436,10 @@ int copRun(int cpuf, unsigned long entry_p, int verbose)
 		return 1;
 	}
 
-	if (verbose)
-	{
-		printf("Coprocessor running! (from 0x%lx)\n", entry_p);
-	}
+//	if (verbose)
+//	{
+		printf("[ustslave] Coprocessor running! (from 0x%lx)\n", entry_p);
+//	}
 	return 0;
 }
 
@@ -442,7 +448,6 @@ int main(int argc, char *argv[])
 {
 	int cpuf = -1;
 	int res;
-	int verbose = 0;
 	unsigned int entry_p, stack_p;
 
 	if (argc == 4)
