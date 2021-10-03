@@ -96,7 +96,7 @@ static tButton cButtonCnbox[] =  // order is same as on HD 9600 RC
 	{ "YELLOW",      "08", KEY_YELLOW },
 	{ "BLUE",        "03", KEY_BLUE },
 	{ "FAV",         "00", KEY_FAVORITES },
-	{ "STATUS",      "0C", KEY_HELP },  // Labelled HELP on Atemio520
+	{ "STATUS",      "0C", KEY_HELP },  // Labeled HELP on Atemio520
 	{ "OPTION",      "19", KEY_TEXT },  // Labeled TEXT on Atemio520
 	{ "FIND",        "16", KEY_SUBTITLE },  // Labeled SUBTITLE on Atemio520
 // Keys present only on the Atemio 520 remote
@@ -110,17 +110,12 @@ static tButton cButtonCnbox[] =  // order is same as on HD 9600 RC
 	{ "SHOOT",       "62", KEY_S },
 	{ "WWW",         "63", KEY_WWW },
 	{ "SLEEP",       "24", KEY_PROGRAM },
-#if 0
-	{ "CHECK",       "42", KEY_SELECT },  // double for NEXT
-	{ "UPUP",        "43", KEY_PAGEUP },  // does not exist
-	{ "DOWNDOWN",    "44", KEY_PAGEDOWN },  // does not exist
-#endif
 	{ "",            "",   KEY_NULL }
 };
 
 /* ***************** our fp button assignment **************** */
 
-/* NOTE on front panel keys: These are al handled by the front
+/* NOTE on front panel keys: These are all handled by the front
  * processor and yield exactly the same codes as the
  * corresponding remote control key. The front panel keys can
  * therefore not be distinguished from the remote control ones.
