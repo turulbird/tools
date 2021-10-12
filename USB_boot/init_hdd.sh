@@ -1,7 +1,7 @@
 #!/bin/sh
-# init - version 140523.1
+# init - version 211012.1
 echo ""
-echo " --={ Load Enigma2 from HDD or USB }=--"
+echo " --={ Load Image from HDD or USB }=--"
 echo ""
 
 # Mount things needed by this script
@@ -78,7 +78,7 @@ echo "[init] Mount root.img"
 mount /mnt/root.img /root2 -t ext3 -o loop
 #umount /sys /proc
 
-echo "[init] Start Enigma2"
+echo "[init] Start Image"
 exec switch_root /root2 /bin/devinit
 echo "[init] Root file system failed!"
 exec sh
