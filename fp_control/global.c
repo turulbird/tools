@@ -121,7 +121,7 @@ static time_t read_e2_timers(time_t curTime)
 		printf(" - Done\n");
 		fclose(fd);
 	}
-	else
+	else if (disp)
 	{
 		printf(" - Error reading %s\n", E2TIMERSXML);
 	}
@@ -155,7 +155,7 @@ static time_t read_neutrino_timers(time_t curTime)
 		printf(" - Done\n");
 		fclose(fd);
 	}
-	else
+	else if (disp)
 	{
 		printf(" - Error reading %s\n", NEUTRINO_TIMERS);
 	}
@@ -249,8 +249,9 @@ int syncWasTimerWakeup(eWakeupReason reason)
 time_t read_timers_utc(time_t curTime)
 {
 	time_t wakeupTime = LONG_MAX;  // flag no timer read (yet)
+
 	wakeupTime = read_e2_timers(curTime);  // get next e2timer
-	if (wakeupTime == LONG_MAX) // if none
+	if (wakeupTime == LONG_MAX)  // if none
 	{
 		wakeupTime = read_neutrino_timers(curTime);  // try neutrino timer
 	}

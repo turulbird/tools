@@ -41,7 +41,7 @@
 #define cRTC_OFFSET_FILE "/proc/stb/fp/rtc_offset"
 
 //Comment next line if you do not want the -ms option
-//#define MODEL_SPECIFIC 1
+#define MODEL_SPECIFIC 1
 
 struct vfd_ioctl_data
 {

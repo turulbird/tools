@@ -107,7 +107,7 @@ typedef struct
 /* ******************* helper/misc functions ****************** */
 
 /* Convert the time received from the FP
- * to the standard time vale (seconds
+ * to the standard time value (seconds
  * since epoch).
  */
 unsigned long getOpt9600Time(char *TimeString)
@@ -188,7 +188,7 @@ static int setTime(Context_t *context, time_t *theGMTTime)
 	vData.u.time.localTime = *theGMTTime;
 	if (ioctl(context->fd, VFDSETTIME, &vData) < 0)
 	{
-		perror("setTime: ");
+		perror("setTime");
 		return -1;
 	}
 	return 0;
@@ -198,7 +198,7 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 {
 	char fp_time[8];
 
-//	fprintf(stderr, "Waiting for current time from fp...\n");
+//	fprintf(stderr, "Waiting for current time from FP...\n");
 	/* front controller time */
 	if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
 	{
@@ -208,13 +208,13 @@ static int getTime(Context_t *context, time_t *theGMTTime)
 	/* if we get the fp time */
 	if (fp_time[0] != '\0')
 	{
-//		fprintf(stderr, "Success reading time from fp\n");
+//		fprintf(stderr, "Successfully read time from FP\n");
 		/* current front controller time */
 		*theGMTTime = (time_t)getOpt9600Time(fp_time);
 	}
 	else
 	{
-		fprintf(stderr, "Error reading time from fp\n");
+		fprintf(stderr, "Error reading time from FP\n");
 		*theGMTTime = 0;
 	}
 	return 0;
@@ -268,8 +268,8 @@ static int setSTime(Context_t *context, time_t *theGMTTime)
 	return 0;
 }
 
-static int setTimer(Context_t *context, time_t *theGMTTime)
-{
+static int setTimer(Context_t *context, time_t *theWakeTime)
+{ // -e command
 	struct opt9600_fp_ioctl_data vData;
 	time_t curTime;
 	time_t curTimeFP;
@@ -283,28 +283,29 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	time(&curTime);  // get system time (UTC)
 	curTime += gmt_offset;  // curTime must be in local time
 	ts = gmtime(&curTime);
-
-	printf("Current Time (local): %02d:%02d:%02d %02d-%02d-%04d\n",
-			ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
-	if (theGMTTime == NULL)
+	if (disp)
+	{
+		printf("Current Time (local): %02d:%02d:%02d %02d-%02d-%04d\n",
+				ts->tm_hour, ts->tm_min, ts->tm_sec, ts->tm_mday, ts->tm_mon + 1, ts->tm_year + 1900);
+	}
+	if (theWakeTime == NULL) // if no time specified
 	{
 		wakeupTime = read_timers_utc(curTime);
 	}
 	else
 	{
-		wakeupTime = *theGMTTime;
+		wakeupTime = *theWakeTime;
 	}
 	tsw = gmtime(&wakeupTime);  // wake up time is assumed to be local
 	printf("Wakeup Time: %02d:%02d:%02d %02d-%02d-%04d\n",
 		   tsw->tm_hour, tsw->tm_min, tsw->tm_sec, tsw->tm_mday, tsw->tm_mon + 1, tsw->tm_year + 1900);
-
-	//check --> WakupTime is set and larger curTime and no larger than a year in the future (gost)
+	//check --> wakeupTime is set and larger curTime and no larger than a year in the future (gost)
 //	if ((wakeupTime <= 0) || (curTime > wakeupTime) || (curTime < (wakeupTime - 25920000)))
 	if ((wakeupTime <= 0) || (wakeupTime == LONG_MAX))
 	{
 		/* no timer set */
-		fprintf(stderr, "No timer set, set it one day in the past.\n");
-		wakeupTime = curTime - 86400;
+		wakeupTime = curTime - 86400;  // set wake up time yesterday
+		fprintf(stderr, "No timer set, set FP wake up time to one day in the past.\n");
 		setOpt9600Time(wakeupTime, vData.u.standby.time);
 		if (ioctl(context->fd, VFDSTANDBY, &vData) < 0)
 		{
@@ -316,11 +317,11 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	{
 		unsigned long diff;
 		char    fp_time[8];
-//		fprintf(stderr, "Waiting for current time from fp...\n");
+//		fprintf(stderr, "Waiting for current time from FP...\n");
 		/* front controller time */
 		if (ioctl(context->fd, VFDGETTIME, &fp_time) < 0)
 		{
-			perror("getTime: ");
+			perror("getTime");
 			return -1;
 		}
 		/* difference from now to wake up */
@@ -328,7 +329,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		/* if we get the fp time */
 		if (fp_time[0] != '\0')
 		{
-//			fprintf(stderr, "Success reading time from fp\n");
+//			fprintf(stderr, "Successfully read time from FP\n");
 			/* current front controller time */
 			curTimeFP = (time_t) getOpt9600Time(fp_time);
 			/* set FP-Time if curTime > or < 12h (gost)*/
@@ -344,7 +345,7 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 		}
 		else
 		{
-			fprintf(stderr, "Error reading time, assuming localtime\n");
+			fprintf(stderr, "Error reading time, assuming local time\n");
 			/* noop current time already set */
 		}
 		wakeupTime = curTimeFP + diff;
@@ -357,7 +358,6 @@ static int setTimer(Context_t *context, time_t *theGMTTime)
 	}
 	return 0;
 }
-
 
 static int getWTime(Context_t *context, time_t *theGMTTime)
 {  //-gw command:
@@ -671,11 +671,11 @@ Model_t Opt9600_model =
 	.Usage            = usage,
 	.SetTime          = setTime,
 	.GetTime          = getTime,
-	.SetTimer         = setTimer,  // setTimer,
-	.GetWTime         = getWTime,  // getWTime,
+	.SetTimer         = setTimer,
+	.GetWTime         = getWTime,
 	.SetWTime         = setWTime,
 	.SetSTime         = setSTime,
-	.Shutdown         = shutdown,  // shutdown,
+	.Shutdown         = shutdown,
 	.Reboot           = NULL,  // reboot,
 	.Sleep            = Sleep,
 	.SetText          = setText,
