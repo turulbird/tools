@@ -841,7 +841,8 @@ int getModel()
 		{
 			vBoxType = Vitamin_HD5000;
 		}
-		else if (!strncasecmp(vName, "opt9600", 7))
+		else if ((!strncasecmp(vName, "opt9600", 7))
+		     ||  (!strncasecmp(vName, "opt9600mini", 11)))
 		{
 			vBoxType = Opt9600;
 		}

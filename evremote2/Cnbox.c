@@ -1,5 +1,5 @@
 /*
- * Cnbox.c (for Atemio 520HD, Opticum HD 9600 series)
+ * Cnbox.c (for Atemio AM 520 HD, Opticum HD 9600 series)
  *
  * (c) 2009 teamducktales
  *
@@ -228,7 +228,7 @@ static int pShutdown(Context_t *context)
 
 RemoteControl_t CNBOX_RC =
 {
-	"Crenova Remote2 RemoteControl",
+	"CreNova Remote2 RemoteControl",
 	CNBox,
 	cButtonCnbox,
 	NULL, //	cButtonCnboxFrontpanel,
