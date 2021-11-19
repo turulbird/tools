@@ -41,7 +41,7 @@ enum cea861_data_block_type
 	CEA861_DATA_BLOCK_TYPE_SPEAKER_ALLOCATION,
 	CEA861_DATA_BLOCK_TYPE_VESA_DTC,
 	CEA861_DATA_BLOCK_TYPE_RESERVED6,
-	CEA861_DATA_BLOCK_TYPE_EXTENDED,
+	CEA861_DATA_BLOCK_TYPE_EXTENDED
 };
 
 enum cea861_audio_format
@@ -61,7 +61,7 @@ enum cea861_audio_format
 	CEA861_AUDIO_FORMAT_MLP,
 	CEA861_AUDIO_FORMAT_DST,
 	CEA861_AUDIO_FORMAT_WMA_PRO,
-	CEA861_AUDIO_FORMAT_EXTENDED,
+	CEA861_AUDIO_FORMAT_EXTENDED
 };
 
 struct __attribute__ (( packed )) cea861_timing_block
@@ -91,7 +91,7 @@ struct __attribute__ (( packed )) cea861_data_block_header
 
 struct __attribute__ (( packed )) cea861_short_video_descriptor
 {
-	unsigned video_identification_code : 7;
+	unsigned video_identification_code : 8;
 	unsigned native                    : 1;
 };
 

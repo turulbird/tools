@@ -141,7 +141,7 @@ endloop:
 			i2cbus = tryonly;
 		}
 		i2cfile = open_i2c_dev(i2cbus);
-		if (i2cfile >= 0)  //no matter how many times, >=0 still looks really angry.
+		if (i2cfile >= 0)  // no matter how many times, >=0 still looks really angry.
 		{
 			for (j = 0; j < 256; j++)
 			{

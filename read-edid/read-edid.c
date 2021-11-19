@@ -135,6 +135,11 @@ static inline void disp_cea861_video_data(const struct cea861_video_data_block *
 	{
 		switch(vdb->svd[i].video_identification_code)
 		{
+			case 1:
+			{
+				printf ("DMT0659 (640x480, 60 Hz)\n");
+				break;
+			}
 			case 6:
 			case 7:
 			{
@@ -175,6 +180,11 @@ static inline void disp_cea861_video_data(const struct cea861_video_data_block *
 				printf ("VIDEO_STD_720P50\n");
 				break;
 			}
+			case 20:
+			{
+				printf ("VIDEO_STD_1080I25\n");
+				break;
+			}
 			case 40:
 			{
 				printf ("VIDEO_STD_1080I50\n");
@@ -205,6 +215,21 @@ static inline void disp_cea861_video_data(const struct cea861_video_data_block *
 				printf ("VIDEO_STD_1080P60\n");
 				break;
 			}
+			case 60:
+			{
+				printf ("VIDEO_STD_720P24\n");
+				break;
+			}
+			case 61:
+			{
+				printf ("VIDEO_STD_720P25\n");
+				break;
+			}
+			case 62:
+			{
+				printf ("VIDEO_STD_720P30\n");
+				break;
+			}
 			case 93:
 			case 98:
 			{
@@ -227,6 +252,24 @@ static inline void disp_cea861_video_data(const struct cea861_video_data_block *
 			case 101:
 			{
 				printf ("VIDEO_STD_2160P50\n");
+				break;
+			}
+			case 97:
+			case 102:
+			{
+				printf ("VIDEO_STD_2160P60\n");
+				break;
+			}
+			case 117:
+			case 218:
+			{
+				printf ("VIDEO_STD_2160P100\n");
+				break;
+			}
+			case 118:
+			case 219:
+			{
+				printf ("VIDEO_STD_2160P120\n");
 				break;
 			}
 			default:
