@@ -36,6 +36,26 @@
 // if font is not in usual place, we look here:
 char FONT[128] = FONTDIR "/neutrino.ttf";
 
+FT_Error 		error;
+FT_Library		library;
+FTC_Manager		manager;
+FTC_SBitCache		cache;
+FTC_SBit		sbit;
+#if FREETYPE_MAJOR == 2 && FREETYPE_MINOR == 0
+FTC_Image_Desc		desc;
+#else
+FTC_ImageTypeRec	desc;
+#endif
+FT_Face			face;
+FT_UInt			prev_glyphindex;
+FT_Bool			use_kerning;
+
+struct fb_fix_screeninfo fix_screeninfo;
+struct fb_var_screeninfo var_screeninfo;
+
+int fb;
+int startx, starty, sx, ex, sy, ey;
+
 //						CMCST,   CMCS,  CMCT,    CMC,    CMCIT,  CMCI,   CMHT,   CMH
 //						WHITE,   BLUE0, TRANSP,  CMS,    ORANGE, GREEN,  YELLOW, RED
 //						COL_MENUCONTENT_PLUS_0 - 3, COL_SHADOW_PLUS_0
@@ -68,7 +88,7 @@ static char menucoltxt[][25]={
 	"Head_Text",
 	"Head"
 };
-static char spres[][4]={"","crt","lcd"};
+static char spres[][4]={"","a","b"};
 
 char *line_buffer=NULL, *title=NULL, *icon=NULL;
 int size=24, type=0, timeout=0, refresh=3, flash=0, selection=0, tbuttons=0, buttons=0, bpline=3, echo=0, absolute=0, mute=1, header=1, cyclic=1;
@@ -790,12 +810,13 @@ int main (int argc, char **argv)
 				break;
 			}
 		}
-	}
+	}  // for
+
 	FSIZE_BIG = (float)FSIZE_MED * 1.25;
 	FSIZE_SMALL = (FSIZE_MED * 4) / 5;
 	TABULATOR = 2 * FSIZE_MED;
 	size = FSIZE_MED;
-		/*
+	/*
 	if (!echo)
 	{
 		printf("\nMsgBox Version %.2f\n", M_VERSION);
@@ -815,7 +836,7 @@ int main (int argc, char **argv)
 	}
 	if (selection)
 	{
-		for (tv = 0; tv < buttons && !found; tv++)		
+		for (tv = 0; tv < buttons && !found; tv++)
 		{
 			if (rbutt[tv] == selection)
 			{
@@ -938,22 +959,22 @@ int main (int argc, char **argv)
 		cix = ix;
 	}
 
-	sprintf(rstr,"infobar_alpha");
+	sprintf(rstr, "infobar_alpha");
 	if ((tv = Read_Neutrino_Cfg(rstr)) >= 0)
 	{
 		tr[COL_SHADOW_PLUS_0] = 255 - (float)tv * 2.55;
 	}
-	sprintf(rstr,"infobar_blue");
+	sprintf(rstr, "infobar_blue");
 	if ((tv = Read_Neutrino_Cfg(rstr)) >= 0)
 	{
 		bl[COL_SHADOW_PLUS_0] = (float)tv * 2.55 * 0.4;
 	}
-	sprintf(rstr,"infobar_green");
+	sprintf(rstr, "infobar_green");
 	if ((tv = Read_Neutrino_Cfg(rstr)) >= 0)
 	{
 		gn[COL_SHADOW_PLUS_0] = (float)tv * 2.55 * 0.4;
 	}
-	sprintf(rstr,"infobar_red");
+	sprintf(rstr, "infobar_red");
 	if ((tv = Read_Neutrino_Cfg(rstr)) >= 0)
 	{
 		rd[COL_SHADOW_PLUS_0] = (float)tv * 2.55 * 0.4;
@@ -978,7 +999,7 @@ int main (int argc, char **argv)
 		printf(NOMEM);
 		return -1;
 	}
-		
+
 	//init fontlibrary
 	if ((error = FT_Init_FreeType(&library)))
 	{
@@ -1033,7 +1054,9 @@ int main (int argc, char **argv)
 	stride = DEFAULT_XRES;
 #else
 	stride = fix_screeninfo.line_length / sizeof(uint32_t);
+#if !BOXMODEL_VUPLUS_ALL
 	if (stride == 7680 && var_screeninfo.xres == 1280)
+#endif
 	{
 		var_screeninfo.yres = 1080;
 	}
@@ -1125,7 +1148,7 @@ int main (int argc, char **argv)
 
 	put_instance(instance = get_instance() + 1);
 
-  	show_txt(0);	
+	show_txt(0);
 	
 	time(&tm1);
 	tm2 = tm1;
