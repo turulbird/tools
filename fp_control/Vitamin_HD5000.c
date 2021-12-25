@@ -23,7 +23,7 @@
  *
  * Date     By              Description
  * --------------------------------------------------------------------------
- * 20190210 Audioniek       CubeRevo specific usage added.
+ * 20190210 Audioniek       Receiver specific usage added.
  * 20190212 Audioniek       Completely tested through and improved/expanded.
  *
  ****************************************************************************/

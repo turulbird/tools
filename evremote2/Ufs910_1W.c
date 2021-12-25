@@ -96,7 +96,7 @@ static tButton cButtonUFS910[] =  // order is the same as on RC660
 /* Front panel keys */
 	{ "VFORMAT_FRONT", "4A", KEY_SWITCHVIDEOMODE },
 	{ "MENU_FRONT",    "49", KEY_MENU },
-	{ "EXIT_FRONT",    "4B", KEY_HOME },
+	{ "EXIT_FRONT",    "4B", KEY_EXIT },
 	{ "STANDBY_FRONT", "48", KEY_POWER },  // currently 1W models only
 	{ "OPTIONS_FRONT", "47", KEY_HELP },
 
@@ -120,7 +120,7 @@ static tButton cButtonUFS910[] =  // order is the same as on RC660
 	{ "LYELLOW",       "EF", KEY_YELLOW },
 	{ "LBLUE",         "F0", KEY_BLUE },
 	{ "LVOLUMEUP",     "90", KEY_VOLUMEUP },
-	{ "LINFO",         "8F", KEY_EXIT },
+	{ "LINFO",         "8F", KEY_INFO },
 	{ "LCHANNELUP",    "9E", KEY_CHANNELUP },
 	{ "LVOLUMEDOWN",   "91", KEY_VOLUMEDOWN },
 	{ "LUP",           "D8", KEY_UP },
@@ -129,7 +129,7 @@ static tButton cButtonUFS910[] =  // order is the same as on RC660
 	{ "LOK",           "DC", KEY_OK },
 	{ "LRIGHT",        "DB", KEY_RIGHT },
 	{ "LEXIT",         "D5", KEY_EXIT },
-	{ "LDOWN",         "59", KEY_DOWN },
+	{ "LDOWN",         "D9", KEY_DOWN },
 	{ "LEPG",          "CC", KEY_EPG },
 	{ "LREWIND",       "A1", KEY_REWIND },
 	{ "LPLAY",         "B8", KEY_PLAY },
@@ -282,4 +282,3 @@ BoxRoutines_t Ufs910_1W_BR =
 	&pNotification
 };
 // vim:ts=4
-

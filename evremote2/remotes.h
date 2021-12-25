@@ -23,6 +23,7 @@ extern RemoteControl_t Cuberevo_RC;
 extern RemoteControl_t Ipbox_RC;
 extern RemoteControl_t CNBOX_RC;
 extern RemoteControl_t VitaminHD5000_RC;
+extern RemoteControl_t Pace7241_RC;
 extern RemoteControl_t LircdName_RC;
 
 extern BoxRoutines_t Ufs910_1W_BR;
@@ -42,6 +43,7 @@ extern BoxRoutines_t Cuberevo_BR;
 extern BoxRoutines_t Ipbox_BR;
 extern BoxRoutines_t CNBOX_BR;
 extern BoxRoutines_t VitaminHD5000_BR;
+extern BoxRoutines_t Pace7241_BR;
 extern BoxRoutines_t LircdName_BR;
 
 int selectRemote(Context_r_t *context_r, Context_t *context, eBoxType type);
