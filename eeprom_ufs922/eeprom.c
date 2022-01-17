@@ -25,7 +25,7 @@
 /*
  * Description:
  *
- * Startup of little EEPROM read/write utility. the EEPROM slots
+ * Startup of little EEPROM read/write utility. The EEPROM slots
  * are based on the very first original fw, so maybe they have
  * changed ...
  *
@@ -674,7 +674,7 @@ slot_t ufs922_slots[cMaxSlots] =
 		}
 	},
 
-	/* i2c addr = 0x54 - 56: boot loader enviroonment */
+	/* i2c addr = 0x54 - 56: boot loader environment */
 
 	/* i2c addr = 0x57 */
 	{
@@ -1059,7 +1059,7 @@ int main(int argc, char *argv[])
 			for (vLoopSlot = 0; vLoopSlot < cMaxSlots; vLoopSlot++)  // counts items in ufs922_slots
 			{
 				char device[256];
-				unsigned char buffer[16] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+				unsigned char buffer[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 				int bytes_processed = 0;
 				int i;
 				char tmpbuf[16] = { 0 };

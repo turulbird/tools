@@ -23,8 +23,8 @@
 /*
  * Description:
  *
- * Little utility to dump the EEPROM contents or show the
- * MAC address on Fortis receivers.
+ * Little utility to dump the EEPROM contents on Kathrein
+ * UFS913 receivers.
  * In effect this a stripped down version of ipbox_eeprom with minor
  * modifications and additions. Kudos to the original authors.
  */

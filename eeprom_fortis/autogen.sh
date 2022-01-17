@@ -1,6 +1,6 @@
 #!/bin/sh
 
-package="tools-fortis_eeprom"
+package="tools-eeprom-fortis"
 
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
