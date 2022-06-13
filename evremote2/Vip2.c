@@ -297,11 +297,13 @@ static int pRead(Context_t *context)
 						if (write(fd, buf, 1) == 1)
 						{
 							context->r->LongKeyPressSupport->rc_code = rc & 0x03;
+							rc = 0x31;
 						}
 					}
 					else
 					{
-						context->r->LongKeyPressSupport->rc_code = rc = 1;  // set default RC code
+						context->r->LongKeyPressSupport->rc_code = 1;  // set default RC code
+						rc = 0x31;
 					}
 					printf("[evremote2 vip2] RC Code set to: %c\n", rc);
 	
