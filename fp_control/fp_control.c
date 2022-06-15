@@ -35,7 +35,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Software version of fp_control, please increase on every change */
-static const char *sw_version = "1.14 (Audioniek 20210928.1)";
+static const char *sw_version = "1.15 (Audioniek 20220615.1)";
 static eWakeupReason reason = 0;
 
 typedef struct

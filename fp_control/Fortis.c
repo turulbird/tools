@@ -28,6 +28,7 @@
  * 20170127 Audioniek       Get version fixed.
  * 20210403 Audioniek       -c now uses actual values for display width,
  *                          led count and icon count.
+ * 20220615 Audioniek       Support for Titan added.
  *
  ****************************************************************************/
 

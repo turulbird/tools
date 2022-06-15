@@ -34,6 +34,8 @@
 
 #define NEUTRINO_TIMERS "/var/tuxbox/config/timerd.conf"
 
+#define TITAN_TIMERS "/mnt/config/timers.xml"  // CAUTION/TODO: item is configurable in titan.cfg
+
 #define CONFIG "/etc/vdstandby.cfg"
 char *sDisplayStd = "%a %d %H:%M:%S";
 
@@ -88,16 +90,28 @@ static time_t read_e2_wakeup(time_t curTime)
 	return recordTime;
 }
 #else
-static time_t read_e2_timers(time_t curTime)
+static time_t read_e2_titan_timers(time_t curTime)
 {
 	char recordString[12];
 	char line[1000];
 	time_t recordTime = LONG_MAX;
-	FILE *fd = fopen(E2TIMERSXML, "r");
+	FILE *fd;
+
+	fd = fopen(E2TIMERSXML, "r");
 	if (fd > 0)
 	{
 		printf("Getting 1st Enigma2 timer");
-		while (fgets(line, 999, fd) != NULL)
+	}
+	else
+	{
+		fd = fopen(TITAN_TIMERS, "r");
+		if (fd > 0)
+		{
+			printf("Getting 1st Titan timer");
+		}
+	}
+	if (fd > 0)
+	{	while (fgets(line, 999, fd) != NULL)
 		{
 			line[999] = '\0';
 			if (!strncmp("<timer begin=\"", line, 14))
@@ -250,7 +264,7 @@ time_t read_timers_utc(time_t curTime)
 {
 	time_t wakeupTime = LONG_MAX;  // flag no timer read (yet)
 
-	wakeupTime = read_e2_timers(curTime);  // get next e2timer
+	wakeupTime = read_e2_titan_timers(curTime);  // get next e2timer
 	if (wakeupTime == LONG_MAX)  // if none
 	{
 		wakeupTime = read_neutrino_timers(curTime);  // try neutrino timer

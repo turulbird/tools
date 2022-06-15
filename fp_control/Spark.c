@@ -69,8 +69,8 @@ typedef struct
 tArgs vHArgs[] =
 {
 	{ "-e", "  --setTimer           ", "Args: [time date] (format: HH:MM:SS dd-mm-YYYY)" },
-	{ "", "                         ", "      No arg:     Set the most recent timer from e2 or neutrino" },
-	{ "", "                         ", "                  to the frontcontroller and shutdown" },
+	{ "", "                         ", "      No arg:     Set the most recent timer from E2, Neutrino" },
+	{ "", "                         ", "                  or Titan to the frontcontroller and shutdown" },
 	{ "", "                         ", "      Arg time date: Set frontcontroller wake-up time to" },
 	{ "", "                         ", "                  time, shutdown, and wake up at given time" },
 	{ "-d", "  --shutdown           ", "Args: [time date] (format: HH:MM:SS dd-mm-YYYY)" },
