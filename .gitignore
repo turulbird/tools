@@ -30,6 +30,7 @@ config.h
 config.h.in
 compile
 configure
+infobox
 install-sh
 libtool
 missing
