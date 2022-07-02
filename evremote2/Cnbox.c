@@ -1,5 +1,5 @@
 /*
- * Cnbox.c (for Atemio AM 520 HD, Opticum HD 9600 series)
+ * Cnbox.c (for Atemio AM 520 HD, Sogno HD 800 V3, Opticum HD 9600 series)
  *
  * (c) 2009 teamducktales
  *
@@ -54,14 +54,81 @@ static tLongKeyPressSupport cLongKeyPressSupport =
 	10, 140
 };
 
-static tButton cButtonCnbox[] =  // order is same as on HD 9600 RC
+/*****************************************************
+ *
+ * Although the three remote controls supported by
+ * this subdriver transmit the same codes, some keys
+ * labeled differently so in some cases a different
+ * key code is to be reported or the same remote
+ * control key value.
+ *
+ * The distinction is made upon driver start by
+ * reading out /proc/stb/info/model.
+ *
+ ****************************************************/
+
+static tButton cButtonAm520[] =  // order is same as on AM 520 HD V2 remote
+{
+	{ "POWER",       "5F", KEY_POWER },
+	{ "1",           "56", KEY_1 },
+	{ "2",           "5A", KEY_2 },
+	{ "3",           "5E", KEY_3 },
+	{ "4",           "55", KEY_4 },
+	{ "5",           "59", KEY_5 },
+	{ "6",           "5D", KEY_6 },
+	{ "7",           "54", KEY_7 },
+	{ "8",           "58", KEY_8 },
+	{ "9",           "5C", KEY_9 },
+	{ "FAV",         "00", KEY_FAVORITES },
+	{ "0",           "1B", KEY_0 },
+	{ "TEXT",        "19", KEY_TEXT },
+	{ "RED",         "5B", KEY_RED },
+	{ "GREEN",       "1F", KEY_GREEN },
+	{ "YELLOW",      "08", KEY_YELLOW },
+	{ "BLUE",        "03", KEY_BLUE },
+	{ "EPG",         "09", KEY_EPG },
+	{ "UP",          "18", KEY_UP },
+	{ "INFO",        "06", KEY_INFO },
+	{ "LEFT",        "41", KEY_LEFT },
+	{ "OK",          "45", KEY_OK },
+	{ "RIGHT",       "49", KEY_RIGHT },
+	{ "EXIT",        "1D", KEY_EXIT },
+	{ "DOWN",        "46", KEY_DOWN },
+	{ "RECALL",      "15", KEY_BACK },  // labeled BACK
+	{ "MUTE",        "57", KEY_MUTE },
+	{ "MENU",        "4A", KEY_MENU },
+	{ "TVRADIO",     "14", KEY_TV2 },
+	{ "VOLUMEUP",    "22", KEY_VOLUMEUP },
+	{ "FILELIST",    "11", KEY_FILE },  // labeled MEDIA
+	{ "CHANNELUP",   "20", KEY_CHANNELUP },
+	{ "VOLUMEDOWN",  "23", KEY_VOLUMEDOWN },
+	{ "PLUGIN",      "60", KEY_P },
+	{ "CHANNELDOWN", "21", KEY_CHANNELDOWN },
+	{ "REWIND",      "1E", KEY_REWIND },
+	{ "PLAY",        "12", KEY_PLAY },
+	{ "FASTFORWARD", "01", KEY_FASTFORWARD },
+	{ "RECORD",      "1C", KEY_RECORD },
+	{ "STOP",        "10", KEY_STOP },
+	{ "PAUSE",       "13", KEY_PAUSE },
+	{ "PIP",         "1a", KEY_SCREEN },
+	{ "FIND",        "16", KEY_SUBTITLE },  // labeled SUBTITLE
+	{ "AUDIO",       "61", KEY_AUDIO },
+	{ "SHOOT",       "62", KEY_S },
+	{ "WWW",         "63", KEY_WWW },
+	{ "HELP",        "0C", KEY_HELP },
+	{ "SLEEP",       "24", KEY_PROGRAM },
+	{ "MODE",        "07", KEY_SWITCHVIDEOMODE },  // labeled RES
+	{ "",            "",   KEY_NULL }
+};
+
+static tButton cButtonOpt9600[] =  // order is same as on HD 9600 RC
 {
 	{ "POWER",       "5F", KEY_POWER },
 	{ "MUTE",        "57", KEY_MUTE },
-	{ "HELP",        "11", KEY_HELP },  // Labeled MEDIA on Atemio520
-	{ "TV_FORMAT",   "07", KEY_ZOOM },  // Labeled RES on Atemio520
+	{ "HELP",        "11", KEY_HELP },
+	{ "V.FORMAT",    "07", KEY_ZOOM },
 	{ "TVRADIO",     "14", KEY_TV2 },
-	{ "MODE",        "1a", KEY_SWITCHVIDEOMODE },  // Labeled PIP on Atemio520
+	{ "MODE",        "1a", KEY_SWITCHVIDEOMODE },
 	{ "1",           "56", KEY_1 },
 	{ "2",           "5A", KEY_2 },
 	{ "3",           "5E", KEY_3 },
@@ -73,10 +140,10 @@ static tButton cButtonCnbox[] =  // order is same as on HD 9600 RC
 	{ "9",           "5C", KEY_9 },
 	{ "MENU",        "4A", KEY_MENU },
 	{ "0",           "1B", KEY_0 },
-	{ "RECALL",      "15", KEY_BACK },  // Labeled BACK on Atemio520
+	{ "RECALL",      "15", KEY_BACK },
 	{ "REWIND",      "1E", KEY_REWIND },
 	{ "STOP",        "10", KEY_STOP },
-	{ "PLAYPAUSE",   "12", KEY_PLAYPAUSE },  // Labeled PLAY on Atemio520
+	{ "PLAYPAUSE",   "12", KEY_PLAYPAUSE },
 	{ "FASTFORWARD", "01", KEY_FASTFORWARD },
 	{ "RECORD",      "1C", KEY_RECORD },
 	{ "UP",          "18", KEY_UP },
@@ -96,20 +163,113 @@ static tButton cButtonCnbox[] =  // order is same as on HD 9600 RC
 	{ "YELLOW",      "08", KEY_YELLOW },
 	{ "BLUE",        "03", KEY_BLUE },
 	{ "FAV",         "00", KEY_FAVORITES },
-	{ "STATUS",      "0C", KEY_HELP },  // Labeled HELP on Atemio520
-	{ "OPTION",      "19", KEY_TEXT },  // Labeled TEXT on Atemio520
-	{ "FIND",        "16", KEY_SUBTITLE },  // Labeled SUBTITLE on Atemio520
-// Keys present only on the Atemio 520 remote
-	{ "VOLUMEUP",    "22", KEY_VOLUMEUP },
-	{ "VOLUMEDOWN",  "23", KEY_VOLUMEDOWN },
+	{ "STATUS",      "0C", KEY_HELP },
+	{ "OPTION",      "19", KEY_TEXT },
+	{ "FIND",        "16", KEY_SUBTITLE },
+};
+
+static tButton cButtonAm520V1[] =  // order is same as on AM 520 HD V1 remote, to be checked
+{
+	{ "POWER",       "5F", KEY_POWER },
+	{ "MUTE",        "57", KEY_MUTE },
+	{ "MEDIA",       "11", KEY_FILE },
+	{ "TV_FORMAT",   "07", KEY_ZOOM },  // labeled RES
+	{ "TVRADIO",     "14", KEY_TV2 },
+	{ "PIP",         "1a", KEY_SCREEN },
+	{ "1",           "56", KEY_1 },
+	{ "2",           "5A", KEY_2 },
+	{ "3",           "5E", KEY_3 },
+	{ "4",           "55", KEY_4 },
+	{ "5",           "59", KEY_5 },
+	{ "6",           "5D", KEY_6 },
+	{ "7",           "54", KEY_7 },
+	{ "8",           "58", KEY_8 },
+	{ "9",           "5C", KEY_9 },
+	{ "MENU",        "4A", KEY_MENU },
+	{ "0",           "1B", KEY_0 },
+	{ "TEXT",        "19", KEY_TEXT },
 	{ "CHANNELUP",   "20", KEY_CHANNELUP },
+	{ "INFO",        "06", KEY_INFO },
+	{ "EPG",         "09", KEY_EPG },
+	{ "VOLUMEUP",    "22", KEY_VOLUMEUP },
 	{ "CHANNELDOWN", "21", KEY_CHANNELDOWN },
-	{ "PLUGIN",      "60", KEY_P },
-	{ "PAUSE",       "13", KEY_PAUSE },
-	{ "AUDIO",       "61", KEY_AUDIO },
-	{ "SHOOT",       "62", KEY_S },
-	{ "WWW",         "63", KEY_WWW },
-	{ "SLEEP",       "24", KEY_PROGRAM },
+	{ "UP",          "18", KEY_UP },
+	{ "VOLUMEDOWN",  "23", KEY_VOLUMEDOWN },
+	{ "LEFT",        "41", KEY_LEFT },
+	{ "OK",          "45", KEY_OK },
+	{ "RIGHT",       "49", KEY_RIGHT },
+	{ "EXIT",        "1D", KEY_EXIT },
+	{ "DOWN",        "46", KEY_DOWN },
+	{ "RECALL",      "15", KEY_BACK },
+	{ "RED",         "5B", KEY_RED },
+	{ "GREEN",       "1F", KEY_GREEN },
+	{ "YELLOW",      "08", KEY_YELLOW },
+	{ "BLUE",        "03", KEY_BLUE },
+	{ "ARCHIVE",     "17", KEY_FILE },
+	{ "RECORD",      "1C", KEY_RECORD },
+	{ "PREVIOUS",    "02", KEY_PREVIOUS },
+	{ "NEXT",        "42", KEY_NEXT },
+	{ "REWIND",      "1E", KEY_REWIND },
+	{ "STOP",        "10", KEY_STOP },
+	{ "PLAYPAUSE",   "12", KEY_PLAYPAUSE },
+	{ "FASTFORWARD", "01", KEY_FASTFORWARD },
+	{ "SLOW",        "0D", KEY_SLOW },
+	{ "FAV",         "00", KEY_FAVORITES },
+	{ "HELP",        "0C", KEY_HELP },
+	{ "SLEEP",       "24", KEY_TIME },
+	{ "FIND",        "16", KEY_SUBTITLE },  // Labeled SUBTITLE
+	{ "",            "",   KEY_NULL }
+};
+
+static tButton cButtonSognoHD800[] =  // order is same as on Sogno HD 800 V3 remote
+{
+	{ "POWER",       "5F", KEY_POWER },
+	{ "MUTE",        "57", KEY_MUTE },
+	{ "PORTAL",      "11", KEY_FILE },
+	{ "V.FORMAT",    "07", KEY_ZOOM },  // labeled TVformat
+	{ "MODE",        "14", KEY_SWITCHVIDEOMODE },  // labeled MODE
+	{ "SETUP",       "1a", KEY_SCREEN },  // used as PIP
+	{ "1",           "56", KEY_1 },
+	{ "2",           "5A", KEY_2 },
+	{ "3",           "5E", KEY_3 },
+	{ "4",           "55", KEY_4 },
+	{ "5",           "59", KEY_5 },
+	{ "6",           "5D", KEY_6 },
+	{ "7",           "54", KEY_7 },
+	{ "8",           "58", KEY_8 },
+	{ "9",           "5C", KEY_9 },
+	{ "PREVIOUS",    "4A", KEY_PREVIOUS },
+	{ "0",           "1B", KEY_0 },
+	{ "NEXT",        "19", KEY_NEXT },
+	{ "CHANNELUP",   "20", KEY_CHANNELUP },
+	{ "INFO",        "06", KEY_INFO },
+	{ "EPG",         "09", KEY_EPG },
+	{ "VOLUMEUP",    "22", KEY_VOLUMEUP },
+	{ "CHANNELDOWN", "21", KEY_CHANNELDOWN },
+	{ "VOLUMEDOWN",  "23", KEY_VOLUMEDOWN },
+	{ "UP",          "18", KEY_UP },
+	{ "LEFT",        "41", KEY_LEFT },
+	{ "OK",          "45", KEY_OK },
+	{ "RIGHT",       "49", KEY_RIGHT },
+	{ "DOWN",        "46", KEY_DOWN },
+	{ "MENU",        "1D", KEY_MENU },
+	{ "EXIT",        "15", KEY_EXIT },
+	{ "RED",         "5B", KEY_RED },
+	{ "GREEN",       "1F", KEY_GREEN },
+	{ "YELLOW",      "08", KEY_YELLOW },
+	{ "BLUE",        "03", KEY_BLUE },
+	{ "AUDIO",       "17", KEY_AUDIO },
+	{ "FIND",        "1C", KEY_SUBTITLE },
+	{ "TEXT",        "02", KEY_TEXT },
+	{ "SLEEP",       "42", KEY_PROGRAM },
+	{ "REWIND",      "1E", KEY_REWIND },
+	{ "STOP",        "10", KEY_STOP },
+	{ "PLAYPAUSE",   "12", KEY_PLAYPAUSE },
+	{ "FASTFORWARD", "01", KEY_FASTFORWARD },
+	{ "TV",          "00", KEY_TV },
+	{ "RECORD",      "0C", KEY_RECORD },
+	{ "FILELIST",    "24", KEY_FILE },
+	{ "RADIO",       "16", KEY_RADIO },
 	{ "",            "",   KEY_NULL }
 };
 
@@ -120,25 +280,58 @@ static tButton cButtonCnbox[] =  // order is same as on HD 9600 RC
  * corresponding remote control key. The front panel keys can
  * therefore not be distinguished from the remote control ones.
  */
-#if 0
-static tButton cButtonCnboxFrontpanel[] =
+
+void Get_Model(Context_t *context)
 {
-	{ "POWER",       "5F", KEY_POWER },
-	{ "OK",          "45", KEY_OK },
-	{ "MENU",        "4A", KEY_MENU },
-	{ "LEFT",        "41", KEY_LEFT },
-	{ "RIGHT",       "49", KEY_RIGHT },
-	{ "UP",          "18", KEY_UP },
-	{ "DOWN",        "46", KEY_DOWN },
-	{ "",            "",   KEY_NULL }
-};
-#endif
+	char procModel[32];
+	int len;
+	int fn;
+
+//	printf("[evremote2 cnbox] %s >\n", __func__);
+	context->r->RemoteControl = cButtonAm520;
+	fn = open("/proc/stb/info/model", O_RDONLY);
+
+	if (fn > -1)
+	{
+		len = read(fn, procModel, sizeof(procModel) - 1);
+		if (len > 0)
+		{
+			procModel[len] = 0;
+			if (strncmp(procModel, "atemio520", 9) == 0)  // use Atemio AM 520 HD V2
+			{
+				printf("[evremote2 cnbox] Using Atemio AM 520 HD V2 mapping.\n");
+			}
+			else if (strncmp(procModel, "atemio520v1", 11) == 0)  // use Atemio AM 520 HD V1
+			{
+				context->r->RemoteControl = cButtonAm520V1;
+				printf("[evremote2 cnbox] Using Atemio AM 520 HD V1 mapping.\n");
+			}
+			else if (strncmp(procModel, "opt9600", 7) == 0)  // use Opticum/Orton HD 9600 series
+			{
+				context->r->RemoteControl = cButtonOpt9600;
+				printf("[evremote2 cnbox] Using Opticum/Orton HD 9600 series mapping.\n");
+			}
+			else if (strncmp(procModel, "sognohd", 7) == 0)  // use / Sogno HD 800 V3
+			{
+				context->r->RemoteControl = cButtonSognoHD800;
+				printf("[evremote2 cnbox] Using Sogno HD 800 V3 mapping.\n");
+			}
+		}
+		close(fn);
+	}
+	else
+	{
+		printf("No model detected, defaulting to Atemio AM 520 HD V2 mapping.\n");
+	}
+//	printf("[evremote2 cnbox] %s <\n", __func__);
+}
 
 static int pInit(Context_t *context, int argc, char *argv[])
 {
 	int vFd;
 	tCNBOXPrivate *private = malloc(sizeof(tCNBOXPrivate));
 
+	Get_Model(context);
 	context->r->private = private;
 	memset(private, 0, sizeof(tCNBOXPrivate));
 	vFd = open(rcDeviceName, O_RDWR);
@@ -158,10 +351,7 @@ static int pInit(Context_t *context, int argc, char *argv[])
 static int pRead(Context_t *context)
 {
 	unsigned char vData[cCNBOXDataLen];
-	eKeyType vKeyType = RemoteControl;
 	int vCurrentCode = -1;
-	static int vNextKey = 0;
-	static char vOldButton = 0;
 
 	while (1)
 	{
@@ -175,37 +365,10 @@ static int pRead(Context_t *context)
 		}
 		printf("\n");
 #endif
-		if (vData[0] == 0xF1)
+		vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[2] & ~0x80);
+		if (vCurrentCode != 0)
 		{
-			vKeyType = RemoteControl;
-		}
-		else
-		{
-			continue;
-		}
-		if (vKeyType == RemoteControl)
-		{
-			vCurrentCode = getInternalCodeHex(context->r->RemoteControl, vData[2] & ~0x80);
-			if (vCurrentCode != 0)
-			{
-#if 0
-				vNextKey = (vData[5] & 0x80 == 0 ? vNextKey + 1 : vNextKey) % 0x100;
-//				printf("[evremote2 cnbox] nextFlag %d\n", vNextKey);
-				vCurrentCode += (vNextKey << 16);
-#endif
-				break;
-			}
-		}
-		else
-		{
-			vCurrentCode = getInternalCodeHex(context->r->Frontpanel, vData[3]);
-			if (vCurrentCode != 0)
-			{
-				vNextKey = (vOldButton != vData[3] ? vNextKey + 1 : vNextKey) % 0x100;
-//				printf("[evremote2 cnbox] nextFlag %d\n", vNextKey);
-				vCurrentCode += (vNextKey << 16);
-				break;
-			}
+			break;
 		}
 	} /* for later use we make a dummy while loop here */
 	return vCurrentCode;
@@ -213,7 +376,7 @@ static int pRead(Context_t *context)
 
 static int pNotification(Context_t *context, const int cOn)
 {
-	/* noop: there are no controllable LEDs or icons on this model */
+	/* noop: there are no controllable LEDs or icons on these models */
 	return 0;
 }
 
@@ -230,10 +393,10 @@ RemoteControl_t CNBOX_RC =
 {
 	"CreNova Remote2 RemoteControl",
 	CNBox,
-	cButtonCnbox,
+	cButtonAm520,
 	NULL, //	cButtonCnboxFrontpanel,
 	NULL,
-	1,
+	1,  // supports long key press
 	&cLongKeyPressSupport
 };
 

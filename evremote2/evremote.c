@@ -500,7 +500,8 @@ int getModel()
 		else if ((!strncasecmp(vName, "atemio520", 9))
 		     ||  (!strncasecmp(vName, "opt9600", 7))
 		     ||  (!strncasecmp(vName, "opt9600mini", 11))
-		     ||  (!strncasecmp(vName, "opt9600prima", 12)))
+		     ||  (!strncasecmp(vName, "opt9600prima", 12))
+		     ||  (!strncasecmp(vName, "sognohd800", 10)))
 		{
 			vBoxType = CNBox;
 		}
