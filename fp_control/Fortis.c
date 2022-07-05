@@ -160,7 +160,7 @@ void calcSetNuvotonTime(time_t theTime, char *destString)
 		now_tm->tm_mday, now_tm->tm_mon + 1, now_tm->tm_year + 1900);
 	
 	mjd = (int)modJulianDate(now_tm);
-	printf("Converted to: MJD = %d %02d-%02d-%02d (local)\n", mjd, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
+	printf("Converted to: MJD = %d %02d:%02d:%02d (local)\n", mjd, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
 	destString[0] = (mjd >> 8);
 	destString[1] = (mjd & 0xff);
 	destString[2] = now_tm->tm_hour;
