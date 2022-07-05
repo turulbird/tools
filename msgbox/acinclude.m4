@@ -179,6 +179,10 @@ AC_ARG_WITH(boxtype,
 			BOXTYPE="duckbox"
 			BOXMODEL="$withval"
 		;;
+		hs8200)
+			BOXTYPE="duckbox"
+			BOXMODEL="$withval"
+		;;
 		hs7*)
 			BOXTYPE="duckbox"
 			BOXMODEL="$withval"
@@ -196,10 +200,6 @@ AC_ARG_WITH(boxtype,
 			BOXMODEL="$withval"
 		;;
 		tf*)
-			BOXTYPE="duckbox"
-			BOXMODEL="$withval"
-		;;
-		pace*)
 			BOXTYPE="duckbox"
 			BOXMODEL="$withval"
 		;;
