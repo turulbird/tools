@@ -265,7 +265,7 @@ int write_JPEG_file_to_FB(unsigned char *fb, int fb_width, int fb_height, char *
 }
 #endif
 
-	blit(int srcx, int srcy)
+int	blit(int srcx, int srcy)
 {
 #if 0 //def	MIPSEL
 	ioctl(fb, FBIO_BLIT);

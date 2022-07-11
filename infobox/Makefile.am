@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS  = -Wall
 AM_CFLAGS += -std=c99
-AM_CFLAGS += -I../../tufsbox/cdkroot/usr/include/freetype2
+AM_CFLAGS += -I../../tufsbox/cdkroot/usr/include/freetype2 -D_SVID_SOURCE -D_BSD_SOURCE
 
 bin_PROGRAMS = infobox
 
