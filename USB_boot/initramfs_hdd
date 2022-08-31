@@ -6,6 +6,7 @@ dir     /bin                                                                    
 file    /bin/busybox              ../../tools/USB_boot/busybox                    0755 0 0
 slink   /bin/cat                  /bin/busybox                                    0755 0 0
 slink   /bin/grep                 /bin/busybox                                    0755 0 0
+slink   /bin/mknod                /bin/busybox                                    0755 0 0
 slink   /bin/mount                /bin/busybox                                    0755 0 0
 slink   /bin/umount               /bin/busybox                                    0755 0 0
 slink   /bin/sh                   /bin/busybox                                    0777 0 0

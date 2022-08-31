@@ -1,7 +1,7 @@
 #!/bin/sh
-# init - version 211012.1
+# init - version 220831.1
 echo ""
-echo " --={ Load Image from HDD or USB }=--"
+echo " --={ Load Image from USB or HDD }=--"
 echo ""
 
 # Mount things needed by this script
@@ -51,11 +51,11 @@ if [ ! "$sd"=="sdb1" ]; then
   done
 fi
 
-if [ "$i" == "%" ]; then
-  echo "[init] Time out on wait for /dev/sda, exiting..."
-  exec sh
-else
-  if [ ! "$sd"=="sdb1" ]; then
+if [ ! "$sd"=="sdb1" ]; then
+  if [ "$i" == "X" ]; then
+    echo "[init] Time out on wait for /dev/sda, exiting..."
+    exec sh
+  else
     sd="sda1"
   fi
 fi
