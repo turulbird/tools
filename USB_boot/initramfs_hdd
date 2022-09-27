@@ -24,6 +24,14 @@ nod     /dev/sda                                                                
 nod     /dev/sda1                                                                 0744 0 0 b   8   1
 nod     /dev/sda2                                                                 0744 0 0 b   8   2
 nod     /dev/sda3                                                                 0744 0 0 b   8   3
+nod     /dev/sdb                                                                  0744 0 0 b   8  16
+nod     /dev/sdb1                                                                 0744 0 0 b   8  17
+nod     /dev/sdb2                                                                 0744 0 0 b   8  18
+nod     /dev/sdb3                                                                 0744 0 0 b   8  19
+nod     /dev/sdc                                                                  0744 0 0 b   8  32
+nod     /dev/sdc1                                                                 0744 0 0 b   8  33
+nod     /dev/sdc2                                                                 0744 0 0 b   8  34
+nod     /dev/sdc3                                                                 0744 0 0 b   8  35
 nod     /dev/mtdblock0                                                            0664 0 0 b  31   0
 nod     /dev/mtdblock1                                                            0664 0 0 b  31   1
 nod     /dev/mtdblock2                                                            0664 0 0 b  31   2
