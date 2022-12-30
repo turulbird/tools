@@ -1,5 +1,5 @@
 #!/bin/sh
-# init - version 220831.1
+# init - version 221021.1
 echo ""
 echo " --={ Load Image from USB or HDD }=--"
 echo ""
@@ -12,7 +12,7 @@ mount -t sysfs sysfs /sys
 /bin/busybox --install -s
 
 # Create device nodes
-mknod /dev/tty c 5 0
+#mknod /dev/tty c 5 0
 
 sd="none"
 echo "[init] Check if /dev/sdb exists"
@@ -31,17 +31,12 @@ done
 
 if [ "$i" == "X" ]; then
   echo "[init] /dev/sdb not found..."
-else
-  sd="sdb1"
-fi
-
-if [ ! "$sd"=="sdb1" ]; then
   echo "[init] Check if /dev/sda exists"
   for i in 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 X
   do
     count=`cat /proc/partitions | grep -c sda`
     if [ $count -eq 0 ]; then
-      if [ ! "$i" == "X" ]; then
+      if [ "$i" -ne "X" ]; then
         echo -ne "       Waiting... [$i] \r"
         sleep 1
       fi
@@ -49,14 +44,17 @@ if [ ! "$sd"=="sdb1" ]; then
       break
     fi
   done
+else
+  sd="sdb1"
 fi
 
-if [ ! "$sd"=="sdb1" ]; then
+
+if [ "$sd" == "none" ]; then
   if [ "$i" == "X" ]; then
     echo "[init] Time out on wait for /dev/sda, exiting..."
     exec sh
   else
-    sd="sda1"
+   sd="sda1"
   fi
 fi
 

@@ -22,8 +22,11 @@ evremote2_SOURCES = \
 	Adb_Box.c \
 	Ipbox.c \
 	VitaminHD5000.c \
-	LircdName.c \
-	Cnbox.c
+	Pace7241.c \
+	Hchs8100.c \
+	Hchs9000.c \
+	Cnbox.c \
+	LircdName.c
 
 AM_CFLAGS = -Wall
 AM_LDFLAGS = -lrt -lpthread

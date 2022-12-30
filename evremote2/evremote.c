@@ -540,6 +540,18 @@ int getModel()
 		{
 			vBoxType = VitaminHD5000;
 		}
+		else if (!strncasecmp(vName, "pace7241", 8))
+		{
+			vBoxType = Pace7241;
+		}
+		else if (!strncasecmp(vName, "hchs8100", 8))
+		{
+			vBoxType = Hchs8100;
+		}
+		else if (!strncasecmp(vName, "hchs9000", 8))
+		{
+			vBoxType = Hchs9000;
+		}
 		else /* for other boxes we use LircdName driver as a default */
 		{
 			vBoxType = LircdName;

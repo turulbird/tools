@@ -40,6 +40,9 @@ static RemoteControl_t *AvailableRemoteControls[] =
 	&Ipbox_RC,
 	&CNBOX_RC,
 	&VitaminHD5000_RC,
+	&Pace7241_RC,
+	&Hchs8100_RC,
+	&Hchs9000_RC,
 	&LircdName_RC,
 	NULL
 };
@@ -63,6 +66,9 @@ static BoxRoutines_t *AvailableBoxRoutines[] =
 	&Ipbox_BR,
 	&CNBOX_BR,
 	&VitaminHD5000_BR,
+	&Pace7241_BR,
+	&Hchs8100_BR,
+	&Hchs9000_BR,
 	&LircdName_BR,
 	NULL
 };
@@ -83,4 +89,3 @@ int selectRemote(Context_r_t *context_r, Context_t *context, eBoxType type)
 	return -1;
 }
 // vim:ts=4
-

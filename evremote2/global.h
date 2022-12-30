@@ -35,7 +35,10 @@ typedef enum
 	Ipbox,          // 15
 	CNBox,          // 16
 	VitaminHD5000,  // 17
-	LircdName       // 18
+	Pace7241,       // 18
+	Hchs8100,       // 19
+	Hchs9000,       // 20
+	LircdName       // 21
 } eBoxType;
 
 typedef enum
@@ -96,4 +99,3 @@ int selectRemote(Context_r_t *context_r, Context_t *context, eBoxType type);
 void setInputEventRepeatRate(unsigned int delay, unsigned int period);
 #endif
 // vim:ts=4
-

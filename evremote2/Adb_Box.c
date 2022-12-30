@@ -289,10 +289,10 @@ static int pShutdown(Context_t *context)
 
 static int pRead(Context_t *context)
 {
-	char vBuffer[128];
-	char vData[3];
+	char      vBuffer[128];
+	char      vData[3];
 	const int cSize = 128;
-	int vCurrentCode = -1;
+	int       vCurrentCode = -1;
 	// When LIRC in XMP, we need to find key by name -> codes are a bit strange
 	char KeyName[30];
 	int count;
@@ -437,4 +437,3 @@ BoxRoutines_t Adb_Box_BR =
 	&pNotification
 };
 // vim:ts=4
-

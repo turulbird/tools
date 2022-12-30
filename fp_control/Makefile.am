@@ -16,7 +16,8 @@ fp_control_SOURCES = \
 	Adb_Box.c \
 	Am520.c \
 	Vitamin_HD5000.c \
-	Opt9600.c
+	Opt9600.c \
+	Hchs8100.c
 
 AM_CFLAGS = -Wall
 AM_LDFLAGS = -lrt

@@ -108,12 +108,12 @@ int printKeyMap(tButton *cButtons)
 	int vLoop = 0;
 
 	printf("             Keyname  Keyword  KeyCode\n");
-	printf("--------------------------------------\n");
+	printf("---------------------------------------------\n");
 	for (vLoop = 0; cButtons[vLoop].KeyCode != KEY_NULL; vLoop++)
 	{
-		printf("%20s  -  %2s  -  %3d\n", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode);
+		printf("%20s  -  %2s  -  %3d (0x%03x)\n", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode, cButtons[vLoop].KeyCode);
 	}
-	printf("--------------------------------------\n");
+	printf("---------------------------------------------\n");
 	return 0;
 }
 
@@ -240,4 +240,3 @@ void setInputEventRepeatRate(unsigned int delay, unsigned int period)
 	close(vFd);
 }
 // vim:ts=4
-

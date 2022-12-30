@@ -35,7 +35,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Software version of fp_control, please increase on every change */
-static const char *sw_version = "1.15 (Audioniek 20220615.1)";
+static const char *sw_version = "1.16 (Audioniek 20221014.2)";
 static eWakeupReason reason = 0;
 
 typedef struct
@@ -846,6 +846,11 @@ int getModel()
 		     ||  (!strncasecmp(vName, "opt9600prima", 12)))
 		{
 			vBoxType = Opt9600;
+		}
+		else if ((!strncasecmp(vName, "hchs8100", 8))
+		     ||  (!strncasecmp(vName, "hchs9000", 8)))
+		{
+			vBoxType = Hchs8100;
 		}
 		else
 		{

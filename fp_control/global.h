@@ -69,7 +69,9 @@ typedef enum
 	Adb_Box,
 	AM5xx,
 	Vitamin_HD5000,
-	Opt9600
+	Opt9600,
+	Hchs8100,
+	Hchs9000
 } eBoxType;
 
 typedef struct Context_s
@@ -129,6 +131,8 @@ extern	Model_t Cuberevo_model;
 extern	Model_t AM5XX_model;
 extern	Model_t Vitamin_model;
 extern	Model_t Opt9600_model;
+extern	Model_t Hchs8100_model;
+//extern	Model_t Hchs9000_model;
 
 double modJulianDate(struct tm *theTime);
 int    get_GMT_offset(struct tm theTime);

@@ -60,6 +60,8 @@ static Model_t *AvailableModels[] =
 	&AM5XX_model,
 	&Vitamin_model,
 	&Opt9600_model,
+	&Hchs8100_model,
+//	&Hchs9000_model,
 	NULL
 };
 
