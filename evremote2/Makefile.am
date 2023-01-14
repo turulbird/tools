@@ -23,7 +23,7 @@ evremote2_SOURCES = \
 	Ipbox.c \
 	VitaminHD5000.c \
 	Pace7241.c \
-	Hchs8100.c \
+	Homecast.c \
 	Hchs9000.c \
 	Cnbox.c \
 	LircdName.c

@@ -24,7 +24,7 @@ extern RemoteControl_t Ipbox_RC;
 extern RemoteControl_t CNBOX_RC;
 extern RemoteControl_t VitaminHD5000_RC;
 extern RemoteControl_t Pace7241_RC;
-extern RemoteControl_t Hchs8100_RC;
+extern RemoteControl_t Homecast_RC;
 extern RemoteControl_t Hchs9000_RC;
 extern RemoteControl_t LircdName_RC;
 
@@ -46,7 +46,7 @@ extern BoxRoutines_t Ipbox_BR;
 extern BoxRoutines_t CNBOX_BR;
 extern BoxRoutines_t VitaminHD5000_BR;
 extern BoxRoutines_t Pace7241_BR;
-extern BoxRoutines_t Hchs8100_BR;
+extern BoxRoutines_t Homecast_BR;
 extern BoxRoutines_t Hchs9000_BR;
 extern BoxRoutines_t LircdName_BR;
 

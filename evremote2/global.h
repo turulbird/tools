@@ -36,7 +36,7 @@ typedef enum
 	CNBox,          // 16
 	VitaminHD5000,  // 17
 	Pace7241,       // 18
-	Hchs8100,       // 19
+	Homecast,       // 19
 	Hchs9000,       // 20
 	LircdName       // 21
 } eBoxType;

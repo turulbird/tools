@@ -1,5 +1,5 @@
-#ifndef __hchs8100__
-#define __hchs8100__
+#ifndef __homecast__
+#define __homecast__
 
 #define VFDDISPLAYCHARS     0xc0425a00
 #define VFDICONDISPLAYONOFF 0xc0425a0a
@@ -58,7 +58,7 @@ struct set_remote_s
 	char key;
 };
 
-struct hchs8100_fp_ioctl_data
+struct homecast_fp_ioctl_data
 {
 	union
 	{
@@ -80,6 +80,6 @@ struct vfd_ioctl_data
 	unsigned char length;
 };
 
-#endif  // __hchs8100__
+#endif  // __homecast__
 // vim:ts=4
 

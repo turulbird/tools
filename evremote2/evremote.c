@@ -544,9 +544,10 @@ int getModel()
 		{
 			vBoxType = Pace7241;
 		}
-		else if (!strncasecmp(vName, "hchs8100", 8))
+		else if ((!strncasecmp(vName, "hchs8100", 8))
+		     ||  (!strncasecmp(vName, "homecast5101", 12)))
 		{
-			vBoxType = Hchs8100;
+			vBoxType = Homecast;
 		}
 		else if (!strncasecmp(vName, "hchs9000", 8))
 		{

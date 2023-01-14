@@ -41,7 +41,7 @@ static RemoteControl_t *AvailableRemoteControls[] =
 	&CNBOX_RC,
 	&VitaminHD5000_RC,
 	&Pace7241_RC,
-	&Hchs8100_RC,
+	&Homecast_RC,
 	&Hchs9000_RC,
 	&LircdName_RC,
 	NULL
@@ -67,7 +67,7 @@ static BoxRoutines_t *AvailableBoxRoutines[] =
 	&CNBOX_BR,
 	&VitaminHD5000_BR,
 	&Pace7241_BR,
-	&Hchs8100_BR,
+	&Homecast_BR,
 	&Hchs9000_BR,
 	&LircdName_BR,
 	NULL
