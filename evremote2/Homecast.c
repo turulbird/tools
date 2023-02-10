@@ -1,6 +1,6 @@
 /*
  * Homecast.c
- * 
+ *
  * (c) 2009 teamducktales
  *
  * This program is free software; you can redistribute it and/or modify
@@ -41,6 +41,7 @@
 
 #define HS8100_PREDATA  0xA2A2
 #define HS5101_PREDATA  0x0404
+#define HS2100_PREDATA  0x807F
 
 static tLongKeyPressSupport cLongKeyPressSupport =
 {
@@ -61,7 +62,7 @@ static tButton cButtonsHchs8100[] =  // HS8100 & HS9000
 	{ "7BUTTON",     "1F", KEY_7 },
 	{ "8BUTTON",     "EF", KEY_8 },
 	{ "9BUTTON",     "6F", KEY_9 },
-	{ "EXIT",        "AF", KEY_EXIT },
+	{ "RECALL",      "AF", KEY_BACK },
 	{ "0BUTTON",     "FF", KEY_0 },
 	{ "MUTE",        "2F", KEY_MUTE },
 	{ "RED",         "CF", KEY_RED },
@@ -89,15 +90,13 @@ static tButton cButtonsHchs8100[] =  // HS8100 & HS9000
 	{ "RECORD",      "75", KEY_RECORD },
 	{ "SLOW",        "B5", KEY_SLOW },
 	{ "LIST",        "35", KEY_FILE },
-//	{ "REPEAT",      "DD", KEY_REPEAT },
+	{ "REPEAT",      "DD", KEY_AGAIN },
 	{ "MARK",        "55", KEY_HELP },
 	{ "JUMP",        "D5", KEY_GOTO },
 	{ "PIP",         "A5", KEY_SCREEN },
 //	{ "PIP_SWAP",    "B5", KEY_GOTO },
 //	{ "PIP_MOVE",    "B5", KEY_GOTO },
 	{ "SLEEP",       "45", KEY_PROGRAM },
-//	{ "TV",          "47", KEY_TV },
-//	{ "STB",         "B5", KEY_GOTO },
 	{ "",            "",   KEY_NULL },
 };
 
@@ -138,6 +137,58 @@ static tButton cButtonsHchs5101[] =  // HS5101
 	{ "",            "",   KEY_NULL },
 };
 
+static tButton cButtonsHchs2100[] =  // HS2100
+{
+	{ "POWER",       "F7", KEY_POWER },
+	{ "TV_RADIO",    "77", KEY_TV2 },
+	{ "TEXT",        "B7", KEY_TEXT },
+	{ "1BUTTON",     "7F", KEY_1 },
+	{ "2BUTTON",     "BF", KEY_2 },
+	{ "3BUTTON",     "3F", KEY_3 },
+	{ "4BUTTON",     "DF", KEY_4 },
+	{ "5BUTTON",     "5F", KEY_5 },
+	{ "6BUTTON",     "9F", KEY_6 },
+	{ "7BUTTON",     "1F", KEY_7 },
+	{ "8BUTTON",     "EF", KEY_8 },
+	{ "9BUTTON",     "6F", KEY_9 },
+	{ "RECALL",      "AF", KEY_BACK },
+	{ "0BUTTON",     "FF", KEY_0 },
+	{ "MUTE",        "2F", KEY_MUTE },
+	{ "RED",         "CF", KEY_RED },
+	{ "GREEN",       "4F", KEY_GREEN },
+	{ "YELLOW",      "8F", KEY_YELLOW },
+	{ "BLUE",        "0F", KEY_BLUE },
+	{ "MENU",        "37", KEY_MENU },
+	{ "EPG",         "D7", KEY_EPG },
+	{ "INFO",        "57", KEY_INFO },
+	{ "UP",          "97", KEY_UP },
+	{ "LEFT",        "17", KEY_LEFT },
+	{ "OK",          "87", KEY_OK },
+	{ "RIGHT",       "07", KEY_RIGHT },
+	{ "DOWN",        "FD", KEY_DOWN },
+	{ "VOLUMEUP",    "7D", KEY_VOLUMEUP },
+	{ "CHANNELUP",   "DD", KEY_CHANNELUP },
+	{ "EXIT",        "BD", KEY_VOLUMEDOWN },
+	{ "VOLUMEDOWN",  "3D", KEY_EXIT },
+	{ "CHANNELDOWN", "5D", KEY_CHANNELDOWN },
+	{ "PAUSE",       "9D", KEY_PAUSE },
+	{ "PLAY",        "1D", KEY_PLAY },
+	{ "REWIND",      "ED", KEY_REWIND },
+	{ "STOP",        "6D", KEY_STOP },
+	{ "FASTFORWARD", "F5", KEY_FASTFORWARD },
+	{ "RECORD",      "75", KEY_RECORD },
+	{ "SLOW",        "B5", KEY_SLOW },
+	{ "LIST",        "35", KEY_FILE },
+	{ "REPEAT",      "95", KEY_AGAIN },
+	{ "MARK",        "55", KEY_HELP },
+	{ "JUMP",        "D5", KEY_GOTO },
+	{ "F1",          "A5", KEY_F1 },
+	{ "F2",          "E5", KEY_F2 },
+	{ "F3",          "65", KEY_F3 },
+	{ "SLEEP",       "45", KEY_PROGRAM },
+	{ "",            "",   KEY_NULL },
+};
+
 /* fixme: move this to a structure and
  * use the private structure of RemoteControl_t
  */
@@ -170,6 +221,10 @@ static tButton *homecastGetButton(int predata)
 	if (predata == HS5101_PREDATA)
 	{
 		pButtons = cButtonsHchs5101;
+	}
+	if (predata == HS2100_PREDATA)
+	{
+		pButtons = cButtonsHchs2100;
 	}
 	return pButtons;
 }
