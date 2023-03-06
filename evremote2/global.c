@@ -36,6 +36,7 @@
 
 #include "global.h"
 #include "map.h"
+#include "key_names.h"
 
 #define DEVICENAME "TDT RC event driver"
 char eventPath[] = "/dev/input/event0";
@@ -68,18 +69,37 @@ int getEventDevice()
 	return vDeviceFound;
 }
 
+// Translates internal remote control value to linux input key name
+char *getKeyName(int keyValue)
+{
+	int vLoop;
+	
+	vLoop = 0;
+	while (1)
+	{
+		if (key_names[vLoop].key_value == keyValue
+		||  key_names[vLoop].key_value == 0xfff)
+		{
+			break;
+		}
+		vLoop++;
+	};
+	return key_names[vLoop].key_name;
+}
+
 // Translates internal remote control value to known linux input key value
 int getInternalCode(tButton *cButtons, const char cCode[3])
 {
 	int vLoop = 0;
+	char *keyName;
 
 	for (vLoop = 0; cButtons[vLoop].KeyCode != KEY_NULL; vLoop++)
 	{
-//		printf("[evremote2] %20s - %2s - %3d\n", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode);
 		if ((cButtons[vLoop].KeyWord[0] == cCode[0] || cButtons[vLoop].KeyWord[0] == (cCode[0] - 32))
 		&&  (cButtons[vLoop].KeyWord[1] == cCode[1] || cButtons[vLoop].KeyWord[1] == (cCode[1] - 32)))
 		{
-			printf("[evremote2] KEY by code: %d (0x%02x, %s)\n", cButtons[vLoop].KeyCode, cButtons[vLoop].KeyCode, cButtons[vLoop].KeyName);
+			keyName = getKeyName(cButtons[vLoop].KeyCode);
+			printf("[evremote2] KEY by code: %d (%s -> %s)\n", cButtons[vLoop].KeyCode, cButtons[vLoop].KeyName, keyName);
 			return cButtons[vLoop].KeyCode;
 		}
 	}
@@ -90,13 +110,15 @@ int getInternalCode(tButton *cButtons, const char cCode[3])
 int getInternalCodeLircKeyName(tButton *cButtons, const char cCode[30])
 {
 	int vLoop = 0;
+	char *keyName;
 
 	for (vLoop = 0; cButtons[vLoop].KeyCode != KEY_NULL; vLoop++)
 	{
 		//printf("%20s - %2s - %3d\n", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode);
 		if (strcmp(cCode, cButtons[vLoop].KeyName) == 0)
 		{
-			printf("[evremote2] KEY by name: %d (0x%02x, %s)\n", cButtons[vLoop].KeyCode, cButtons[vLoop].KeyCode, cButtons[vLoop].KeyName);
+			keyName = getKeyName(cButtons[vLoop].KeyCode);
+			printf("[evremote2] KEY by name: %d (%s -> %s)\n", cButtons[vLoop].KeyCode, cButtons[vLoop].KeyName, keyName);
 			return cButtons[vLoop].KeyCode;
 		}
 	}
@@ -106,14 +128,16 @@ int getInternalCodeLircKeyName(tButton *cButtons, const char cCode[30])
 int printKeyMap(tButton *cButtons)
 {
 	int vLoop = 0;
+	char *keyName;
 
-	printf("             Keyname  Keyword  KeyCode\n");
-	printf("---------------------------------------------\n");
+	printf("             Keyname  Keyword  KeyCode    Translates to\n");
+	printf("-------------------------------------------------------------\n");
 	for (vLoop = 0; cButtons[vLoop].KeyCode != KEY_NULL; vLoop++)
 	{
-		printf("%20s  -  %2s  -  %3d (0x%03x)\n", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode, cButtons[vLoop].KeyCode);
+		keyName = getKeyName(cButtons[vLoop].KeyCode);
+		printf("%20s  -  %2s  -   %3d  ->  %s\n", cButtons[vLoop].KeyName, cButtons[vLoop].KeyWord, cButtons[vLoop].KeyCode, keyName);
 	}
-	printf("---------------------------------------------\n");
+	printf("-------------------------------------------------------------\n");
 	return 0;
 }
 

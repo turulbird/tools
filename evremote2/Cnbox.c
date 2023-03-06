@@ -58,8 +58,8 @@ static tLongKeyPressSupport cLongKeyPressSupport =
  *
  * Although the three remote controls supported by
  * this subdriver transmit the same codes, some keys
- * labeled differently so in some cases a different
- * key code is to be reported or the same remote
+ * are labeled differently so in some cases a different
+ * key code is to be reported for the same remote
  * control key value.
  *
  * The distinction is made upon driver start by
@@ -309,7 +309,7 @@ void Get_Model(Context_t *context)
 			else if (strncmp(procModel, "opt9600", 7) == 0)  // use Opticum/Orton HD 9600 series
 			{
 				context->r->RemoteControl = cButtonOpt9600;
-				printf("[evremote2 cnbox] Using Opticum/Orton HD 9600 series mapping.\n");
+				printf("[evremote2 cnbox] Using Opticum/Orton/Globo HD 9600 series mapping.\n");
 			}
 			else if (strncmp(procModel, "sognohd", 7) == 0)  // use / Sogno HD 800 V3
 			{
